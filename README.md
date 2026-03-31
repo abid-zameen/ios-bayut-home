@@ -1,4 +1,3 @@
-# ios-bayut-home
 # Home Feed Revamp — Tech Spec
 **Dynamic Compositional Feed · Independent Module · VIP Architecture**
 
