@@ -1,17 +1,17 @@
-# ios-bayut-home
-# Home Feed Revamp — Tech Spec
-**Dynamic Compositional Feed · Independent Module · VIP Architecture**
+# HomeFeed Module — Tech Spec
+**Dynamic Compositional Feed · Independent Module · Segregated Routing · VIP Architecture**
 
 ---
 
 ## 1. Goal
 
-Replace the legacy `NewHomeScreenViewController` (a 1,357-line monolith backed by XIB + nested `UIStackView`s) with a **self-contained `HomeFeed` module** built on `UICollectionViewCompositionalLayout` and a config-driven section model.
+Replace the legacy `NewHomeScreenViewController` — a 1,357-line monolith coupled to a Storyboard XIB and nested `UIStackView`s — with a self-contained **HomeFeed** module built on `UICollectionViewCompositionalLayout` and a config-driven section model.
 
-The result is a feed that is:
-- **Dynamic** — section order and visibility driven by a single config, not hardcoded XML
-- **Scalable** — adding a new section is a 1-file change
-- **Independent** — the module owns its own VIP stack, layout, and cells; the main app only provides a config and a router delegate
+The HomeFeed module is:
+- **Dynamic** — section order and visibility driven by a single configuration, not hardcoded XML
+- **Scalable** — adding a new section requires one enum case and one cell file
+- **Self-contained** — the host app never touches cells, layout, or sections
+- **Independently navigable** — routing split into four focused, single-responsibility delegates
 
 ---
 
@@ -19,88 +19,82 @@ The result is a feed that is:
 
 | Pain Point | Impact |
 |---|---|
-| 40+ `@IBOutlet` connections to a XIB | Silent crashes on storyboard/XIB changes |
-| Sections hardcoded in `UIStackView` order | Adding/reordering requires XIB edits + segue + container VC |
-| `isHidden` toggling for feature flags | All sections allocated in memory even when invisible |
-| 15+ `NSLayoutConstraint` mutations per scroll frame | Poor scroll performance, fragile math |
-| Remote config checks spread across 10+ methods in `viewDidLoad` | No single source of truth for what renders |
-| Child VCs wired via Storyboard segues | Module is inseparable from the main app storyboard |
+| 40+ `@IBOutlet` connections to a XIB | Silent crashes on any storyboard/XIB change |
+| Sections hardcoded in `UIStackView` order | Adding or reordering requires XIB edit + segue + child VC + delegate wiring |
+| `isHidden` toggling for feature flags | All sections allocated in memory even when not visible |
+| 15+ `NSLayoutConstraint` mutations per scroll frame | Poor scroll performance; fragile offset arithmetic |
+| Remote config logic scattered across 10+ methods | No single source of truth for what the feed renders |
+| All navigation in one 968-line `HomeScreenRouter` | Any routing change requires understanding the entire router |
+| Child VCs wired via Storyboard segues | Module inseparable from the main app storyboard |
 
 ---
 
-## 3. What We're Building
+## 3. Module Overview
 
-A **`HomeFeed` module** that receives a configuration object from the host app and renders a fully dynamic, diffable collection view. The host app does not know about cells, sections, or layout — it only hands off a config and implements a routing delegate.
+The HomeFeed module is a **plugin** to the main app. It accepts a typed config on creation and communicates back only through narrow, focused routing protocols.
+
+> **Rule:** The main app owns navigation. The HomeFeed module owns rendering.
 
 ```mermaid
-graph TB
-    subgraph MainApp["Main App (Host)"]
-        BA[BottomBarViewController]
-        RC[RemoteConfig / Environment]
-        RT[HomeScreenRouter\nexisting routing logic]
+graph TD
+    subgraph MainApp["Main App"]
+        BB["BottomBarViewController"]
+        RC["RemoteConfig / Environment"]
+        HSR["HomeScreenRouter"]
     end
 
     subgraph HomeFeedModule["HomeFeed Module"]
-        direction TB
-        VC[HomeFeedViewController]
-        I[HomeFeedInteractor]
-        P[HomeFeedPresenter]
-        R[HomeFeedRouter]
-
-        subgraph Layout["Layout Layer"]
-            LF[LayoutFactory\nper-section NSCollectionLayoutSection]
-            DS[DiffableDataSource\nHomeFeedSection → HomeFeedItem]
-        end
-
-        subgraph Sections["Section Registry"]
-            SE[HomeFeedSection enum\nhero · railing · stories · saved\nfavourites · nearby · popular · blogs…]
-        end
-
-        subgraph Workers["Workers"]
-            OW[SectionOrderWorker\nreads config → returns ordered sections]
-            DW[DataWorker\nfetches data per section in parallel]
-            AW[AnalyticsWorker\nwraps existing event tracking]
-        end
+        VC["HomeFeedViewController"]
+        I["HomeFeedInteractor"]
+        P["HomeFeedPresenter"]
+        DS["DiffableDataSource"]
+        LF["CompositionalLayoutFactory"]
+        OW["SectionOrderWorker"]
+        DW["DataWorker"]
+        AW["AnalyticsWorker"]
     end
 
-    RC -->|HomeFeedConfig| I
-    BA --> VC
-    R -->|HomeFeedRoutingDelegate| RT
-    VC --> I --> P --> VC
-    I --> OW & DW & AW
+    subgraph RoutingDelegates["Routing Delegates"]
+        SR["HomeFeedSearchRouting"]
+        FR["HomeFeedFeatureRouting"]
+        PR["HomeFeedPropertyRouting"]
+        CR["HomeFeedContentRouting"]
+    end
+
+    BB -->|"make(config:)"| VC
+    RC -->|HomeFeedSectionFlags| OW
+    VC -->|Request| I
+    I -->|Response| P
+    P -->|ViewModel| VC
     VC --> DS --> LF
-    OW --> SE
+    I --> OW & DW & AW
+    SR & FR & PR & CR -->|callbacks| HSR
 ```
 
-### Clear Boundary Contract
+### Contract
+
+| Direction | What is exchanged |
+|---|---|
+| **Main App → HomeFeed** | `HomeFeedConfig` (section flags, initial purpose, four routing delegates) |
+| **HomeFeed → Main App** | Routing delegate callbacks only. Analytics via existing `AnalyticsManager`. No UIKit references back. |
 
 ```swift
-// ─── What the Main App provides ───────────────────────────────────────────
-
-protocol HomeFeedRoutingDelegate: AnyObject {
-    func homeFeed(didRequestSearch filter: Filter)
-    func homeFeed(didSelectProperty property: VProperty)
-    func homeFeed(didSelectBlog url: String)
-    func homeFeed(didRequestRoute destination: HomeFeedDestination)
-}
-
 struct HomeFeedConfig {
-    let sectionFlags: HomeFeedSectionFlags    // wraps all remote config flags
+    let sectionFlags: HomeFeedSectionFlags
     let initialPurpose: VProperty.Purpose
-    let routingDelegate: HomeFeedRoutingDelegate
+    let searchRouting: HomeFeedSearchRouting
+    let featureRouting: HomeFeedFeatureRouting
+    let propertyRouting: HomeFeedPropertyRouting
+    let contentRouting: HomeFeedContentRouting
 }
 
-// ─── What the Main App receives ────────────────────────────────────────────
-
-// A single UIViewController — plug it in, done.
-let homeFeedVC = HomeFeedViewController.make(config: config)
+// Host hands off one VC — nothing else needed
+let feedVC = HomeFeedViewController.make(config: config)
 ```
-
-The main app provides **config in, routing delegate out**. It never touches a cell, a section, or a layout.
 
 ---
 
-## 4. Architecture Inside the Module
+## 4. Internal Architecture
 
 ### 4.1 VIP Data Flow
 
@@ -114,154 +108,225 @@ sequenceDiagram
     participant DS as DiffableDataSource
 
     VC->>I: fetchFeed()
-    I->>OW: buildSections(config)
+    I->>OW: buildSections(flags)
     OW-->>I: [HomeFeedSection]
-    I->>DW: fetchData(for sections) [parallel]
+    I->>DW: fetchData(sections)
+    Note over DW: parallel async per section
     DW-->>I: HomeFeed.Response
     I->>P: present(response)
-    P->>P: map → NSDiffableDataSourceSnapshot
     P-->>VC: displayFeed(viewModel)
-    VC->>DS: apply(snapshot, animatingDifferences: true)
+    VC->>DS: apply(snapshot)
 ```
 
-### 4.2 The Section Model — Single Source of Truth
+### 4.2 The Section Model
 
 ```swift
 enum HomeFeedSection: Hashable {
-    case hero
-    case railing
-    case stories
-    case recentSearches
-    case savedSearches
-    case browseProjects
-    case favourites
-    case nearbyLocations
-    case popularTypes
-    case sellerLeadsBanner
-    case nativeAd
-    case blogs
-    case carouselBanners
-    // Future: just add a case here
+    case hero               // sticky search bar + purpose tabs
+    case railing            // horizontal feature shortcut cards
+    case stories            // agent stories rail
+    case recentSearches     // recent / last search cards
+    case savedSearches      // user's saved searches
+    case browseProjects     // new projects rail
+    case favourites         // saved property cards
+    case nearbyLocations    // location-based property cards
+    case popularTypes       // 2-column property type grid
+    case sellerLeadsBanner  // full-width CTA banner
+    case nativeAd           // full-width ad unit (market-specific)
+    case blogs              // editorial content cards
+    case carouselBanners    // event / workshop banners
+    // New section = add one case here. Nothing else changes.
 }
 ```
 
-The `SectionOrderWorker` reads `HomeFeedConfig` and returns a plain `[HomeFeedSection]`. This is the **only place** that decides what renders and in what order.
+### 4.3 Section Ordering — Single Source of Truth
 
 ```swift
-// Before (legacy) — scattered across viewDidLoad:
+// Before — 10+ scattered isHidden blocks in viewDidLoad:
 if Environment.valueFor(key: .homeRailingEnabled) { homeRailingStackView?.isHidden = false }
 if Environment.valueFor(key: .isStoriesEnabled)   { storiesWidgetView.isHidden = false }
-// … 8 more blocks
+// … no single readable output
 
-// After — one function, one output:
-func buildSections(config: HomeFeedConfig) -> [HomeFeedSection] {
+// After — one function, one return value:
+func buildSections(flags: HomeFeedSectionFlags) -> [HomeFeedSection] {
     var sections: [HomeFeedSection] = [.hero]
-    if config.flags.isRailingEnabled    { sections.append(.railing) }
-    if config.flags.isStoriesEnabled    { sections.append(.stories) }
-    if config.flags.isRecentSearches    { sections.append(.recentSearches) }
-    sections.append(contentsOf: [.savedSearches, .favourites, .nearbyLocations, .popularTypes, .blogs])
+    if flags.isRailingEnabled   { sections.append(.railing) }
+    if flags.isStoriesEnabled   { sections.append(.stories) }
+    if flags.showRecentSearches { sections.append(.recentSearches) }
+    sections += [.savedSearches, .favourites, .nearbyLocations, .popularTypes, .blogs]
     return sections
+    // Reorder = move one line.  Remove a section = delete one line.
 }
 ```
 
-### 4.3 Layout Factory — One Section, One Layout
+### 4.4 Layout per Section Type
 
 ```mermaid
 graph LR
-    A[HomeFeedSection] --> B{Layout Type}
-    B -->|hero| C[Full-width · self-sizing · sticky boundary]
-    B -->|railing · stories · saved · blogs| D[Horizontal orthogonal scroll]
-    B -->|popularTypes| E[2-column grid]
-    B -->|sellerLeads · nativeAd| F[Full-width banner]
-```
+    A["HomeFeedSection"] --> B["hero"]
+    A --> C["railing · stories\nsaved · blogs · nearby"]
+    A --> D["popularTypes"]
+    A --> E["sellerLeads\nnativeAd · banners"]
 
-Each layout is built independently inside `HomeFeedLayoutFactory`. The collection view calls the factory per section index — no layout logic lives in the ViewController.
+    B --> B1["Full-width · sticky"]
+    C --> C1["Horizontal orthogonal scroll"]
+    D --> D1["2-column grid"]
+    E --> E1["Full-width banner"]
+```
 
 ---
 
-## 5. Benefits
+## 5. Routing & Navigation Boundaries
 
-### 5.1 Developer Experience
+A single monolithic routing delegate becomes hard to mock, test, and extend. HomeFeed instead uses **four focused protocols** — one per domain — following the **Interface Segregation Principle**.
 
-| | Legacy | HomeFeed Module |
+### 5.1 The Four Delegates
+
+```mermaid
+graph TD
+    Router["HomeFeedRouter\ninternal to module"]
+
+    Router --> SR["HomeFeedSearchRouting"]
+    Router --> FR["HomeFeedFeatureRouting"]
+    Router --> PR["HomeFeedPropertyRouting"]
+    Router --> CR["HomeFeedContentRouting"]
+
+    SR --> HSR["HomeScreenRouter\nmain app"]
+    FR --> HSR
+    PR --> HSR
+    CR --> HSR
+
+    SR -. "routeToSearch()\nrouteToCommuteSearch()\nrouteToRecentSearch()" .- SR
+    FR -. "routeToFeature(.truEstimate)\nrouteToFeature(.gpt)\nrouteToFeature(.dubaiTransactions)" .- FR
+    PR -. "routeToPropertyDetail()\nrouteToListings()\nrouteToFavourites()" .- PR
+    CR -. "routeToBlog()\nrouteToStory()\nrouteToContentDestination()" .- CR
+```
+
+### 5.2 Protocol Definitions
+
+```swift
+// Search — anything that begins a search intent
+protocol HomeFeedSearchRouting: AnyObject {
+    func routeToSearch()
+    func routeToCommuteSearch()
+    func routeToRecentSearch(filter: Filter, sorting: Sorting)
+}
+
+// Feature — standalone product surfaces via railing or entry points
+protocol HomeFeedFeatureRouting: AnyObject {
+    func routeToFeature(_ feature: HomeFeedFeature)
+}
+// HomeFeedFeature: .truEstimate · .dubaiTransactions · .gpt
+//                  .findAgent   · .dailyRental       · .mapView · .notifications
+
+// Property — listings, detail pages, saved collections
+protocol HomeFeedPropertyRouting: AnyObject {
+    func routeToPropertyDetail(id: String)
+    func routeToListings(filter: Filter, context: HomeFeedListingsContext)
+    func routeToFavourites()
+    func routeToSavedSearches()
+}
+
+// Content — editorial, media, banners, ads
+protocol HomeFeedContentRouting: AnyObject {
+    func routeToBlog(url: String)
+    func routeToStory(storyID: String)
+    func routeToContentDestination(_ destination: HomeFeedContentDestination)
+}
+```
+
+### 5.3 Action → Delegate Mapping
+
+| User Action | Delegate | Navigation |
 |---|---|---|
-| **Add a new section** | XIB edit + new container view + Storyboard segue + child VC + delegate wiring | Add 1 enum case + 1 cell file |
-| **Reorder sections** | Drag views in XIB, fix auto-layout | Change array order in `buildSections()` |
-| **Feature-flag a section** | Add `isHidden = true` in 2–3 places | Exclude from `[HomeFeedSection]` |
-| **Fix a section's layout** | Constrained by XIB + parent stack spacing | Edit one `NSCollectionLayoutSection` builder |
-| **Add iPad-specific sizing** | Manual margin delegation callbacks | `NSCollectionLayoutEnvironment.traitCollection` in layout factory |
-| **ViewController size** | 1,357 lines | < 200 lines |
-| **IBOutlets** | 40+ | 0 |
+| Tap search bar / location field | `SearchRouting` | Present |
+| Tap recent / last search card | `SearchRouting` | Push |
+| Tap commute search in railing | `SearchRouting` | Present |
+| Tap TruEstimate in railing | `FeatureRouting` | Push / Tab Switch |
+| Tap Dubai Transactions in railing | `FeatureRouting` | Push |
+| Tap BayutGPT in railing | `FeatureRouting` | Push |
+| Tap Find Agent in railing | `FeatureRouting` | Push |
+| Tap Notification bell | `FeatureRouting` | Push |
+| Tap Map View in railing | `FeatureRouting` | Tab Switch |
+| Tap a favourite property | `PropertyRouting` | Push |
+| View All Favourites | `PropertyRouting` | Push / Tab Switch |
+| Tap a saved search | `PropertyRouting` | Push |
+| Tap a nearby location | `PropertyRouting` | Push |
+| Tap a popular property type | `PropertyRouting` | Push |
+| Tap a blog article | `ContentRouting` | Push |
+| Tap an agent story | `ContentRouting` | Present Fullscreen |
+| Tap native ad / event banner | `ContentRouting` | Push |
+| Tap seller leads banner | `ContentRouting` | Present |
 
-### 5.2 Runtime Performance
+---
 
-| | Legacy | HomeFeed Module |
+## 6. Benefits
+
+### 6.1 Developer Experience
+
+| Task | Legacy | HomeFeed Module |
 |---|---|---|
-| **Scroll performance** | 15 `NSLayoutConstraint` mutations per frame | Zero — cells self-size, layout engine handles it |
-| **Memory** | All container VCs allocated even when section is hidden | Only visible cells are in memory (collection view recycling) |
-| **Section updates** | Manual `isHidden` + `layoutIfNeeded` + animate manually | `dataSource.apply(snapshot)` — diffable, animated, batched |
+| Add a new section | XIB + segue + container VC + delegate wiring | 1 enum case + 1 cell file |
+| Reorder sections | Drag views in XIB, fix Auto Layout | Move one line in `buildSections()` |
+| Feature-flag a section | `isHidden` in multiple places | Exclude from `[HomeFeedSection]` |
+| Add a routing destination | Modify 968-line `HomeScreenRouter` | Add one method to one focused delegate |
+| iPad-specific sizing | Manual margin callbacks across child VCs | `NSCollectionLayoutEnvironment` in factory |
+| ViewController size | 1,357 lines | < 200 lines |
+| `@IBOutlet` count | 40+ | Zero |
 
-### 5.3 Maintainability
+### 6.2 Runtime Performance
 
-- **No XIB/Storyboard dependency** — the module is pure Swift, instantiated programmatically
-- **No child VC delegation hell** — section data flows through the VIP stack, not through 6 child VC delegates
-- **Remote config centralized** — one config struct, one worker, one output. Any engineer can read `buildSections()` and know exactly what will render
-- **Cells are independent** — each cell takes a typed view model and knows nothing about the parent VC or other sections
+| Metric | Legacy | HomeFeed Module |
+|---|---|---|
+| Scroll performance | 15+ `NSLayoutConstraint` mutations per scroll frame | Zero — layout engine handles it natively |
+| Memory footprint | All child VCs allocated even when section is hidden | Only visible cells held in memory |
+| Section updates | Manual `isHidden` + `layoutIfNeeded` + custom animation | `dataSource.apply(snapshot)` — diffable and batched |
 
-### 5.4 Testability
+### 6.3 Maintainability
 
-| Layer | How it's tested |
+- **No XIB/Storyboard dependency** — pure Swift, fully programmatic
+- **No child VC delegation chains** — section data flows through VIP, not 6 child delegates
+- **Centralised remote config** — one `buildSections()` call; any engineer can read exactly what renders
+- **Segregated routing** — 4 focused delegates instead of 1 monolith; each independently mockable
+- **Independent cells** — each cell takes a typed view model with no knowledge of parent or sibling sections
+
+### 6.4 Testability
+
+| Layer | Approach |
 |---|---|
-| `SectionOrderWorker` | Unit test with a mock `HomeFeedConfig` — no UIKit needed |
-| `HomeFeedInteractor` | Unit test with mock workers and a mock presenter |
-| `HomeFeedPresenter` | Pass a `Response`, assert the resulting `Snapshot` sections and items |
-| Cells | Snapshot tests with a typed view model |
-| Integration with main app | `HomeFeedRoutingDelegate` mock — assert the right route was triggered |
+| `SectionOrderWorker` | Unit test with mock `HomeFeedSectionFlags` — zero UIKit |
+| `HomeFeedInteractor` | Unit test with mock workers + mock presenter |
+| `HomeFeedPresenter` | Assert snapshot sections and items from a given `Response` |
+| Routing | Mock each of the 4 delegates independently — no need to stub the full router |
+| Cells | Snapshot tests driven by a typed view model |
 
-### 5.5 Future-Proofing
+### 6.5 Future-Proofing
 
-Because the feed is config-driven and the module has clean boundaries:
-- **Server-driven feed order** — the backend can eventually dictate `[HomeFeedSection]` directly; no client changes needed
-- **Personalisation** — user-specific section ordering is a `buildSections()` input, not a VC refactor
-- **Multi-target reuse** — the `HomeFeed` module can be shared across UAE, KSA, Egypt targets with different `HomeFeedConfig` inputs
-
----
-
-## 6. Integration With the Main App
-
-```mermaid
-graph LR
-    subgraph MainApp
-        BB[BottomBarViewController]
-        RC[Environment / RemoteConfig]
-        HSR[HomeScreenRouter\nexisting]
-    end
-
-    subgraph HomeFeedModule
-        VC[HomeFeedViewController]
-        R[HomeFeedRouter]
-    end
-
-    BB -->|init with HomeFeedConfig| VC
-    RC -->|HomeFeedSectionFlags| VC
-    R -->|HomeFeedRoutingDelegate| HSR
-```
-
-1. `BottomBarViewController` creates `HomeFeedViewController.make(config:)` — exactly as it does today for `NewHomeScreenViewController`
-2. `HomeFeedConfig.sectionFlags` wraps all `Environment.valueFor(key:)` calls — the module never imports `Environment` directly
-3. All navigation goes through `HomeFeedRoutingDelegate` — implemented by the existing `HomeScreenRouter`, so zero routing logic is duplicated
-4. Analytics — `HomeFeedAnalyticsWorker` wraps the existing `AnalyticsManager.instance.track()` calls; event schema is unchanged
+- **Server-driven feed** — backend can return `[HomeFeedSection]` order; zero client changes needed
+- **Personalisation** — user-specific ordering is a `buildSections()` input, not a VC refactor
+- **Multi-target reuse** — UAE, KSA, Egypt share the module with different `HomeFeedConfig`
+- **Routing extensibility** — new feature = one method on one small focused protocol
 
 ---
 
 ## 7. Rollout Plan
 
-The new module ships behind a remote config flag. Both the old and new ViewControllers coexist with zero risk until QA sign-off.
+> The HomeFeed module ships behind a remote config flag. Old and new ViewControllers coexist at zero production risk until full QA sign-off.
 
+```mermaid
+graph LR
+    P1["Phase 1\nFoundation"] --> P2["Phase 2\nVIP Wiring"]
+    P2 --> P3["Phase 3\nRouting Delegates"]
+    P3 --> P4["Phase 4\nSection Migration"]
+    P4 --> P5["Phase 5\nQA & Integration"]
+    P5 --> P6["Phase 6\nCleanup"]
 ```
-Phase 1 · Foundation      HomeFeedSection enum · LayoutFactory · cell scaffolds
-Phase 2 · VIP Wiring      Interactor → SectionOrderWorker → Presenter → DiffableDataSource
-Phase 3 · Sections         Migrate all sections one by one, behind the flag
-Phase 4 · Integration      HomeFeedRoutingDelegate wiring · analytics audit · iPad + RTL
-Phase 5 · Cleanup          Remove legacy NewHomeScreenViewController and storyboard references
-```
+
+| Phase | Goal |
+|---|---|
+| **1 — Foundation** | `HomeFeedSection` enum · `CompositionalLayoutFactory` · empty cell scaffolds |
+| **2 — VIP Wiring** | Interactor → `SectionOrderWorker` → Presenter → DiffableDataSource, end-to-end |
+| **3 — Routing Delegates** | Implement all 4 protocols; wire into existing `HomeScreenRouter` |
+| **4 — Section Migration** | Migrate all 13 sections one by one behind the remote config flag |
+| **5 — QA & Integration** | iPad + RTL · analytics audit · deep link verification |
+| **6 — Cleanup** | Delete `NewHomeScreenViewController`, Storyboard XIB, all dead `@IBOutlet`s |
