@@ -11,6 +11,17 @@ final class HomeSectionBuilder {
     
     func buildSections(sectionsData: Home.HomeSections) -> [AnySection] {
         var sections: [AnySection] = []
+        
+        
+        // Append TruBroker Banner
+        let truBrokerBannerSection = TruBrokerBannerSection()
+        sections.append(AnySection(truBrokerBannerSection, isCustomizable: false))
+        
+        // Append SellerLeads Banner
+        let sellerLeadsBannerSection = SellerLeadsBannerSection()
+        sections.append(AnySection(sellerLeadsBannerSection, isCustomizable: false))
+
+        
         // MARK: - Build New Projects Group
         let newProjectsActions = NewProjectsActions(delegate: sectionsData.viewController)
         let newProjectsGroup = NewProjectsGroup(

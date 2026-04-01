@@ -21,6 +21,14 @@ final class CellRegistry {
         let projectNib = UINib(nibName: ProjectsCollectionViewCell.reuseId, bundle: nil)
         collectionView.register(projectNib, forCellWithReuseIdentifier: ProjectsCollectionViewCell.reuseId)
         
+        // TruBroker Banner
+        let truBrokerNib = UINib(nibName: TruBrokerBannerCell.reuseId, bundle: nil)
+        collectionView.register(truBrokerNib, forCellWithReuseIdentifier: TruBrokerBannerCell.reuseId)
+        
+        // Seller Leads Banner
+        let sellerLeadsNib = UINib(nibName: SellerLeadsBannerCell.reuseId, bundle: nil)
+        collectionView.register(sellerLeadsNib, forCellWithReuseIdentifier: SellerLeadsBannerCell.reuseId)
+        
         // Add more cells to register here
     }
 }
