@@ -243,20 +243,6 @@ protocol HomeFeedContentRouting: AnyObject {
 | Tap recent / last search card | `SearchRouting` | Push |
 | Tap commute search in railing | `SearchRouting` | Present |
 | Tap TruEstimate in railing | `FeatureRouting` | Push / Tab Switch |
-| Tap Dubai Transactions in railing | `FeatureRouting` | Push |
-| Tap BayutGPT in railing | `FeatureRouting` | Push |
-| Tap Find Agent in railing | `FeatureRouting` | Push |
-| Tap Notification bell | `FeatureRouting` | Push |
-| Tap Map View in railing | `FeatureRouting` | Tab Switch |
-| Tap a favourite property | `PropertyRouting` | Push |
-| View All Favourites | `PropertyRouting` | Push / Tab Switch |
-| Tap a saved search | `PropertyRouting` | Push |
-| Tap a nearby location | `PropertyRouting` | Push |
-| Tap a popular property type | `PropertyRouting` | Push |
-| Tap a blog article | `ContentRouting` | Push |
-| Tap an agent story | `ContentRouting` | Present Fullscreen |
-| Tap native ad / event banner | `ContentRouting` | Push |
-| Tap seller leads banner | `ContentRouting` | Present |
 
 ---
 
@@ -306,27 +292,3 @@ protocol HomeFeedContentRouting: AnyObject {
 - **Personalisation** — user-specific ordering is a `buildSections()` input, not a VC refactor
 - **Multi-target reuse** — UAE, KSA, Egypt share the module with different `HomeFeedConfig`
 - **Routing extensibility** — new feature = one method on one small focused protocol
-
----
-
-## 7. Rollout Plan
-
-> The HomeFeed module ships behind a remote config flag. Old and new ViewControllers coexist at zero production risk until full QA sign-off.
-
-```mermaid
-graph LR
-    P1["Phase 1\nFoundation"] --> P2["Phase 2\nVIP Wiring"]
-    P2 --> P3["Phase 3\nRouting Delegates"]
-    P3 --> P4["Phase 4\nSection Migration"]
-    P4 --> P5["Phase 5\nQA & Integration"]
-    P5 --> P6["Phase 6\nCleanup"]
-```
-
-| Phase | Goal |
-|---|---|
-| **1 — Foundation** | `HomeFeedSection` enum · `CompositionalLayoutFactory` · empty cell scaffolds |
-| **2 — VIP Wiring** | Interactor → `SectionOrderWorker` → Presenter → DiffableDataSource, end-to-end |
-| **3 — Routing Delegates** | Implement all 4 protocols; wire into existing `HomeScreenRouter` |
-| **4 — Section Migration** | Migrate all 13 sections one by one behind the remote config flag |
-| **5 — QA & Integration** | iPad + RTL · analytics audit · deep link verification |
-| **6 — Cleanup** | Delete `NewHomeScreenViewController`, Storyboard XIB, all dead `@IBOutlet`s |
