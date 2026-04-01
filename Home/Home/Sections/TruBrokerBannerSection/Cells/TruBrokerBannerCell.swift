@@ -18,6 +18,15 @@ final class TruBrokerBannerCell: UICollectionViewCell {
     @IBOutlet private weak var arrowImage: UIImageView?
     @IBOutlet private weak var newView: UIView?
     @IBOutlet private weak var newLabel: UILabel?
+    
+    // MARK: - Constants
+    private enum Constants {
+        static let backgroundImage = "truBroker_entry_bg"
+        static let descriptionText = "Find trusted agents awarded for their excellent performance"
+        static let headingText = "TruBroker™"
+        static let new = "NEW"
+        static let arrowImage = "icon_right_arrow_white"
+    }
 
     // MARK: - LifeCycle
     override func awakeFromNib() {
@@ -31,7 +40,7 @@ private extension TruBrokerBannerCell {
     func setupViews() {
         mainContentView?.setRoundedCorner(radius: 8)
         
-        backgroundImage?.image = "language" == "arabic" ? UIImage(named: "truBroker_entry_bg")?.imageFlippedForRightToLeftLayoutDirection() : UIImage(named: "truBroker_entry_bg")
+        backgroundImage?.image = "language" == "arabic" ? UIImage(named: Constants.backgroundImage)?.imageFlippedForRightToLeftLayoutDirection() : UIImage(named: Constants.backgroundImage)
         
         truBrokerBadgeView?.clipsToBounds = false
         truBrokerBadgeView?.layer.shadowColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5).cgColor
@@ -41,21 +50,21 @@ private extension TruBrokerBannerCell {
         truBrokerBadgeView?.layer.masksToBounds = false
         
         headingLabel?.font = UIFont.body
-        headingLabel?.text = "truBroker"
+        headingLabel?.text = Constants.headingText
         headingLabel?.textColor = UIColor.white
-        //headingLabel?.highlight(text: "broker".localized(), font: UIFont.headingL4)
+        headingLabel?.highlight(text: "Broker", font: UIFont.headingL4)
         
-        descriptionLabel?.text = "Find Verified Agents"
+        descriptionLabel?.text = Constants.descriptionText
         descriptionLabel?.font = UIFont.body
-        //descriptionLabel?.add(lineHeight: 1.25, alignment: AppLanguage.selected.isRightToLeft ? .right : .left, lineBreakMode: .byWordWrapping)
+        descriptionLabel?.add(lineHeight: 1.25, alignment: "language" == "arabic" ? .right : .left, lineBreakMode: .byWordWrapping)
         
-        arrowImage?.image = "language" == "arabic" ? UIImage(named: "icon_right_arrow_white")?.imageFlippedForRightToLeftLayoutDirection() : UIImage(named: "icon_right_arrow_white")
+        arrowImage?.image = "language" == "arabic" ? UIImage(named: Constants.arrowImage)?.imageFlippedForRightToLeftLayoutDirection() : UIImage(named: Constants.arrowImage)
         
         newView?.backgroundColor = UIColor.AppColors.secondaryRedColor
-        //newView?.setRoundedWithRespectToHeight()
+        newView?.setRoundedWithRespectToHeight()
         
         newLabel?.textColor = UIColor.white
         newLabel?.font = UIFont.appBoldFont(ofSize: 8.92)
-        newLabel?.text = "New"
+        newLabel?.text = Constants.new
     }
 }
