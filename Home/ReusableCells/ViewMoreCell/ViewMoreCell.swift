@@ -10,8 +10,8 @@ import UIKit
 final class ViewMoreCell: UICollectionViewCell {
     
     // MARK: - Subviews
-    private lazy var button: UIButton = {
-        let btn = PrimaryOutlinedButton(type: .system)
+    private lazy var button: PrimaryDarkButton = {
+        let btn = PrimaryDarkButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.addTarget(self, action: #selector(didTap), for: .touchUpInside)
         return btn
@@ -43,7 +43,7 @@ final class ViewMoreCell: UICollectionViewCell {
     // MARK: - Configuration
     func configure(buttonTitle: String, action: (() -> Void)?) {
         viewMoreAction = action
-        
+        button.setupTealColors()
         button.applyButtonConfiguration(
             title: buttonTitle,
             iconName: Constants.chevronRight,
@@ -51,7 +51,8 @@ final class ViewMoreCell: UICollectionViewCell {
             titleColor: .AppColors.teal5,
             iconColor: .AppColors.teal5,
             imagePlacement: .trailing,
-            imagePadding: Constants.iconPadding
+            imagePadding: Constants.iconPadding,
+            cornerRadius: 8
         )
     }
     
