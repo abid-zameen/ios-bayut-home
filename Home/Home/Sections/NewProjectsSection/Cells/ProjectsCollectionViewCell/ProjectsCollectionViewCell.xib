@@ -189,7 +189,7 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="10S-cM-BxU">
                                         <rect key="frame" x="0.0" y="342" width="378" height="40"/>
                                         <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gcK-6N-ULN" customClass="WhatsappButton" customModule="Home" customModuleProvider="target">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gcK-6N-ULN" customClass="PrimaryDarkButton" customModule="Home" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="378" height="40"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="40" id="QNJ-50-zIq"/>

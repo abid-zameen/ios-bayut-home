@@ -237,9 +237,9 @@ final class NewProjectsViewAllSection: SectionDescriptor {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
                 top: NewProjectsLayout.spacing,
-                leading: 16,
+                leading: 0,
                 bottom: NewProjectsLayout.spacing,
-                trailing: 16
+                trailing: 0
             )
         )
     }

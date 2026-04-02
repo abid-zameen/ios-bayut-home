@@ -23,7 +23,7 @@ final class ProjectsCollectionViewCell: UICollectionViewCell {
     @IBOutlet private weak var dividerView: UIView?
     @IBOutlet private weak var handOverPriceView: UIView?
     @IBOutlet private weak var launchPriceView: UIView?
-    @IBOutlet private weak var whatsappButton: UIButton?
+    @IBOutlet private weak var whatsappButton: PrimaryDarkButton?
     @IBOutlet private weak var handOverValue: UILabel?
     @IBOutlet private weak var bottomView: UIView?
     @IBOutlet private weak var projectLocation: UILabel?
@@ -55,15 +55,17 @@ final class ProjectsCollectionViewCell: UICollectionViewCell {
     }
 }
 
-//extension ProjectsCollectionViewCell {
-//    private func setupViews() {
-//        contentView.clipsToBounds = false
-//        bottomView.layer.cornerRadius = Constants.cornerRadius
-//        projectImage.roundCorners(corners: .allCorners, radius: Constants.cornerRadius)
-//        handOverTitle?.text = Constants.handOver
-//        launchPriceTitle.text = Constants.launchPrice
-//    }
-//}
+extension ProjectsCollectionViewCell {
+    private func setupViews() {
+        contentView.clipsToBounds = false
+        //bottomView?.layer.cornerRadius = Constants.cornerRadius
+       // projectImage?.roundCorners(corners: .allCorners, radius: Constants.cornerRadius)
+        //handOverTitle?.text = Constants.handOver
+        //launchPriceTitle?.text = Constants.launchPrice
+        whatsappButton?.setTitle("Whatsapp", for: .normal)
+        whatsappButton?.setupTealColors()
+    }
+}
 
 //extension ProjectsCollectionViewCell: ProjectsCollectionViewCellDisplayLogic {
 //    func displayProject(viewModel: ProjectsCollectionViewCellModels.ViewModel) {
