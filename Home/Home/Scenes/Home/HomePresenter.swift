@@ -57,10 +57,24 @@ final class HomePresenter: HomePresentationLogic {
             )
         ]
         
+        let favourites = [
+            FavouriteProperty(id: "f1", title: "Mag 214 Tower", location: "Jumeirah Lake Towers (JLT)", price: "AED 2,500,000", beds: "2", baths: "2", area: "1,234 sqft", imageURL: nil),
+            FavouriteProperty(id: "f2", title: "Marina Heights", location: "Dubai Marina", price: "AED 3,200,000", beds: "3", baths: "3", area: "1,800 sqft", imageURL: nil),
+            FavouriteProperty(id: "f3", title: "Burj Khalifa Apartment", location: "Downtown Dubai", price: "AED 15,000,000", beds: "3", baths: "4", area: "2,500 sqft", imageURL: nil)
+        ]
+        
+        let savedSearches = [
+            SavedSearchesModel(title: "Apartment for Sale", location: "Dubai Marina", searchName: "Marina Apartments", image: ""),
+            SavedSearchesModel(title: "Villa for Rent", location: "Palm Jumeirah", searchName: "Palm Villas", image: ""),
+            SavedSearchesModel(title: "Office for Sale", location: "Downtown Dubai", searchName: "Downtown Offices", image: "")
+        ]
+        
         let sectionsBuilder = HomeSectionBuilder()
-        let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections (
+        let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
             projects: projects,
             locations: locations,
+            favourites: favourites,
+            savedSearches: savedSearches,
             viewController: viewController)
         )
         

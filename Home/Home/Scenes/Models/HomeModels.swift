@@ -14,6 +14,8 @@ struct Home {
     struct HomeSections {
         let projects: [NewProject]
         let locations: [LocationChipViewModel]
+        let favourites: [FavouriteProperty]
+        let savedSearches: [SavedSearchesModel]
         let viewController: HomeViewController
     }
 }

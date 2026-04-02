@@ -29,6 +29,19 @@ final class CellRegistry {
         let sellerLeadsNib = UINib(nibName: SellerLeadsBannerCell.reuseId, bundle: nil)
         collectionView.register(sellerLeadsNib, forCellWithReuseIdentifier: SellerLeadsBannerCell.reuseId)
         
+        // Railing Section
+        let railingCardNib = UINib(nibName: RailingCardCell.reuseId, bundle: nil)
+        collectionView.register(railingCardNib, forCellWithReuseIdentifier: RailingCardCell.reuseId)
+        collectionView.register(PageControlCell.self, forCellWithReuseIdentifier: PageControlCell.reuseId)
+        
+        // Favourites Section
+        let favouritesNib = UINib(nibName: FavouritesCell.reuseId, bundle: nil)
+        collectionView.register(favouritesNib, forCellWithReuseIdentifier: FavouritesCell.reuseId)
+        
+        // Saved Searches Section
+        let savedSearchesNib = UINib(nibName: SavedSearchesCell.reuseId, bundle: nil)
+        collectionView.register(savedSearchesNib, forCellWithReuseIdentifier: SavedSearchesCell.reuseId)
+        
         // Add more cells to register here
     }
 }

@@ -125,6 +125,42 @@ extension HomeViewController: NewProjectsActionsDelegate {
     }
 }
 
+// MARK: - RailingActionsDelegate
+extension HomeViewController: RailingActionsDelegate {
+    func railingDidTapCard(at index: Int) {
+        print("Tapped Railing Card at index: \(index)")
+    }
+    
+    func railingDidTapPageControl(index: Int) {
+//        // Find the native Diffable Section index for the Carousel explicitly
+//        let snapshot = dataSource.snapshot()
+//        if let sectionIndex = snapshot.sectionIdentifiers.firstIndex(where: { ($0.identifier as? RailingSectionId) == .carousel }) {
+//            let indexPath = IndexPath(item: index, section: sectionIndex)
+//            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+//        }
+    }
+}
+
+extension HomeViewController: FavouritesActionsDelegate {
+    func favouritesDidTapCard(at index: Int) {
+        
+    }
+    
+    func favouritesDidTapViewAll() {
+        
+    }
+}
+
+extension HomeViewController: SavedSearchesActionsDelegate {
+    func savedSearchesDidTapCard(at index: Int) {
+        print("Tapped Saved Search Card at index: \(index)")
+    }
+    
+    func savedSearchesDidTapViewAll() {
+        print("Tapped View All Saved Searches")
+    }
+}
+
 // MARK: - Layout & Data Source
 private extension HomeViewController {
     
