@@ -64,6 +64,15 @@ final class HomeSectionBuilder {
         )
         sections.append(contentsOf: savedSearchesGroup.buildSections())
         
+        let blogsActions = BlogsActions(delegate: sectionsData.viewController)
+        let blogsGroup = BlogsGroup(
+            title: "From our Blog",
+            viewAllTitle: "View all blogs",
+            blogs: sectionsData.blogs,
+            actions: blogsActions
+        )
+        sections.append(contentsOf: blogsGroup.buildSections())
+        
         return sections
     }
 }

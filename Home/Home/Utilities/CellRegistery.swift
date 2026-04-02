@@ -42,6 +42,10 @@ final class CellRegistry {
         let savedSearchesNib = UINib(nibName: SavedSearchesCell.reuseId, bundle: nil)
         collectionView.register(savedSearchesNib, forCellWithReuseIdentifier: SavedSearchesCell.reuseId)
         
+        // Blogs Section
+        let blogNib = UINib(nibName: BlogCell.reuseId, bundle: nil)
+        collectionView.register(blogNib, forCellWithReuseIdentifier: BlogCell.reuseId)
+        
         // Add more cells to register here
     }
 }

@@ -69,12 +69,19 @@ final class HomePresenter: HomePresentationLogic {
             SavedSearchesModel(title: "Office for Sale", location: "Downtown Dubai", searchName: "Downtown Offices", image: "")
         ]
         
+        let blogs = [
+            BlogData(title: "Dubai Real Estate Market 2026", category: "Market Profile", image: ""),
+            BlogData(title: "Top 5 Areas for Families", category: "Area Guides", image: ""),
+            BlogData(title: "Mortgage Guide for Expats", category: "Home Buying", image: "")
+        ]
+        
         let sectionsBuilder = HomeSectionBuilder()
         let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
             projects: projects,
             locations: locations,
             favourites: favourites,
             savedSearches: savedSearches,
+            blogs: blogs,
             viewController: viewController)
         )
         

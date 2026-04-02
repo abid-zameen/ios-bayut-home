@@ -58,14 +58,14 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.headingText = "Search 2.0"
             self.descriptionText = "Find a homes by commute time"
             self.backgroundImage = nil
-            self.itemImage = "commute_icon"
+            self.itemImage = "commuteBannerImage"
             self.backgroundViewColor = .AppColors.turquoise1
             self.ctaText = "Search Now"
             
         case .bayutGPT:
             self.headingText = "BayutGPT"
             self.descriptionText = "Your trusted AI Assitant for UAE Property"
-            self.itemImage = "gpt_icon"
+            self.itemImage = "bayutGPTBannerImage"
             self.backgroundImage = nil
             self.backgroundViewColor = .AppColors.teal1
             self.ctaText = "Start Chatting"

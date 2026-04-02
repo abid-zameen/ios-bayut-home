@@ -161,6 +161,16 @@ extension HomeViewController: SavedSearchesActionsDelegate {
     }
 }
 
+extension HomeViewController: BlogsActionsDelegate {
+    func blogsDidTapCard(at index: Int) {
+        print("Tapped Blog Card at index: \(index)")
+    }
+    
+    func blogsDidTapViewAll() {
+        print("Tapped View All Blogs")
+    }
+}
+
 // MARK: - Layout & Data Source
 private extension HomeViewController {
     
