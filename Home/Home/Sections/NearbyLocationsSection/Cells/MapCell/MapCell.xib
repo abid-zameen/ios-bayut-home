@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="gTV-IL-0wX" customClass="MapCell" customModule="Home" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="356" height="224"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="356" height="224"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bV8-8I-IMI">
+                        <rect key="frame" x="0.0" y="0.0" width="356" height="224"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="mapCellBackground" translatesAutoresizingMaskIntoConstraints="NO" id="0Eh-0y-L1v">
+                                <rect key="frame" x="0.0" y="0.0" width="356" height="224"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="mapIcon" translatesAutoresizingMaskIntoConstraints="NO" id="m6W-Vf-sG4">
+                                <rect key="frame" x="143" y="22" width="70" height="70"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="70" id="8Wz-Xf-1xU"/>
+                                    <constraint firstAttribute="height" constant="70" id="SI9-hK-VDP"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zOE-9o-bMJ">
+                                <rect key="frame" x="16" y="116" width="324" height="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ulX-IQ-SFM" customClass="PrimaryDarkButton" customModule="Home" customModuleProvider="target">
+                                <rect key="frame" x="16" y="160" width="324" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="orQ-x6-cwg"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="tappedAllowLocation:" destination="gTV-IL-0wX" eventType="touchUpInside" id="cMK-45-9qi"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="m6W-Vf-sG4" firstAttribute="top" secondItem="bV8-8I-IMI" secondAttribute="top" constant="22" id="0Am-Q8-IOW"/>
+                            <constraint firstAttribute="bottom" secondItem="ulX-IQ-SFM" secondAttribute="bottom" constant="24" id="3hC-0i-Wvf"/>
+                            <constraint firstItem="zOE-9o-bMJ" firstAttribute="top" relation="greaterThanOrEqual" secondItem="m6W-Vf-sG4" secondAttribute="bottom" constant="24" id="78K-IY-4Iu"/>
+                            <constraint firstItem="m6W-Vf-sG4" firstAttribute="centerX" secondItem="bV8-8I-IMI" secondAttribute="centerX" id="CXe-Qr-QjD"/>
+                            <constraint firstAttribute="trailing" secondItem="ulX-IQ-SFM" secondAttribute="trailing" constant="16" id="ErZ-KU-aqq"/>
+                            <constraint firstItem="ulX-IQ-SFM" firstAttribute="top" secondItem="zOE-9o-bMJ" secondAttribute="bottom" constant="30" id="SGf-n1-OOi"/>
+                            <constraint firstItem="ulX-IQ-SFM" firstAttribute="leading" secondItem="bV8-8I-IMI" secondAttribute="leading" constant="16" id="aaP-oY-laB"/>
+                            <constraint firstAttribute="trailing" secondItem="0Eh-0y-L1v" secondAttribute="trailing" id="drG-jW-wao"/>
+                            <constraint firstAttribute="trailing" secondItem="zOE-9o-bMJ" secondAttribute="trailing" constant="16" id="fC2-9D-Zbf"/>
+                            <constraint firstItem="0Eh-0y-L1v" firstAttribute="top" secondItem="bV8-8I-IMI" secondAttribute="top" id="m5f-yZ-vDI"/>
+                            <constraint firstItem="zOE-9o-bMJ" firstAttribute="leading" secondItem="bV8-8I-IMI" secondAttribute="leading" constant="16" id="sHx-SZ-wWH"/>
+                            <constraint firstItem="0Eh-0y-L1v" firstAttribute="leading" secondItem="bV8-8I-IMI" secondAttribute="leading" id="x9e-3a-Sgf"/>
+                            <constraint firstAttribute="bottom" secondItem="0Eh-0y-L1v" secondAttribute="bottom" id="xBc-A4-1Fp"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="bV8-8I-IMI" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="9ca-QJ-3u9"/>
+                <constraint firstAttribute="bottom" secondItem="bV8-8I-IMI" secondAttribute="bottom" id="BzJ-ze-k5w"/>
+                <constraint firstItem="bV8-8I-IMI" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="n4f-uA-pqp"/>
+                <constraint firstAttribute="trailing" secondItem="bV8-8I-IMI" secondAttribute="trailing" id="t9c-Bf-pug"/>
+            </constraints>
+            <size key="customSize" width="356" height="224"/>
+            <connections>
+                <outlet property="allowLocationCTA" destination="ulX-IQ-SFM" id="sgI-sa-vhi"/>
+                <outlet property="titleTextLabel" destination="zOE-9o-bMJ" id="8k5-wR-6A4"/>
+            </connections>
+            <point key="canvasLocation" x="143.5114503816794" y="111.26760563380282"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="mapCellBackground" width="343" height="256"/>
+        <image name="mapIcon" width="70" height="70"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
