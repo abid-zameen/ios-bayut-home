@@ -1,0 +1,17 @@
+//
+//  PopularSearchActions.swift
+//  Home
+//
+//  Created by Hammad Shahid on 03/04/2026.
+//
+
+import Foundation
+
+protocol PopularSearchActionsDelegate: AnyObject {
+    func popularSearchDidSelectPurpose(_ purpose: PopularSearchPurpose)
+    func popularSearchDidSelectSearchItem(at index: Int)
+}
+
+struct PopularSearchActions {
+    weak var delegate: PopularSearchActionsDelegate?
+}
