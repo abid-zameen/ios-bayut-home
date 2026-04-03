@@ -75,6 +75,21 @@ final class HomePresenter: HomePresentationLogic {
             BlogData(title: "Mortgage Guide for Expats", category: "Home Buying", image: "")
         ]
         
+        let nearbyLocations = [
+            NearbyLocation(name: "Dubai Marina Mall", distance: "0.5 km", city: "Dubai"),
+            NearbyLocation(name: "JBR Beach", distance: "1.2 km", city: "Dubai"),
+            NearbyLocation(name: "Skydive Dubai", distance: "2.0 km", city: "Dubai")
+        ]
+        
+        let popularSearches = [
+            PopularSearch(title: "Apartments", location: "in UAE", iconName: "rent_icon"),
+            PopularSearch(title: "Villas", location: "in Dubai", iconName: "buy_icon"),
+            PopularSearch(title: "Offices", location: "in Abu Dhabi", iconName: "commercial_icon"),
+            PopularSearch(title: "Townhouses", location: "in UAE", iconName: "buy_icon")
+        ]
+        
+        let purposes: [PopularSearchPurpose] = [.buy, .rent]
+        
         let sectionsBuilder = HomeSectionBuilder()
         let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
             projects: projects,
@@ -82,6 +97,11 @@ final class HomePresenter: HomePresentationLogic {
             favourites: favourites,
             savedSearches: savedSearches,
             blogs: blogs,
+            nearbyLocations: nearbyLocations,
+            isLocationEnabled: false,
+            popularSearches: popularSearches,
+            purposes: purposes,
+            selectedPurpose: .rent,
             viewController: viewController)
         )
         

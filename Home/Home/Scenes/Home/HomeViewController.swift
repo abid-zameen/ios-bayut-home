@@ -171,6 +171,26 @@ extension HomeViewController: BlogsActionsDelegate {
     }
 }
 
+extension HomeViewController: NearbyLocationsActionsDelegate {
+    func nearbyLocationsDidTapCard(at index: Int) {
+        print("Tapped Nearby Location Card at index: \(index)")
+    }
+    
+    func nearbyLocationsDidTapAllowLocation() {
+        print("Tapped Allow Location Access")
+    }
+}
+
+extension HomeViewController: PopularSearchActionsDelegate {
+    func popularSearchDidSelectPurpose(_ purpose: PopularSearchPurpose) {
+        print("Selected Popular Search Purpose: \(purpose.rawValue)")
+    }
+    
+    func popularSearchDidSelectSearchItem(at index: Int) {
+        print("Tapped Popular Search Item at index: \(index)")
+    }
+}
+
 // MARK: - Layout & Data Source
 private extension HomeViewController {
     

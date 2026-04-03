@@ -17,6 +17,11 @@ struct Home {
         let favourites: [FavouriteProperty]
         let savedSearches: [SavedSearchesModel]
         let blogs: [BlogData]
+        let nearbyLocations: [NearbyLocation]
+        let isLocationEnabled: Bool
+        let popularSearches: [PopularSearch]
+        let purposes: [PopularSearchPurpose]
+        let selectedPurpose: PopularSearchPurpose
         let viewController: HomeViewController
     }
 }

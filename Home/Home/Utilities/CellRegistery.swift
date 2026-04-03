@@ -46,6 +46,17 @@ final class CellRegistry {
         let blogNib = UINib(nibName: BlogCell.reuseId, bundle: nil)
         collectionView.register(blogNib, forCellWithReuseIdentifier: BlogCell.reuseId)
         
+        // Nearby Locations Section
+        let nearbyNib = UINib(nibName: NearbyLocationCell.reuseId, bundle: nil)
+        collectionView.register(nearbyNib, forCellWithReuseIdentifier: NearbyLocationCell.reuseId)
+        
+        let mapNib = UINib(nibName: MapCell.reuseId, bundle: nil)
+        collectionView.register(mapNib, forCellWithReuseIdentifier: MapCell.reuseId)
+        
+        // Popular Search Section
+        collectionView.register(UINib(nibName: "PopularSearchPurposeCell", bundle: nil), forCellWithReuseIdentifier: "PopularSearchPurposeCell")
+        collectionView.register(UINib(nibName: "PopularSearchCell", bundle: nil), forCellWithReuseIdentifier: "PopularSearchCell")
+        
         // Add more cells to register here
     }
 }
