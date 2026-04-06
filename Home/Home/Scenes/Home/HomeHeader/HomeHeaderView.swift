@@ -27,7 +27,7 @@ class HomeHeaderView: UIView {
     
     private let bottomCurveImageView: UIImageView = {
         let iv = UIImageView()
-        iv.image = UIImage(named: "Home-Header-Bottom-Curve")
+        iv.image = UIImage(named: "home-header-bottom-curve-uae")
         iv.contentMode = .scaleToFill
         return iv
     }()
@@ -123,11 +123,9 @@ class HomeHeaderView: UIView {
         backgroundHeightConstraint = backgroundImageView.heightAnchor.constraint(equalToConstant: 114)
         backgroundTopConstraint = backgroundImageView.topAnchor.constraint(equalTo: topAnchor, constant: 64)
         
-        // Horizontal pinning as per XIB
         NSLayoutConstraint.activate([
             backgroundTopConstraint!,
-            backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -18),
-            backgroundImageView.widthAnchor.constraint(equalToConstant: 284),
+            backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
             backgroundHeightConstraint!,
             
             topCurveImageView.topAnchor.constraint(equalTo: topAnchor, constant: 101),
@@ -145,7 +143,6 @@ class HomeHeaderView: UIView {
             bottomCurveTopConstraint!
         ])
         
-        // Correct height as per XIB
         bottomCurveHeightConstraint = bottomCurveImageView.heightAnchor.constraint(equalToConstant: 97)
         bottomCurveHeightConstraint?.isActive = true
         
@@ -153,12 +150,13 @@ class HomeHeaderView: UIView {
         contentTopConstraint = contentStackView.topAnchor.constraint(equalTo: topAnchor, constant: 165)
         
         // RELATIVE Vertical Chain for stable spacing
-        // Increased gaps for a more breathable layout
-        aiSearchTopConstraint = aiSearchView.topAnchor.constraint(equalTo: contentStackView.bottomAnchor, constant: 12)
+        // Decoupled AI Search to allow independent movement
+        aiSearchTopConstraint = aiSearchView.topAnchor.constraint(equalTo: topAnchor, constant: 221)
         dividerTopConstraint = dividerLabel.topAnchor.constraint(equalTo: aiSearchView.bottomAnchor, constant: 8)
         searchTopConstraint = searchView.topAnchor.constraint(equalTo: dividerLabel.bottomAnchor, constant: 8)
         
         // Definitive Overlay Fix (Pin bottom-most view to header bottom)
+        // Use a negative constant to ensure header bottom is BELOW the search view
         let bottomPin = searchView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 20)
         bottomPin.priority = .defaultLow // Allow height shrinkage during scroll
         bottomPin.isActive = true
@@ -199,20 +197,19 @@ class HomeHeaderView: UIView {
         
         if isGCCVariant {
             searchTopConstraint?.isActive = false
-            // Decoupled: Pin directly to topAnchor (165 Tabs + 36 Height + 16 Gap = 217)
             searchTopConstraint = searchView.topAnchor.constraint(equalTo: topAnchor, constant: 217)
             searchTopConstraint?.isActive = true
         } else {
             searchTopConstraint?.isActive = false
             searchTopConstraint = searchView.topAnchor.constraint(equalTo: dividerLabel.bottomAnchor, constant: 8)
             searchTopConstraint?.isActive = true
+            aiSearchTopConstraint?.isActive = true
         }
     }
     
     // MARK: - Animation Support
     func update(with offset: CGFloat) {
-        let stickyHeight: CGFloat = 140
-        let maxCollapseOffset: CGFloat = 120 // Duration of internal transitions
+        let maxCollapseOffset: CGFloat = 120
         let progress = min(1, max(0, offset / maxCollapseOffset))
         
         let fadeProgress = min(1, progress / 0.8)
@@ -228,7 +225,14 @@ class HomeHeaderView: UIView {
         backgroundImageView.isHidden = shouldHide
         logoImageView.isHidden = shouldHide
         topCurveImageView.isHidden = shouldHide
-        tabsView.isHidden = shouldHide
+        
+        // Dynamic Bottom Curve Asset Swap
+        // Use UAE gradient for expanded state, Solid for sticky state to avoid transparency
+        if progress > 0.9 {
+            bottomCurveImageView.image = UIImage(named: "Home-Header-Bottom-Curve")
+        } else {
+            bottomCurveImageView.image = UIImage(named: "home-header-bottom-curve-uae")
+        }
         
         // Animate Logo shrinking
         let initialLogoTop: CGFloat = 90
@@ -258,13 +262,21 @@ class HomeHeaderView: UIView {
             aiSearchView.setProgress(progress)
             
             // INDEPENDENT TOP ANIMATION (XIB Alignment)
-            // Initial offset 165 (Tabs Start) -> Collapsed end height 140
-            let initialTop: CGFloat = 165
-            let stickyYOffset: CGFloat = -115 // Adjusted to keep target around y=71
-            contentTopConstraint?.constant = initialTop + (stickyYOffset) * progress
+            // Tabs: 165 -> 50 (Move up/out)
+            let initialTabsTop: CGFloat = 165
+            let tabsStickyYOffset: CGFloat = -150
+            contentTopConstraint?.constant = initialTabsTop + (tabsStickyYOffset) * progress
+            
+            // AI Search: 221 -> 70 (Target sticky point to clear notch)
+            let initialAITop: CGFloat = 221
+            let aiStickyYOffset: CGFloat = -161 // Lands at 70pt from top
+            aiSearchTopConstraint?.constant = initialAITop + (aiStickyYOffset) * progress
             
             searchView.alpha = alpha
             searchView.isHidden = shouldHide
+            
+            // Keep tabs visible but faded to avoid "jump" effect
+            tabsView.isHidden = false
         } else {
             searchView.setProgress(progress)
             

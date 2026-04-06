@@ -137,7 +137,7 @@ extension HomeViewController: UICollectionViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let stickyHeight: CGFloat = 140
         let maxCollapseOffset: CGFloat = initialHeaderHeight - stickyHeight
-        let totalInset = initialHeaderHeight + 20
+        let totalInset = initialHeaderHeight + 50
         
         let absoluteOffset = scrollView.contentOffset.y + totalInset
         let progress = min(1, max(0, absoluteOffset / maxCollapseOffset))
@@ -145,6 +145,26 @@ extension HomeViewController: UICollectionViewDelegate {
         homeHeaderView.update(with: absoluteOffset)
         
         headerHeightConstraint?.constant = initialHeaderHeight - (initialHeaderHeight - stickyHeight) * progress
+    }
+   
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let stickyHeight: CGFloat = 140
+        let maxCollapseOffset: CGFloat = initialHeaderHeight - stickyHeight
+        let totalInset = initialHeaderHeight + 50
+        
+        let targetY = targetContentOffset.pointee.y + totalInset
+        
+        // Only snap if we are within the middle of the collapsing range
+        if targetY > 0 && targetY < maxCollapseOffset {
+            // SNAP THRESHOLD:
+            // If scrolled more than 50% of the range, snap to COLLAPSED
+            // otherwise, snap to EXPANDED
+            if targetY < maxCollapseOffset / 2 {
+                targetContentOffset.pointee.y = -totalInset
+            } else {
+                targetContentOffset.pointee.y = -totalInset + maxCollapseOffset
+            }
+        }
     }
    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HomeHeaderAISearchView: UIView {
+final class HomeHeaderAISearchView: UIView {
     
     // MARK: - UI Components
     private let containerView: UIView = {
@@ -24,7 +24,7 @@ class HomeHeaderAISearchView: UIView {
     
     private let aiIcon: UIImageView = {
         let iv = UIImageView()
-        iv.image = UIImage(named: "AI-Stars-Icon") // Assuming this asset exists or using a placeholder
+        iv.image = UIImage(named: "ai_search_logo")
         iv.contentMode = .scaleAspectFit
         return iv
     }()
@@ -33,23 +33,22 @@ class HomeHeaderAISearchView: UIView {
         let lbl = UILabel()
         lbl.text = "Search your dream home with AI"
         lbl.textColor = .darkGray
-        lbl.font = .systemFont(ofSize: 15, weight: .medium)
+        lbl.font = .bodyL1
         return lbl
     }()
     
     private let aiBadge: UILabel = {
         let lbl = UILabel()
         lbl.text = "AI"
-        lbl.textColor = .white
-        lbl.backgroundColor = UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 1.0)
-        lbl.font = .systemFont(ofSize: 10, weight: .bold)
-        lbl.textAlignment = .center
-        lbl.layer.cornerRadius = 4
-        lbl.clipsToBounds = true
-        lbl.widthAnchor.constraint(equalToConstant: 20).isActive = true
-        lbl.heightAnchor.constraint(equalToConstant: 14).isActive = true
+        lbl.textColor = .AppColors.blackTextColor
+        lbl.font = .boldBody
         return lbl
     }()
+    
+    // MARK: - Constants
+    private enum Constants {
+        static let gradientLayerName = "animatedGradientBorder"
+    }
     
     // MARK: - Init
     override init(frame: CGRect) {
@@ -60,6 +59,17 @@ class HomeHeaderAISearchView: UIView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.reApplyAnimatedGradient()
+    }
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window != nil else { return }
+        applyGradientBorder()
     }
     
     // MARK: - Setup
@@ -76,35 +86,51 @@ class HomeHeaderAISearchView: UIView {
         
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
-            containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            containerView.widthAnchor.constraint(equalToConstant: 343),
+            containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            aiIcon.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            aiIcon.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            aiIcon.widthAnchor.constraint(equalToConstant: 24),
-            aiIcon.heightAnchor.constraint(equalToConstant: 24),
-            
-            aiLabel.leadingAnchor.constraint(equalTo: aiIcon.trailingAnchor, constant: 12),
+            aiLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 18),
             aiLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             
             aiBadge.leadingAnchor.constraint(greaterThanOrEqualTo: aiLabel.trailingAnchor, constant: 8),
             aiBadge.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            aiBadge.centerYAnchor.constraint(equalTo: containerView.centerYAnchor)
+            aiBadge.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            
+            aiIcon.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            aiIcon.trailingAnchor.constraint(equalTo: aiBadge.leadingAnchor),
+            aiIcon.widthAnchor.constraint(equalToConstant: 24),
+            aiIcon.heightAnchor.constraint(equalToConstant: 24)
         ])
     }
     
     // MARK: - Animation Support
     func setProgress(_ progress: CGFloat) {
-        let activeColor = UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 1.0)
-        
-        // Keep background white as requested
         containerView.backgroundColor = .white
         
         // Text and Badge colors
         aiLabel.textColor = progress > 0.5 ? .black : .darkGray
-        aiBadge.backgroundColor = activeColor
-        aiBadge.textColor = .white
-        aiIcon.tintColor = activeColor
+    }
+    
+    func reApplyAnimatedGradient() {
+        if let gradient = layer.sublayers?.first(where: { $0.name == Constants.gradientLayerName }) as? CAGradientLayer {
+            gradient.frame = bounds
+            if let shape = gradient.mask as? CAShapeLayer {
+                shape.path = UIBezierPath(
+                    roundedRect: bounds.insetBy(dx: 1, dy: 1),
+                    cornerRadius: 24
+                ).cgPath
+            }
+        }
+    }
+    
+    func applyGradientBorder() {
+        applyAnimatedGradientBorder(colors: [
+            UIColor.AppColors.blue5,
+            UIColor.AppColors.green2,
+            UIColor.AppColors.lightDividerColorSecondary,
+            UIColor.AppColors.lightDividerColorSecondary,
+            UIColor.AppColors.green5
+        ], lineWidth: 2, cornerRadius: 24)
     }
 }
