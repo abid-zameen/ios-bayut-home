@@ -180,4 +180,63 @@ extension UIView {
         layer.addSublayer(gradientLayer)
     }
 
+    func applyTruBrokerTheme(radius: CGFloat? = nil) {
+        if let oldLayer = layer.sublayers?.first(where: { $0 is CAGradientLayer }) {
+            oldLayer.removeFromSuperlayer()
+        }
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [
+            UIColor.AppColors.deepTealColor.cgColor,
+            UIColor.AppColors.emeraldTideColor.cgColor,
+            UIColor.AppColors.midnightAquaColor.cgColor
+        ]
+        gradientLayer.locations = [0.2, 0.49, 0.72]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        gradientLayer.frame = bounds
+        gradientLayer.cornerRadius = radius ?? layer.cornerRadius
+        layer.masksToBounds = true
+        layer.insertSublayer(gradientLayer, at: 0)
+    }
+    
+    func addBadgeShadow(opacity: CGFloat = 0.1) {
+        layer.masksToBounds = false
+        layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: opacity).cgColor
+        layer.shadowOpacity = 1
+        layer.shadowOffset = CGSize(width: 0, height: 3)
+        layer.shadowRadius = 2
+        let backgroundCGColor = backgroundColor?.cgColor
+        backgroundColor = nil
+        layer.backgroundColor = backgroundCGColor
+    }
+    
+    func updateShadowFrame() {
+        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
+    }
+    
+    func removeGradientLayer() {
+        layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
+    }
+    
+    func applyShadow(
+        offsetX: CGFloat,
+        offsetY: CGFloat,
+        blur: CGFloat,
+        spread: CGFloat,
+        color: UIColor,
+        opacity: Float
+    ) {
+        self.layer.shadowColor = color.cgColor
+        self.layer.shadowOpacity = opacity
+        self.layer.shadowOffset = CGSize(width: offsetX, height: offsetY)
+        self.layer.shadowRadius = blur / 2.0
+        
+        if spread == 0 {
+            self.layer.shadowPath = UIBezierPath(rect: bounds).cgPath
+        } else {
+            let dx = -spread
+            let rect = bounds.insetBy(dx: dx, dy: dx)
+            self.layer.shadowPath = UIBezierPath(rect: rect).cgPath
+        }
+    }
 }

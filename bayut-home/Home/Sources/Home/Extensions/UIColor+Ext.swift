@@ -63,6 +63,22 @@ extension UIColor {
         static let lightGreenBackgroundColor = UIColor(hex: "#ECF9F6")
         static let lightDividerColorSecondary = UIColor(hex: "#EFEFEF")
         
+        static let redChipTitleColor = UIColor(hex: "#F96E6E")
+        static let redChipOutlineColor = UIColor(hex: "#FDC0C0")
+        static let blueChipTitleColor = UIColor(hex: "#63B7E3")
+        static let blueChipOutlineColor = UIColor(hex: "#BCE0F3")
+        static let purpleOutlineColor = UIColor(hex: "#D6BDDF")
+        static let purpleTitleColor = UIColor(hex: "#A265B5")
+        static let grayChipTitleColor = UIColor(hex: "#495057")
+        static let grayChipOutlineColor = UIColor(hex: "#CED4DA")
+        
+        static let signatureTagGradientColor1 = UIColor(hex: "#696EFF")
+        static let signatureTagGradientColor2 = UIColor(hex: "#D466DE")
+        static let hotTagGradientColor1 = UIColor(hex: "#AB251D")
+        static let hotTagGradientColor2 = UIColor(hex: "#DD5050")
+        static let bookUntilGradientColor1 = UIColor(hex: "#41b997")
+        static let bookUntilGradientColor2 = UIColor(hex: "#00a075")
+        
 
         // Advanced Report Theme Colors
         static let teal = UIColor(hex: "#02312C").withAlphaComponent(0.8)
@@ -73,6 +89,12 @@ extension UIColor {
         static let green = UIColor(hex: "#18b079").withAlphaComponent(0.8)
         static let lightBlue = UIColor(hex: "#0693e3").withAlphaComponent(0.8)
         static let lightPurple = UIColor(hex: "#9b51e0").withAlphaComponent(0.8)
+
+        // TruBroker and Status Colors
+        static let midnightAquaColor = UIColor(hex: "#033F46")
+        static let emeraldTideColor = UIColor(hex: "#00745F")
+        static let deepTealColor = UIColor(hex: "#053940")
+        static let lightGreenChipColor = UIColor(hex: "#098F79")
     }
     
     

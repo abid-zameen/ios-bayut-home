@@ -14,17 +14,24 @@ let package = Package(
             targets: ["Home"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/SectorLabs/ios-network-core", from: "1.0.4"),
+        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.10.0")
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "Home",
-            path: "Sources",
+            dependencies: [
+                .product(name: "NetworkLayer", package: "ios-network-core"),
+                "Kingfisher"
+            ],
+            path: "Sources/Home",
             resources: [
                 .process("Resources/Assets.xcassets"),
                 .process("Resources/Lato")
             ]
         ),
-
     ]
 )
