@@ -8,7 +8,7 @@
 import Foundation
 
 protocol HomePresentationLogic: AnyObject {
-    func presentData()
+    func presentData(data: Home.HomeSections?)
 }
 
 final class HomePresenter: HomePresentationLogic {
@@ -16,11 +16,11 @@ final class HomePresenter: HomePresentationLogic {
     
     // MARK: - HomePresentationLogic
     @MainActor
-    func presentData() {
+    func presentData(data: Home.HomeSections?) {
         guard let viewController = viewController as? HomeViewController else { return }
         
-        // MARK: Mock Data Layer
-        let locations = [
+        // MARK: Mock Data Layer (Fallback if not provided)
+        let locations = data?.locations ?? [
             LocationChipViewModel(name: "Dubai Marina", localizedName: "Dubai Marina", externalID: "1", isSelected: true),
             LocationChipViewModel(name: "Downtown Dubai", localizedName: "Downtown Dubai", externalID: "2", isSelected: false),
             LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "4", isSelected: false),
@@ -35,7 +35,7 @@ final class HomePresenter: HomePresentationLogic {
             LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "13", isSelected: false)
         ]
         
-        let projects = [
+        let projects = data?.projects ?? [
             NewProject(
                 id: "p1",
                 title: "Luxury Villa",
@@ -58,38 +58,34 @@ final class HomePresenter: HomePresentationLogic {
             )
         ]
         
-        let favourites = [
-            FavouriteProperty(id: "f1", title: "Mag 214 Tower", location: "Jumeirah Lake Towers (JLT)", price: "AED 2,500,000", beds: "2", baths: "2", area: "1,234 sqft", imageURL: nil),
-            FavouriteProperty(id: "f2", title: "Marina Heights", location: "Dubai Marina", price: "AED 3,200,000", beds: "3", baths: "3", area: "1,800 sqft", imageURL: nil),
-            FavouriteProperty(id: "f3", title: "Burj Khalifa Apartment", location: "Downtown Dubai", price: "AED 15,000,000", beds: "3", baths: "4", area: "2,500 sqft", imageURL: nil)
-        ]
+        let favourites = data?.favourites ?? [] // Mocks removed for simplicity as we have real data flow now
         
-        let savedSearches = [
+        let savedSearches = data?.savedSearches ?? [
             SavedSearchesModel(title: "Apartment for Sale", location: "Dubai Marina", searchName: "Marina Apartments", image: ""),
             SavedSearchesModel(title: "Villa for Rent", location: "Palm Jumeirah", searchName: "Palm Villas", image: ""),
             SavedSearchesModel(title: "Office for Sale", location: "Downtown Dubai", searchName: "Downtown Offices", image: "")
         ]
         
-        let blogs = [
+        let blogs = data?.blogs ?? [
             BlogData(title: "Dubai Real Estate Market 2026", category: "Market Profile", image: ""),
             BlogData(title: "Top 5 Areas for Families", category: "Area Guides", image: ""),
             BlogData(title: "Mortgage Guide for Expats", category: "Home Buying", image: "")
         ]
         
-        let nearbyLocations = [
+        let nearbyLocations = data?.nearbyLocations ?? [
             NearbyLocation(name: "Dubai Marina Mall", distance: "0.5 km", city: "Dubai"),
             NearbyLocation(name: "JBR Beach", distance: "1.2 km", city: "Dubai"),
             NearbyLocation(name: "Skydive Dubai", distance: "2.0 km", city: "Dubai")
         ]
         
-        let popularSearches = [
+        let popularSearches = data?.popularSearches ?? [
             PopularSearch(title: "Apartments", location: "in UAE", iconName: "rent_icon"),
             PopularSearch(title: "Villas", location: "in Dubai", iconName: "buy_icon"),
             PopularSearch(title: "Offices", location: "in Abu Dhabi", iconName: "commercial_icon"),
             PopularSearch(title: "Townhouses", location: "in UAE", iconName: "buy_icon")
         ]
         
-        let purposes: [PopularSearchPurpose] = [.buy, .rent]
+        let purposes: [PopularSearchPurpose] = data?.purposes ?? [.buy, .rent]
         
         let sectionsBuilder = HomeSectionBuilder()
         let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
@@ -99,10 +95,10 @@ final class HomePresenter: HomePresentationLogic {
             savedSearches: savedSearches,
             blogs: blogs,
             nearbyLocations: nearbyLocations,
-            isLocationEnabled: false,
+            isLocationEnabled: data?.isLocationEnabled ?? false,
             popularSearches: popularSearches,
             purposes: purposes,
-            selectedPurpose: .rent,
+            selectedPurpose: data?.selectedPurpose ?? .rent,
             viewController: viewController)
         )
         

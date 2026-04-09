@@ -7,53 +7,200 @@
 
 import UIKit
 
-struct FavouriteCellViewModel: Hashable {
-    let id: String
-    let price: String
-    let beds: String
-    let baths: String
-    let area: String
-    let location: String
-    let imageUrl: URL?
-}
-
-class FavouritesCell: UICollectionViewCell {
+final class FavouritesCell: UICollectionViewCell {
     
     // MARK: - IBOutlets
-    @IBOutlet private weak var propertyImage: UIImageView?
-    @IBOutlet private weak var priceLabel: UILabel?
+    @IBOutlet private weak var bgView: UIView?
+    @IBOutlet private weak var propertyImageBgView: UIView?
+    @IBOutlet private weak var propertyImageView: UIImageView?
+    @IBOutlet private weak var trueCheckButton: UIButton?
+    @IBOutlet private weak var offPlanBadgeView: UIView?
+    @IBOutlet private weak var favoriteButton: UIButton?
+    @IBOutlet private weak var currencyPriceAndFrequencyLabel: UILabel?
+    @IBOutlet private weak var bedsImageView: UIImageView?
+    @IBOutlet private weak var bathsImageView: UIImageView?
+    @IBOutlet private weak var areaImageView: UIImageView?
     @IBOutlet private weak var bedsLabel: UILabel?
     @IBOutlet private weak var bathsLabel: UILabel?
     @IBOutlet private weak var areaLabel: UILabel?
-    @IBOutlet private weak var locationLabel: UILabel?
+    @IBOutlet private weak var propertyTitleLabel: UILabel?
+    @IBOutlet private weak var propertyAddressLabel: UILabel?
+    @IBOutlet private weak var hotView: PropertyBadgeView?
+    @IBOutlet private weak var bedStackView: UIStackView?
+    @IBOutlet private weak var bathStackView: UIStackView?
+    @IBOutlet private weak var areaStackView: UIStackView?
+    @IBOutlet private weak var contactedView: UIView?
+    @IBOutlet private weak var contactedLabel: UILabel?
+    @IBOutlet private weak var viewedButtonTransparent: UIButton?
+    @IBOutlet private weak var contactedViewWidth: NSLayoutConstraint?
+    @IBOutlet private weak var contactedViewHeight: NSLayoutConstraint?
+    @IBOutlet private weak var offPlanResaleBadgeView: UIView?
+    @IBOutlet private weak var bookUntilDailyRentalTagView: PropertyBadgeView?
+    @IBOutlet private weak var downPaymentInfoView: UIView?
+    @IBOutlet private weak var downPaymentDetailView: DownPaymentView?
+    @IBOutlet private weak var offPlanResaleLabel: UILabel?
+    @IBOutlet private weak var resaleLabelStackView: UIStackView?
+    @IBOutlet private weak var resaleLabel: UILabel?
+    @IBOutlet private weak var potwView: UIView?
+    @IBOutlet private weak var potwLabel: UILabel?
+    @IBOutlet private weak var potwButton: UIButton?
+    @IBOutlet private weak var truBrokerBadge: TruBrokerBadge?
+    @IBOutlet private weak var imagesContainerHeightConstraint: NSLayoutConstraint?
+    @IBOutlet private weak var offPlanInformationView: UIView?
+    @IBOutlet private weak var offPlanDetailView: OffPlanPropertyCardView?
+    @IBOutlet private weak var offplanResaleTransparentButton: UIButton?
+    @IBOutlet private weak var offplanTransparentButton: UIButton?
+    @IBOutlet private weak var offPlanTitle: UILabel?
 
+    // MARK: - Properties
+    private var viewModel: FavoritesCellViewModelType?
+    
+    // MARK: - Lifecycle
     override func awakeFromNib() {
         super.awakeFromNib()
         setupViews()
     }
     
-    func configure(with viewModel: FavouriteCellViewModel) {
-        priceLabel?.text = viewModel.price
+    override func configure(with viewModel: Any) {
+        guard let viewModel = viewModel as? FavoritesCellViewModelType else { return }
+        self.viewModel = viewModel
+        setupWithViewModel()
+    }
+    
+    // MARK: - IBActions
+    @IBAction private func offplanResalePressedAction(_ sender: UIButton) {
+        // TODO: Handle offplan resale action
+    }
+    
+    @IBAction private func offplanPressedAction(_ sender: UIButton) {
+        // TODO: Handle offplan action
+    }
+    
+    @IBAction private func favoriteAction() {
+        // TODO: Handle favorite action using viewModel?.id
+    }
+    
+    @IBAction private func viewedAction(_ sender: UIButton) {
+        // TODO: Handle viewed action
+    }
+    
+    @IBAction private func verificationAction() {
+        // TODO: Handle verification action
+    }
+    
+    @IBAction private func potwAction(_ sender: UIButton) {
+        // TODO: Handle POTW action
+    }
+
+}
+
+// MARK: - Private Methods
+private extension FavouritesCell {
+    
+    func setupViews() {
+        let isProductTypeEnabled = true
+        let isTruBrokerEnabled = true
+        let cardCornerRadius: CGFloat = 8
+        
+        hotView?.isHidden = !isProductTypeEnabled
+        
+        bgView?.setRoundedCorner(radius: cardCornerRadius)
+        bgView?.setBorder(.clear, width: 1)
+        
+        propertyImageBgView?.backgroundColor = .yellow
+        propertyImageBgView?.setRoundedCorner(radius: cardCornerRadius)
+        propertyImageView?.setRoundedCorner(radius: cardCornerRadius)
+        
+        
+        offPlanBadgeView?.backgroundColor = UIColor.AppColors.blackTextColor.withAlphaComponent(0.8)
+        offPlanBadgeView?.layer.cornerRadius = 12
+        offPlanBadgeView?.addBadgeShadow()
+        
+        offPlanResaleBadgeView?.backgroundColor = UIColor.AppColors.blue1
+        offPlanResaleBadgeView?.layer.cornerRadius = 12
+        offPlanResaleBadgeView?.addBadgeShadow()
+        
+        potwView?.layer.cornerRadius = 12.0
+        potwView?.addBadgeShadow()
+        potwView?.layer.borderWidth = 1.0
+        potwView?.layer.borderColor = UIColor.AppColors.purpleOutlineColor.cgColor
+        
+        // 4. Texts and Fonts
+        offPlanTitle?.text = "offplan".localized()
+        offPlanTitle?.textColor = UIColor.AppColors.grey1
+        offPlanResaleLabel?.text = "offplan".localized()
+        resaleLabel?.text = "resale".localized()
+        resaleLabel?.font = UIFont.appRegularFont(ofSize: 12.0)
+        
+        bedsLabel?.textColor = UIColor.AppColors.grey7
+        bedsLabel?.font = UIFont.body
+        bathsLabel?.textColor = UIColor.AppColors.grey7
+        bathsLabel?.font = UIFont.body
+        areaLabel?.textColor = UIColor.AppColors.grey7
+        areaLabel?.font = UIFont.body
+        propertyTitleLabel?.textColor = UIColor.AppColors.grey7
+        propertyTitleLabel?.font = UIFont.semiBoldBody
+        propertyAddressLabel?.textColor = UIColor.AppColors.grey7
+        propertyAddressLabel?.font = UIFont.body
+        
+        // 5. Icons Tinting
+        let iconTint = UIColor.AppColors.grey6
+        bedsImageView?.tintColor = iconTint
+        bathsImageView?.tintColor = iconTint
+        areaImageView?.tintColor = iconTint
+        
+        // 6. Interaction Elements
+        offplanTransparentButton?.setTitle("", for: .normal)
+        offplanResaleTransparentButton?.setTitle("", for: .normal)
+        potwButton?.setTitle("", for: .normal)
+        
+        favoriteButton?.isSelected = true
+        imagesContainerHeightConstraint?.constant = 228
+        
+        downPaymentInfoView?.isHidden = true
+        
+        setupViewedButtonAttributes()
+        setupForViewedListing()
+    }
+    
+    func setupWithViewModel() {
+        guard let viewModel else { return }
+        
+        currencyPriceAndFrequencyLabel?.text = viewModel.price
+        propertyTitleLabel?.text = viewModel.title
+        propertyAddressLabel?.text = viewModel.location
+        
         bedsLabel?.text = viewModel.beds
         bathsLabel?.text = viewModel.baths
         areaLabel?.text = viewModel.area
-        locationLabel?.text = viewModel.location
         
-        // Image loading logic would go here (e.g. SDWebImage)
-        // propertyImage?.sd_setImage(with: viewModel.imageUrl)
+        propertyImageView?.loadImage(with: viewModel.imageUrl)
+        trueCheckButton?.isHidden = true
+        setupForViewedListing()
+        setBadgeComponent()
+        
+        offPlanDetailView?.property = viewModel.property
+        let hasOffPlanInfo = viewModel.property.handoverDate != nil || viewModel.property.paymentPlanPercentage != nil
+        offPlanInformationView?.isHidden = !hasOffPlanInfo
     }
-}
-
-private extension FavouritesCell {
-    func setupViews() {
-        contentView.layer.cornerRadius = 8
-        contentView.clipsToBounds = true
-        
-        // Add shadow to the cell if needed, or rely on mainContentView
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.1
-        layer.shadowOffset = CGSize(width: 0, height: 2)
-        layer.shadowRadius = 4
-        clipsToBounds = false
+    
+    func setupViewedButtonAttributes() {
+        contactedView?.backgroundColor = UIColor.AppColors.grey1
+        contactedView?.setRoundedWithRespectToHeight(shouldClipToBounds: true)
+        contactedLabel?.textColor = UIColor.AppColors.grey6
+        contactedLabel?.font = UIFont.headingL6
+        viewedButtonTransparent?.setBackgroundColor(color: .clear, forState: .normal)
+        viewedButtonTransparent?.setTitle("" ,for: .normal)
+    }
+    
+    func setupForViewedListing() {
+        // TODO: Add ViewedListing support to the viewModel/Property
+        contactedView?.isHidden = true
+        contactedViewWidth?.constant = 0
+        contactedView?.setRoundedWithRespectToHeight(shouldClipToBounds: true)
+    }
+    
+    func setBadgeComponent() {
+        truBrokerBadge?.isHidden = true
     }
 }

@@ -62,15 +62,15 @@ final class FavouritesCarouselSection: SectionDescriptor {
     let identifier: FavouritesSectionId = .carousel
     
     struct Item: Hashable {
-        let property: FavouriteProperty
+        let property: Property
         func hash(into hasher: inout Hasher) { hasher.combine(property.id) }
         static func == (lhs: Item, rhs: Item) -> Bool { lhs.property.id == rhs.property.id }
     }
     
-    private let properties: [FavouriteProperty]
+    private let properties: [Property]
     private let actions: FavouritesActions
     
-    init(properties: [FavouriteProperty], section: HomeSection?, actions: FavouritesActions) {
+    init(properties: [Property], section: HomeSection?, actions: FavouritesActions) {
         self.properties = properties
         self.actions = actions
     }
@@ -85,36 +85,29 @@ final class FavouritesCarouselSection: SectionDescriptor {
             heightDimension: .estimated(FavouritesLayout.cardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(FavouritesLayout.cardWidth),
+            widthDimension: .fractionalWidth(1.0),
             heightDimension: .estimated(FavouritesLayout.cardHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .continuous
-        section.interGroupSpacing = FavouritesLayout.spacing
+        section.orthogonalScrollingBehavior = .groupPaging
+        section.interGroupSpacing = 0
         section.contentInsets = NSDirectionalEdgeInsets(
             top: FavouritesLayout.spacing,
-            leading: 16,
+            leading: 0,
             bottom: 0,
-            trailing: 16
+            trailing: 0
         )
         return section
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FavouritesCell.reuseId, for: indexPath) as? FavouritesCell else { return UICollectionViewCell() }
-        let vm = FavouriteCellViewModel(
-            id: item.property.id,
-            price: item.property.price,
-            beds: item.property.beds,
-            baths: item.property.baths,
-            area: item.property.area,
-            location: item.property.location,
-            imageUrl: item.property.imageURL
-        )
+        let vm = FavouriteCellViewModel(property: item.property)
         cell.configure(with: vm)
         return cell
     }

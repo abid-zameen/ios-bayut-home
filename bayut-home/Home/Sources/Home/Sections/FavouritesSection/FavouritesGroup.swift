@@ -7,18 +7,6 @@
 
 import Foundation
 
-// MARK: - Safe Data Models
-struct FavouriteProperty: Hashable {
-    let id: String
-    let title: String
-    let location: String
-    let price: String
-    let beds: String
-    let baths: String
-    let area: String
-    let imageURL: URL?
-}
-
 // MARK: - Section Group
 final class FavouritesGroup: SectionGroup {
     let groupId: String = "favouritesGroup"
@@ -27,13 +15,13 @@ final class FavouritesGroup: SectionGroup {
     
     private let title: String
     private let viewAllTitle: String
-    private let properties: [FavouriteProperty]
+    private let properties: [Property]
     private let actions: FavouritesActions
     
     init(
         title: String,
         viewAllTitle: String,
-        properties: [FavouriteProperty],
+        properties: [Property],
         actions: FavouritesActions
     ) {
         self.title = title

@@ -41,12 +41,18 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
         setupConstraints()
         configureDataSource()
         CellRegistry.registerCells(in: collectionView)
-        interactor?.loadData()
+    }
+    
+    func loadData() {
+        Task {
+            await interactor?.loadData()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        self.loadData()
     }
     
     override func viewDidLayoutSubviews() {
