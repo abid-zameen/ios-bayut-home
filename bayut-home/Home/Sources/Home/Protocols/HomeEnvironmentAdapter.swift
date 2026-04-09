@@ -8,4 +8,6 @@ public protocol HomeEnvironmentAdapter {
     var algoliaAppID: String { get }
     var algoliaAPIKey: String { get }
     var userID: String? { get }
+    var blogAuthorization: String { get }
+    var blogAuthorizationHeaderKey: String { get }
 }

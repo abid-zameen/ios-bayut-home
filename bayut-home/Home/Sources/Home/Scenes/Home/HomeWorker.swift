@@ -12,6 +12,7 @@ protocol HomeWorkerLogic: AnyObject {
     func fetchProjectsData() async
     func fetchFavoritesIDs(userID: String) async throws -> [String]
     func fetchFavoritesProperties(ids: [String]) async throws -> [Property]
+    func fetchLatestBlogs() async throws -> [Blog]
 }
 
 final class HomeWorker: HomeWorkerLogic {
@@ -85,5 +86,31 @@ final class HomeWorker: HomeWorkerLogic {
         
         let result: SearchResult<AlgoliaPropertyHit> = try await networking.searchService.search(query: request, in: Constants.listingsIndexName)
         return result.hits?.map { Property(hit: $0) } ?? []
+    }
+    
+    func fetchLatestBlogs() async throws -> [Blog] {
+        let headers: [String: String] = [
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            HomeModule.shared.environment.blogAuthorizationHeaderKey: HomeModule.shared.environment.blogAuthorization
+        ]
+        
+        let queryItems = [
+            "lang" :"en",
+            "category" : "market-trends"
+        ]
+        
+        let request = APIRequestBuilder.create(
+            path: "/mybayut/wp-json/bayutapi/v2/latest/",
+            type: .get,
+            encoding: .url,
+            params: queryItems,
+            headers: headers,
+            cache: .none,
+            shouldHandleCookies: true,
+            fullURL: "https://www.bayut.com/mybayut/wp-json/bayutapi/v2/latest/"
+        )
+        
+        return try await networking.networkingService.execute(request: request)
     }
 }

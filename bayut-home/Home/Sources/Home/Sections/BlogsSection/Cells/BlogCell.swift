@@ -47,6 +47,6 @@ private extension BlogCell {
         guard let viewModel else { return }
         blogTitleLabel?.text = viewModel.title
         categoryLabel?.text = viewModel.category
-        blogImageView?.image = UIImage(named: viewModel.image, in: .module, compatibleWith: nil)
+        blogImageView?.loadImage(with: viewModel.image)
     }
 }

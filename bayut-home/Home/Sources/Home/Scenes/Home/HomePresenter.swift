@@ -58,7 +58,7 @@ final class HomePresenter: HomePresentationLogic {
             )
         ]
         
-        let favourites = data?.favourites ?? [] // Mocks removed for simplicity as we have real data flow now
+        let favourites = data?.favourites ?? []
         
         let savedSearches = data?.savedSearches ?? [
             SavedSearchesModel(title: "Apartment for Sale", location: "Dubai Marina", searchName: "Marina Apartments", image: ""),
@@ -66,11 +66,7 @@ final class HomePresenter: HomePresentationLogic {
             SavedSearchesModel(title: "Office for Sale", location: "Downtown Dubai", searchName: "Downtown Offices", image: "")
         ]
         
-        let blogs = data?.blogs ?? [
-            BlogData(title: "Dubai Real Estate Market 2026", category: "Market Profile", image: ""),
-            BlogData(title: "Top 5 Areas for Families", category: "Area Guides", image: ""),
-            BlogData(title: "Mortgage Guide for Expats", category: "Home Buying", image: "")
-        ]
+        let blogs = data?.blogs ?? []
         
         let nearbyLocations = data?.nearbyLocations ?? [
             NearbyLocation(name: "Dubai Marina Mall", distance: "0.5 km", city: "Dubai"),
@@ -78,7 +74,7 @@ final class HomePresenter: HomePresentationLogic {
             NearbyLocation(name: "Skydive Dubai", distance: "2.0 km", city: "Dubai")
         ]
         
-        let popularSearches = data?.popularSearches ?? [
+        let popularSearches = [
             PopularSearch(title: "Apartments", location: "in UAE", iconName: "rent_icon"),
             PopularSearch(title: "Villas", location: "in Dubai", iconName: "buy_icon"),
             PopularSearch(title: "Offices", location: "in Abu Dhabi", iconName: "commercial_icon"),

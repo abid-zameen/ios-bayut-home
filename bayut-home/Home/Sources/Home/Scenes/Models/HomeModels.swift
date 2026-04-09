@@ -16,7 +16,7 @@ struct Home {
         let locations: [LocationChipViewModel]
         let favourites: [Property]
         let savedSearches: [SavedSearchesModel]
-        let blogs: [BlogData]
+        let blogs: [Blog]
         let nearbyLocations: [NearbyLocation]
         let isLocationEnabled: Bool
         let popularSearches: [PopularSearch]

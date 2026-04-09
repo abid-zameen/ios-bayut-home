@@ -26,6 +26,7 @@ final class HomeInteractor: HomeBusinessLogic {
     // MARK: - HomeBusinessLogic
     func loadData() async {
         var favouriteProperties: [Property] = []
+        var latestBlogs: [Blog] = []
         
         do {
             if let userID = adapter.environment.userID {
@@ -34,8 +35,10 @@ final class HomeInteractor: HomeBusinessLogic {
                     favouriteProperties = try await worker.fetchFavoritesProperties(ids: favIds)
                 }
             }
+            
+            latestBlogs = try await worker.fetchLatestBlogs()
         } catch {
-            print("HomeInteractor: Error loading favorites: \(error)")
+            print("HomeInteractor: Error loading data: \(error)")
         }
         
         await MainActor.run {
@@ -44,7 +47,7 @@ final class HomeInteractor: HomeBusinessLogic {
                 locations: [],
                 favourites: favouriteProperties,
                 savedSearches: [],
-                blogs: [],
+                blogs: latestBlogs,
                 nearbyLocations: [],
                 isLocationEnabled: false,
                 popularSearches: [],

@@ -64,15 +64,6 @@ final class HomeSectionBuilder {
         )
         sections.append(contentsOf: savedSearchesGroup.buildSections())
         
-        let nearbyActions = NearbyLocationsActions(delegate: sectionsData.viewController)
-        let nearbyGroup = NearbyLocationsGroup(
-            title: "Nearby Locations",
-            isLocationEnabled: sectionsData.isLocationEnabled,
-            locations: sectionsData.nearbyLocations,
-            actions: nearbyActions
-        )
-        sections.append(contentsOf: nearbyGroup.buildSections())
-        
         let popularSearchActions = PopularSearchActions(delegate: sectionsData.viewController)
         let popularSearchGroup = PopularSearchGroup(
             title: "Popular Searches",
@@ -82,6 +73,16 @@ final class HomeSectionBuilder {
             actions: popularSearchActions
         )
         sections.append(contentsOf: popularSearchGroup.buildSections())
+        
+        let nearbyActions = NearbyLocationsActions(delegate: sectionsData.viewController)
+        let nearbyGroup = NearbyLocationsGroup(
+            title: "Nearby Locations",
+            isLocationEnabled: sectionsData.isLocationEnabled,
+            locations: sectionsData.nearbyLocations,
+            actions: nearbyActions
+        )
+        sections.append(contentsOf: nearbyGroup.buildSections())
+        
         
         let blogsActions = BlogsActions(delegate: sectionsData.viewController)
         let blogsGroup = BlogsGroup(

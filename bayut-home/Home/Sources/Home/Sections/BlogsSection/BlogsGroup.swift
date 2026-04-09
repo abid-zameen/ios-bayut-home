@@ -14,13 +14,13 @@ final class BlogsGroup: SectionGroup {
     
     private let title: String
     private let viewAllTitle: String
-    private let blogs: [BlogData]
+    private let blogs: [Blog]
     private let actions: BlogsActions
     
     init(
         title: String,
         viewAllTitle: String,
-        blogs: [BlogData],
+        blogs: [Blog],
         actions: BlogsActions
     ) {
         self.title = title

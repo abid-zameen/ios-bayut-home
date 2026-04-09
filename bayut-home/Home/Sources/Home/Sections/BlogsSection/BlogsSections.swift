@@ -23,7 +23,7 @@ private enum BlogsLayout {
     static let spacing: CGFloat = 16
     
     static let cardWidth: CGFloat = 280
-    static let estimatedCardHeight: CGFloat = 250
+    static let estimatedCardHeight: CGFloat = 260
 }
 
 final class BlogsTitleSection: SectionDescriptor {
@@ -55,15 +55,15 @@ final class BlogsCarouselSection: SectionDescriptor {
     let identifier: BlogsSectionId = .carousel
     
     struct Item: Hashable {
-        let blog: BlogData
+        let blog: Blog
         func hash(into hasher: inout Hasher) { hasher.combine(blog.title) }
         static func == (lhs: Item, rhs: Item) -> Bool { lhs.blog.title == rhs.blog.title }
     }
     
-    private let blogs: [BlogData]
+    private let blogs: [Blog]
     private let actions: BlogsActions
     
-    init(blogs: [BlogData], section: HomeSection?, actions: BlogsActions) {
+    init(blogs: [Blog], section: HomeSection?, actions: BlogsActions) {
         self.blogs = blogs
         self.actions = actions
     }
@@ -75,13 +75,13 @@ final class BlogsCarouselSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(BlogsLayout.estimatedCardHeight)
+            heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(BlogsLayout.cardWidth),
-            heightDimension: .estimated(BlogsLayout.estimatedCardHeight)
+            widthDimension: .fractionalWidth(0.85),
+            heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
