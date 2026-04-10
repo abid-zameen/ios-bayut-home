@@ -55,8 +55,8 @@ final class SavedSearchesCarouselSection: SectionDescriptor {
     
     struct Item: Hashable {
         let search: SavedSearchesModel
-        func hash(into hasher: inout Hasher) { hasher.combine(search.searchName) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.search.searchName == rhs.search.searchName }
+        func hash(into hasher: inout Hasher) { hasher.combine(search.name) }
+        static func == (lhs: Item, rhs: Item) -> Bool { lhs.search.name == rhs.search.name }
     }
     
     private let searches: [SavedSearchesModel]
@@ -77,21 +77,22 @@ final class SavedSearchesCarouselSection: SectionDescriptor {
             heightDimension: .estimated(SavedSearchesLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(SavedSearchesLayout.cardWidth),
+            widthDimension: .fractionalWidth(1.0),
             heightDimension: .estimated(SavedSearchesLayout.estimatedCardHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .continuous
+        section.orthogonalScrollingBehavior = .groupPagingCentered
         section.interGroupSpacing = SavedSearchesLayout.spacing
         section.contentInsets = NSDirectionalEdgeInsets(
             top: SavedSearchesLayout.spacing,
-            leading: 16,
+            leading: 0,
             bottom: 0,
-            trailing: 16
+            trailing: 0
         )
         return section
     }

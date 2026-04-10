@@ -5,9 +5,12 @@
 //  Created by Hammad Shahid on 02/04/2026.
 //
 
+import Foundation
+
 struct SavedSearchesModel {
-    let title: String
+    let name: String
+    let displayTitle: String
     let location: String
-    let searchName: String
-    let image: String
+    let showIcon: Bool
+    let imageName: String?
 }

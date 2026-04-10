@@ -54,6 +54,7 @@ private extension SavedSearchesCell {
         searchNameLabel?.text = viewModel.searchName
         locationsLabel?.text = viewModel.location
         imageView.image = viewModel.image
+        imageView.isHidden = !viewModel.showIcon
     }
 }
 
