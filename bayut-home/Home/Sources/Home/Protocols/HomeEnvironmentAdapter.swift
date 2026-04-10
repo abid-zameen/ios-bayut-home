@@ -10,4 +10,9 @@ public protocol HomeEnvironmentAdapter {
     var userID: String? { get }
     var blogAuthorization: String { get }
     var blogAuthorizationHeaderKey: String { get }
+    
+    // MARK: - Location
+    var userCoordinates: (lat: Double, lon: Double)? { get }
+    var isLocationAuthorized: Bool { get }
+    func requestLocationAuthorization()
 }

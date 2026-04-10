@@ -13,6 +13,9 @@ protocol HomeWorkerLogic: AnyObject {
     func fetchFavoritesIDs(userID: String) async throws -> [String]
     func fetchFavoritesProperties(ids: [String]) async throws -> [Property]
     func fetchLatestBlogs() async throws -> [Blog]
+    func fetchSavedSearches(userID: String) async throws -> [SavedSearch]
+    func fetchLocations(slugs: [String]) async throws -> [Location]
+    func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [Location]
 }
 
 final class HomeWorker: HomeWorkerLogic {
@@ -22,6 +25,7 @@ final class HomeWorker: HomeWorkerLogic {
     private enum Constants {
         static let listingsIndexName = "bayut-development-ads-en"
         static let projectIndexName = "bayut-development-ads-project-en"
+        static let locationsIndexName = "bayut-development-locations-en"
     }
     
     init(networking: HomeNetworkingAdapter) {
@@ -112,5 +116,56 @@ final class HomeWorker: HomeWorkerLogic {
         )
         
         return try await networking.networkingService.execute(request: request)
+    }
+    
+    func fetchSavedSearches(userID: String) async throws -> [SavedSearch] {
+        let request = APIRequestBuilder.create(
+            path: "/api/user/\(userID)/searches/saved/",
+            type: .get,
+            headers: [
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            ],
+            cache: .none,
+            shouldHandleCookies: true
+        )
+            
+        return try await networking.networkingService.execute(request: request)
+    }
+    
+    func fetchLocations(slugs: [String]) async throws -> [Location] {
+        guard !slugs.isEmpty else { return [] }
+        
+        let filterString = slugs.map { "slug:\"\($0)\"" }.joined(separator: " OR ")
+        let algoliaFilters = "(\(filterString))"
+        
+        let request = SearchRequest(
+            query: "",
+            filters: algoliaFilters,
+            page: 0,
+            hitsPerPage: slugs.count,
+            attributesToRetrieve: ["id", "name", "slug", "level", "cityName"]
+        )
+        
+        let result: SearchResult<Location> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
+        return result.hits ?? []
+    }
+    
+    func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [Location] {
+        
+        let filters = "level <= 9 AND level > 1 AND adCount > 0"
+        
+        let request = SearchRequest(
+            query: "",
+            filters: filters,
+            page: 0,
+            hitsPerPage: 25,
+            attributesToRetrieve: ["id", "name", "slug", "level", "cityName", "geography", "adCount"],
+            geoFilter: GeoFilter(latitude: latitude, longitude: longitude, radius: 20000),
+            ranking: ["geo"]
+        )
+        
+        let result: SearchResult<Location> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
+        return result.hits ?? []
     }
 }

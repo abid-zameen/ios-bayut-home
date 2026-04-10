@@ -30,6 +30,10 @@ final class NearbyLocationsGroup: SectionGroup {
     }
     
     func buildSections() -> [AnySection] {
+        if isLocationEnabled && locations.isEmpty {
+            return []
+        }
+        
         var sections: [AnySection] = []
         
         // 1. Title Header

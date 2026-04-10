@@ -22,7 +22,7 @@ private enum PopularSearchLayout {
     static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 12
     static let purposeHeight: CGFloat = 40
-    static let cardWidth: CGFloat = 160
+    static let cardWidth: CGFloat = 217
     static let cardHeight: CGFloat = 72
 }
 

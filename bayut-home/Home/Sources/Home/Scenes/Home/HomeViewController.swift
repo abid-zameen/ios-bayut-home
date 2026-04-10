@@ -188,8 +188,13 @@ extension HomeViewController: BlogsActionsDelegate {
 }
 
 extension HomeViewController: NearbyLocationsActionsDelegate {
-    func nearbyLocationsDidTapCard(at index: Int) { }
-    func nearbyLocationsDidTapAllowLocation() { }
+    func nearbyLocationsDidTapCard(at index: Int) {
+        // Handle card tap - navigate to area detail if needed
+    }
+    
+    func nearbyLocationsDidTapAllowLocation() {
+        interactor?.requestLocationAuthorization()
+    }
 }
 
 extension HomeViewController: PopularSearchActionsDelegate {

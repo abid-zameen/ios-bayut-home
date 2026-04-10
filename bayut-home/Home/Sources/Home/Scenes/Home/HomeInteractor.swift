@@ -9,6 +9,7 @@ import Foundation
 
 protocol HomeBusinessLogic: AnyObject {
     func loadData() async
+    func requestLocationAuthorization()
 }
 
 final class HomeInteractor: HomeBusinessLogic {
@@ -27,6 +28,10 @@ final class HomeInteractor: HomeBusinessLogic {
     func loadData() async {
         var favouriteProperties: [Property] = []
         var latestBlogs: [Blog] = []
+        var savedSearches: SavedSearchesData? = nil
+        
+        var nearbyLocations: [Location] = []
+        let isLocationAuthorized = adapter.environment.isLocationAuthorized
         
         do {
             if let userID = adapter.environment.userID {
@@ -34,28 +39,49 @@ final class HomeInteractor: HomeBusinessLogic {
                 if !favIds.isEmpty {
                     favouriteProperties = try await worker.fetchFavoritesProperties(ids: favIds)
                 }
+                
+                let rawSearches = try await worker.fetchSavedSearches(userID: userID)
+                let slicedSearches = Array(rawSearches.prefix(5))
+                
+                let allSlugs = slicedSearches.compactMap { $0.params.locations }.flatMap { $0 }
+                let uniqueSlugs = Array(Set(allSlugs))
+                let resolvedLocations = try await worker.fetchLocations(slugs: uniqueSlugs)
+                
+                savedSearches = SavedSearchesData(searches: slicedSearches, resolvedLocations: resolvedLocations)
             }
             
             latestBlogs = try await worker.fetchLatestBlogs()
+            
+            if isLocationAuthorized, let coords = adapter.environment.userCoordinates {
+                nearbyLocations = try await worker.fetchNearbyLocations(latitude: coords.lat, longitude: coords.lon)
+            }
         } catch {
             print("HomeInteractor: Error loading data: \(error)")
         }
         
         await MainActor.run {
-            let sectionsData = Home.HomeSections(
+            let config = adapter.utilities.popularSearchConfig
+            let availablePurposes = config.purposeConfigs.map { $0.purpose }
+            let initialPurpose = availablePurposes.first ?? .rent
+            
+            let response = Home.Response(
                 projects: [],
                 locations: [],
                 favourites: favouriteProperties,
-                savedSearches: [],
+                savedSearches: savedSearches,
                 blogs: latestBlogs,
-                nearbyLocations: [],
-                isLocationEnabled: false,
+                nearbyLocations: nearbyLocations,
+                isLocationEnabled: isLocationAuthorized,
                 popularSearches: [],
-                purposes: [.buy, .rent],
-                selectedPurpose: .rent,
-                viewController: (presenter as? HomePresenter)?.viewController as! HomeViewController
+                popularSearchConfig: config,
+                purposes: availablePurposes,
+                selectedPurpose: .rent
             )
-            presenter?.presentData(data: sectionsData)
+            presenter?.presentData(data: response)
         }
+    }
+    
+    func requestLocationAuthorization() {
+        adapter.environment.requestLocationAuthorization()
     }
 }

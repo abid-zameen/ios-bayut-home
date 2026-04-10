@@ -6,80 +6,37 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol HomePresentationLogic: AnyObject {
-    func presentData(data: Home.HomeSections?)
+    func presentData(data: Home.Response?)
 }
 
 final class HomePresenter: HomePresentationLogic {
     weak var viewController: HomeDisplayLogic?
+    private let adapter: HomeModuleAdapter
+    
+    init(adapter: HomeModuleAdapter) {
+        self.adapter = adapter
+    }
     
     // MARK: - HomePresentationLogic
     @MainActor
-    func presentData(data: Home.HomeSections?) {
+    func presentData(data: Home.Response?) {
         guard let viewController = viewController as? HomeViewController else { return }
         
-        // MARK: Mock Data Layer (Fallback if not provided)
-        let locations = data?.locations ?? [
-            LocationChipViewModel(name: "Dubai Marina", localizedName: "Dubai Marina", externalID: "1", isSelected: true),
-            LocationChipViewModel(name: "Downtown Dubai", localizedName: "Downtown Dubai", externalID: "2", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "4", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "5", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "6", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "7", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "8", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "9", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "10", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "11", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "12", isSelected: false),
-            LocationChipViewModel(name: "Palm Jumeirah", localizedName: "Palm Jumeirah", externalID: "13", isSelected: false)
-        ]
-        
-        let projects = data?.projects ?? [
-            NewProject(
-                id: "p1",
-                title: "Luxury Villa",
-                type: "Villa",
-                location: "Dubai Marina",
-                startingPrice: "AED 2,000,000",
-                handoverValue: "Q4 2026",
-                imageURL: nil,
-                showWhatsappButton: true
-            ),
-            NewProject(
-                id: "p2",
-                title: "Modern Apartment",
-                type: "Apartment",
-                location: "Downtown Dubai",
-                startingPrice: "AED 1,500,000",
-                handoverValue: "Q2 2025",
-                imageURL: nil,
-                showWhatsappButton: false
-            )
-        ]
-        
+        let locations = data?.locations ?? []
+        let projects = data?.projects ?? []
         let favourites = data?.favourites ?? []
-        
-        let savedSearches = data?.savedSearches ?? [
-            SavedSearchesModel(title: "Apartment for Sale", location: "Dubai Marina", searchName: "Marina Apartments", image: ""),
-            SavedSearchesModel(title: "Villa for Rent", location: "Palm Jumeirah", searchName: "Palm Villas", image: ""),
-            SavedSearchesModel(title: "Office for Sale", location: "Downtown Dubai", searchName: "Downtown Offices", image: "")
-        ]
-        
+        let savedSearches = mapSavedSearches(data: data?.savedSearches)
         let blogs = data?.blogs ?? []
+        let nearbyLocations = mapNearbyLocations(locations: data?.nearbyLocations, isLocationEnabled: data?.isLocationEnabled ?? false)
         
-        let nearbyLocations = data?.nearbyLocations ?? [
-            NearbyLocation(name: "Dubai Marina Mall", distance: "0.5 km", city: "Dubai"),
-            NearbyLocation(name: "JBR Beach", distance: "1.2 km", city: "Dubai"),
-            NearbyLocation(name: "Skydive Dubai", distance: "2.0 km", city: "Dubai")
-        ]
-        
-        let popularSearches = [
-            PopularSearch(title: "Apartments", location: "in UAE", iconName: "rent_icon"),
-            PopularSearch(title: "Villas", location: "in Dubai", iconName: "buy_icon"),
-            PopularSearch(title: "Offices", location: "in Abu Dhabi", iconName: "commercial_icon"),
-            PopularSearch(title: "Townhouses", location: "in UAE", iconName: "buy_icon")
-        ]
+        // Map Popular Searches
+        let popularSearches = mapPopularSearches(
+            config: data?.popularSearchConfig,
+            selectedPurpose: data?.selectedPurpose ?? .rent
+        )
         
         let purposes: [PopularSearchPurpose] = data?.purposes ?? [.buy, .rent]
         
@@ -93,13 +50,123 @@ final class HomePresenter: HomePresentationLogic {
             nearbyLocations: nearbyLocations,
             isLocationEnabled: data?.isLocationEnabled ?? false,
             popularSearches: popularSearches,
+            popularSearchConfig: data?.popularSearchConfig,
             purposes: purposes,
             selectedPurpose: data?.selectedPurpose ?? .rent,
             viewController: viewController)
         )
         
-        // MARK: Complete VIP Cycle -> Present view model
         let viewModel = Home.HomeViewModel(sections: sections, animated: false)
         viewController.displaySections(viewModel: viewModel)
+    }
+    
+    // MARK: - Helpers
+    private func mapPopularSearches(config: PopularSearchConfig?, selectedPurpose: PopularSearchPurpose) -> [PopularSearch] {
+        guard let config = config else { return [] }
+        
+        let purposeConfig = config.purposeConfigs.first { $0.purpose == selectedPurpose }
+        let categories = purposeConfig?.categories ?? []
+        let locations = adapter.utilities.lastSearchedLocations ?? adapter.utilities.defaultCityName
+        
+        return categories.map { slug in
+            let info = adapter.utilities.getPropertyTypeInfo(category: slug)
+            let title = info?.titlePlural ?? slug.capitalized
+            
+            return PopularSearch(
+                title: title,
+                location: "in \(locations)",
+                iconName: advanceImagesMap[slug] ?? "adv-res-apartments"
+            )
+        }
+    }
+    
+    private func mapNearbyLocations(locations: [Location]?, isLocationEnabled: Bool) -> [NearbyLocation] {
+        guard isLocationEnabled, let locations = locations else { return [] }
+        
+        let userCoords = adapter.environment.userCoordinates
+        let userLocation = userCoords.map { CLLocation(latitude: $0.lat, longitude: $0.lon) }
+        
+        return locations.compactMap { location in
+            let name = location.name ?? ""
+            
+            var distanceString: String? = nil
+            if let userLocation = userLocation, let geo = location.geography {
+                let loc = CLLocation(latitude: geo.lat, longitude: geo.lng)
+                let distance = userLocation.distance(from: loc) // meters
+                
+                if distance >= 1000 {
+                    let km = Int(round(distance / 1000.0))
+                    distanceString = "\(km) km"
+                } else {
+                    let meters = Int(round(distance))
+                    distanceString = "\(meters) m"
+                }
+            }
+            
+            return NearbyLocation(
+                name: name,
+                distance: distanceString ?? "",
+                city: location.cityName ?? ""
+            )
+        }
+    }
+    
+    private func mapSavedSearches(data: SavedSearchesData?) -> [SavedSearchesModel] {
+        guard let data = data else { return [] }
+        return data.searches.map { search in
+            let info = search.params
+            let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category)
+            
+            let displayTitle = propertyTypeInfo?.titlePlural ?? search.name
+            
+            var locationString = ""
+            if let slugs = info.locations, !slugs.isEmpty {
+                let matchedLocations = data.resolvedLocations.filter { location in
+                    guard let slug = location.slug else { return false }
+                    return slugs.contains(slug)
+                }
+                
+                if !matchedLocations.isEmpty {
+                    locationString = matchedLocations.compactMap { $0.name }.joined(separator: ", ")
+                } else {
+                    locationString = adapter.utilities.defaultCityName
+                }
+            } else {
+                locationString = adapter.utilities.defaultCityName
+            }
+            
+            let isParent = propertyTypeInfo?.isParent ?? true
+            let showIcon = !isParent
+            let imageName = showIcon ? advanceImagesMap[info.category] : nil
+            
+            return SavedSearchesModel(
+                name: search.name,
+                displayTitle: displayTitle,
+                location: locationString,
+                showIcon: showIcon,
+                imageName: imageName
+            )
+        }
+    }
+    
+    private var advanceImagesMap: [String: String] {
+        return [
+            "hotel-apartments" : "adv-res-hotel-apartments",
+            "apartments" : "adv-res-apartments",
+            "residential-buildings" : "adv-res-buildings",
+            "villas" : "sel-res-villas",
+            "residential-lands" : "adv-res-land",
+            "chalets" : "sel-res-chalets",
+            "rooms" : "sel-res-rooms",
+            "offices" : "adv-com-offices",
+            "warehouses" : "adv-com-warehouses",
+            "shops" : "adv-com-shops",
+            "commercial-properties" : "adv-com-properties",
+            "agriculture-plots" : "sel-com-agriculture-plots",
+            "duplexes" : "sel-res-duplexes",
+            "townhouses" : "sel-res-townhouses",
+            "residential-land" : "adv-res-land",
+            "residential-plots" : "adv-res-land"
+        ]
     }
 }

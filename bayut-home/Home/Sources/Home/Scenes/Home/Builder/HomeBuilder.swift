@@ -13,7 +13,7 @@ public final class HomeBuilder {
         let viewController = HomeViewController()
         let worker = HomeWorker(networking: adapter.networking)
         let interactor = HomeInteractor(adapter: adapter, worker: worker)
-        let presenter = HomePresenter()
+        let presenter = HomePresenter(adapter: adapter)
         viewController.interactor = interactor
         interactor.presenter = presenter
         presenter.viewController = viewController

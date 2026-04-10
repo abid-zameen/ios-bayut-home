@@ -20,10 +20,30 @@ struct Home {
         let nearbyLocations: [NearbyLocation]
         let isLocationEnabled: Bool
         let popularSearches: [PopularSearch]
+        let popularSearchConfig: PopularSearchConfig?
         let purposes: [PopularSearchPurpose]
         let selectedPurpose: PopularSearchPurpose
         let viewController: HomeViewController
     }
+    
+    struct Response {
+        let projects: [NewProject]
+        let locations: [LocationChipViewModel]
+        let favourites: [Property]
+        let savedSearches: SavedSearchesData?
+        let blogs: [Blog]
+        let nearbyLocations: [Location]
+        let isLocationEnabled: Bool
+        let popularSearches: [PopularSearch]
+        let popularSearchConfig: PopularSearchConfig?
+        let purposes: [PopularSearchPurpose]
+        let selectedPurpose: PopularSearchPurpose
+    }
+}
+
+struct SavedSearchesData {
+    let searches: [SavedSearch]
+    let resolvedLocations: [Location]
 }
 
 struct FavoriteIDItem: Codable {
@@ -96,4 +116,25 @@ struct Location: Codable {
     let name: String?
     let slug: String?
     let level: Int?
+    let cityName: String?
+    let geography: Geography?
+    let adCount: Int?
+}
+
+struct Geography: Codable {
+    let lat: Double
+    let lng: Double
+}
+
+// MARK: - API Response Models
+struct SavedSearch: Codable {
+    let id: Int
+    let name: String
+    let params: SavedSearchInfo
+}
+
+struct SavedSearchInfo: Codable {
+    let category: String
+    let locations: [String]?
+    let purpose: String
 }

@@ -23,7 +23,7 @@ private enum NearbyLocationsLayout {
     static let spacing: CGFloat = 16
     
     static let cardWidth: CGFloat = 200
-    static let cardHeight: CGFloat = 100
+    static let cardHeight: CGFloat = 80
     
     static let mapHeight: CGFloat = 240
 }
@@ -77,13 +77,13 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(NearbyLocationsLayout.cardHeight)
+            heightDimension: .absolute(NearbyLocationsLayout.cardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .absolute(NearbyLocationsLayout.cardWidth),
-            heightDimension: .estimated(NearbyLocationsLayout.cardHeight)
+            widthDimension: .estimated(NearbyLocationsLayout.cardWidth),
+            heightDimension: .absolute(NearbyLocationsLayout.cardHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         

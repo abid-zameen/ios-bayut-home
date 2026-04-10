@@ -5,6 +5,7 @@ import Foundation
 public protocol HomeModuleAdapter {
     var networking: HomeNetworkingAdapter { get }
     var environment: HomeEnvironmentAdapter { get }
+    var utilities: HomeUtilitiesAdapter { get }
 }
 
 
