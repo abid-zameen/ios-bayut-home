@@ -78,21 +78,22 @@ final class BlogsCarouselSection: SectionDescriptor {
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(0.85),
+            widthDimension: .fractionalWidth(1.0),
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .continuous
+        section.orthogonalScrollingBehavior = .groupPaging
         section.interGroupSpacing = BlogsLayout.spacing
         section.contentInsets = NSDirectionalEdgeInsets(
             top: BlogsLayout.spacing,
-            leading: 16,
+            leading: 0,
             bottom: 0,
-            trailing: 16
+            trailing: 0
         )
         return section
     }
