@@ -7,18 +7,6 @@
 
 import Foundation
 
-// MARK: - Data Model
-struct NewProject: Hashable {
-    let id: String
-    let title: String
-    let type: String
-    let location: String
-    let startingPrice: String?
-    let handoverValue: String?
-    let imageURL: URL?
-    let showWhatsappButton: Bool
-}
-
 // MARK: - Section Group
 final class NewProjectsGroup: SectionGroup {
     let groupId: String
@@ -27,7 +15,7 @@ final class NewProjectsGroup: SectionGroup {
     
     private let headerTitle: String
     private let viewAllTitle: String
-    private let projects: [NewProject]
+    private let projects: [ProjectHit]
     private let locations: [LocationChipViewModel]
     private let actions: NewProjectsActions
     
@@ -37,7 +25,7 @@ final class NewProjectsGroup: SectionGroup {
         section: HomeSection? = .main,
         headerTitle: String,
         viewAllTitle: String,
-        projects: [NewProject],
+        projects: [ProjectHit],
         locations: [LocationChipViewModel],
         actions: NewProjectsActions
     ) {

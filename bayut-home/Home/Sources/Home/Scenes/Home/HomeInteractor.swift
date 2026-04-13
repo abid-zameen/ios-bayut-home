@@ -10,12 +10,15 @@ import Foundation
 protocol HomeBusinessLogic: AnyObject {
     func loadData() async
     func requestLocationAuthorization()
+    func didSelectNewProjectsLocation(id: String) async
 }
 
 final class HomeInteractor: HomeBusinessLogic {
     let adapter: HomeModuleAdapter
     var presenter: HomePresentationLogic?
     var worker: HomeWorkerLogic
+    
+    var selectedNewProjectsLocationID: String = Emirates.dubai.rawValue
     
     // MARK: - Initialization
     init(adapter: HomeModuleAdapter, worker: HomeWorkerLogic) {
@@ -26,6 +29,7 @@ final class HomeInteractor: HomeBusinessLogic {
     
     // MARK: - HomeBusinessLogic
     func loadData() async {
+        var newProjects: [ProjectHit] = []
         var favouriteProperties: [Property] = []
         var latestBlogs: [Blog] = []
         var savedSearches: SavedSearchesData? = nil
@@ -54,6 +58,10 @@ final class HomeInteractor: HomeBusinessLogic {
             latestBlogs = try await worker.fetchLatestBlogs()
             recentSearches = await worker.fetchRecentSearches()
             
+            // CPL Logic
+            let cplIDs = adapter.utilities.supportedLocIDsCPL[selectedNewProjectsLocationID]
+            newProjects = await worker.fetchNewProjects(locationID: selectedNewProjectsLocationID, cplIDs: cplIDs)
+            
             if isLocationAuthorized, let coords = adapter.environment.userCoordinates {
                 nearbyLocations = try await worker.fetchNearbyLocations(latitude: coords.lat, longitude: coords.lon)
             }
@@ -67,7 +75,7 @@ final class HomeInteractor: HomeBusinessLogic {
             let initialPurpose = availablePurposes.first ?? .rent
             
             let response = Home.Response(
-                projects: [],
+                projects: newProjects,
                 locations: [],
                 favourites: favouriteProperties,
                 savedSearches: savedSearches,
@@ -86,5 +94,18 @@ final class HomeInteractor: HomeBusinessLogic {
     
     func requestLocationAuthorization() {
         adapter.environment.requestLocationAuthorization()
+    }
+    
+    func didSelectNewProjectsLocation(id: String) async {
+        guard selectedNewProjectsLocationID != id else { return }
+        selectedNewProjectsLocationID = id
+        
+        // CPL Logic
+        let cplIDs = adapter.utilities.supportedLocIDsCPL[id]
+        let projects = await worker.fetchNewProjects(locationID: id, cplIDs: cplIDs)
+        
+        await MainActor.run {
+            presenter?.presentNewProjects(projects: projects, selectedLocationID: id)
+        }
     }
 }

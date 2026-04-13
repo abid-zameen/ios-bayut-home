@@ -30,7 +30,7 @@ private enum NewProjectsLayout {
     static let chipSpacing: CGFloat = 8
     
     // Project cards
-    static let cardWidth: CGFloat = 220
+    static let cardWidth: CGFloat = 280
     static let cardHeight: CGFloat = 280
 }
 
@@ -154,16 +154,21 @@ final class NewProjectsCarouselSection: SectionDescriptor {
     let identifier: NewProjectsSectionId = .projects
     
     struct Item: Hashable {
-        let data: NewProject
+        let data: ProjectHit
         
-        func hash(into hasher: inout Hasher) { hasher.combine(data.id) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.data.id == rhs.data.id }
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(data.externalID ?? data.objectID)
+        }
+        
+        static func == (lhs: Item, rhs: Item) -> Bool {
+            (lhs.data.externalID ?? lhs.data.objectID) == (rhs.data.externalID ?? rhs.data.objectID)
+        }
     }
     
-    private let projects: [NewProject]
+    private let projects: [ProjectHit]
     private let actions: NewProjectsActions
     
-    init(projects: [NewProject], section: HomeSection?, actions: NewProjectsActions) {
+    init(projects: [ProjectHit], section: HomeSection?, actions: NewProjectsActions) {
         self.projects = projects
         self.actions = actions
     }
@@ -203,7 +208,8 @@ final class NewProjectsCarouselSection: SectionDescriptor {
         ) as? ProjectsCollectionViewCell else {
             return UICollectionViewCell()
         }
-        cell.configure(with: item.data)
+        let viewModel = NewProjectCellViewModel(hit: item.data)
+        cell.configure(with: viewModel)
         return cell
     }
     

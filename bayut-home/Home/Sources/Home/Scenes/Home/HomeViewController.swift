@@ -162,9 +162,19 @@ extension HomeViewController: UICollectionViewDelegate {
 
 // MARK: - Section Handlers
 extension HomeViewController: NewProjectsActionsDelegate {
-    func newProjectsDidTapCard(at index: Int) { }
-    func newProjectsDidTapLocationChip(externalID: String) { }
-    func newProjectsDidTapViewAll() { }
+    func newProjectsDidTapCard(at index: Int) { 
+        // Handle project card tap (navigation)
+    }
+    
+    func newProjectsDidTapLocationChip(externalID: String) {
+        Task {
+            await interactor?.didSelectNewProjectsLocation(id: externalID)
+        }
+    }
+    
+    func newProjectsDidTapViewAll() {
+        // Handle View All navigation
+    }
 }
     
 extension HomeViewController: RailingActionsDelegate {

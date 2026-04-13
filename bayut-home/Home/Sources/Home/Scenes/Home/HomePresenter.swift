@@ -10,11 +10,13 @@ import CoreLocation
 
 protocol HomePresentationLogic: AnyObject {
     func presentData(data: Home.Response?)
+    func presentNewProjects(projects: [ProjectHit], selectedLocationID: String)
 }
 
 final class HomePresenter: HomePresentationLogic {
     weak var viewController: HomeDisplayLogic?
     private let adapter: HomeModuleAdapter
+    private var lastResponse: Home.Response?
     
     init(adapter: HomeModuleAdapter) {
         self.adapter = adapter
@@ -24,8 +26,9 @@ final class HomePresenter: HomePresentationLogic {
     @MainActor
     func presentData(data: Home.Response?) {
         guard let viewController = viewController as? HomeViewController else { return }
+        self.lastResponse = data
         
-        let locations = data?.locations ?? []
+        let locations = mapLocationChips(selectedID: Emirates.dubai.rawValue)
         let projects = data?.projects ?? []
         let favourites = data?.favourites ?? []
         let savedSearches = mapSavedSearches(data: data?.savedSearches)
@@ -59,6 +62,34 @@ final class HomePresenter: HomePresentationLogic {
         )
         
         let viewModel = Home.HomeViewModel(sections: sections, animated: false)
+        viewController.displaySections(viewModel: viewModel)
+    }
+    
+    @MainActor
+    func presentNewProjects(projects: [ProjectHit], selectedLocationID: String) {
+        guard let viewController = viewController as? HomeViewController,
+              let lastResponse = self.lastResponse else { return }
+        
+        let locations = mapLocationChips(selectedID: selectedLocationID)
+        
+        let sectionsBuilder = HomeSectionBuilder()
+        let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
+            projects: projects,
+            locations: locations,
+            favourites: lastResponse.favourites, // Use cached data
+            savedSearches: mapSavedSearches(data: lastResponse.savedSearches),
+            blogs: lastResponse.blogs,
+            nearbyLocations: mapNearbyLocations(locations: lastResponse.nearbyLocations, isLocationEnabled: lastResponse.isLocationEnabled),
+            isLocationEnabled: lastResponse.isLocationEnabled,
+            popularSearches: mapPopularSearches(config: lastResponse.popularSearchConfig, selectedPurpose: lastResponse.selectedPurpose),
+            popularSearchConfig: lastResponse.popularSearchConfig,
+            purposes: lastResponse.purposes,
+            selectedPurpose: lastResponse.selectedPurpose,
+            recentSearches: lastResponse.recentSearches,
+            viewController: viewController)
+        )
+        
+        let viewModel = Home.HomeViewModel(sections: sections, animated: true)
         viewController.displaySections(viewModel: viewModel)
     }
     
@@ -109,6 +140,17 @@ final class HomePresenter: HomePresentationLogic {
                 name: name,
                 distance: distanceString ?? "",
                 city: location.cityName ?? ""
+            )
+        }
+    }
+    
+    private func mapLocationChips(selectedID: String) -> [LocationChipViewModel] {
+        return Emirates.allCases.map { emirate in
+            LocationChipViewModel(
+                name: emirate.displayName,
+                localizedName: emirate.displayName.localized(),
+                externalID: emirate.rawValue,
+                isSelected: emirate.rawValue == selectedID
             )
         }
     }

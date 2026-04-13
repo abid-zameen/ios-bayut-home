@@ -12,7 +12,7 @@ struct Home {
     }
     
     struct HomeSections {
-        let projects: [NewProject]
+        let projects: [ProjectHit]
         let locations: [LocationChipViewModel]
         let favourites: [Property]
         let savedSearches: [SavedSearchesModel]
@@ -28,7 +28,7 @@ struct Home {
     }
     
     struct Response {
-        let projects: [NewProject]
+        let projects: [ProjectHit]
         let locations: [LocationChipViewModel]
         let favourites: [Property]
         let savedSearches: SavedSearchesData?

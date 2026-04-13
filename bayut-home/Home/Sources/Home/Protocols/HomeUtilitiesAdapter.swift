@@ -7,4 +7,5 @@ public protocol HomeUtilitiesAdapter {
     var defaultCityName: String { get }
     var popularSearchConfig: PopularSearchConfig { get }
     var lastSearchedLocations: String? { get }
+    var supportedLocIDsCPL: [String: [String]] { get }
 }

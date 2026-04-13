@@ -9,7 +9,7 @@ import NetworkLayer
 import SearchService
 
 protocol HomeWorkerLogic: AnyObject {
-    func fetchProjectsData() async
+    func fetchNewProjects(locationID: String, cplIDs: [String]?) async -> [ProjectHit]
     func fetchFavoritesIDs(userID: String) async throws -> [String]
     func fetchFavoritesProperties(ids: [String]) async throws -> [Property]
     func fetchLatestBlogs() async throws -> [Blog]
@@ -29,32 +29,19 @@ final class HomeWorker: HomeWorkerLogic {
         static let locationsIndexName = "bayut-development-locations-en"
     }
     
+    private lazy var newProjectsWorker: NewProjectsWorkerLogic = {
+        return NewProjectsWorker(
+            searchService: networking.searchService,
+            networkingService: networking.networkingService
+        )
+    }()
+    
     init(networking: HomeNetworkingAdapter) {
         self.networking = networking
     }
     
-    func fetchProjectsData() async {
-        let location = "/dubai"
-        
-        let request = SearchRequest(
-            query: "",
-            filters: "(location.slug: \(location))",
-            page: 0,
-            hitsPerPage:  30,
-            facets: nil,
-            keywords:  nil,
-            numericFilters:  nil,
-            attributesToRetrieve: ["*"],
-            attributesToHighlight:  nil,
-            geoFilter:nil
-        )
-        
-        do {
-            let result: SearchResult<AlgoliaPropertyHit> = try await networking.searchService.search(query: request, in: Constants.projectIndexName)
-            print(result)
-        } catch {
-            print("Error \(error)")
-        }
+    func fetchNewProjects(locationID: String, cplIDs: [String]?) async -> [ProjectHit] {
+        return await newProjectsWorker.fetchProjects(locationID: locationID, cplIDs: cplIDs)
     }
     
     func fetchFavoritesIDs(userID: String) async throws -> [String] {
