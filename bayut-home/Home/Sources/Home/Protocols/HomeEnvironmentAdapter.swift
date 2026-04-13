@@ -15,4 +15,7 @@ public protocol HomeEnvironmentAdapter {
     var userCoordinates: (lat: Double, lon: Double)? { get }
     var isLocationAuthorized: Bool { get }
     func requestLocationAuthorization()
+    
+    // MARK: - Recent Searches
+    var recentSearchesProvider: RecentSearchesProvider { get }
 }

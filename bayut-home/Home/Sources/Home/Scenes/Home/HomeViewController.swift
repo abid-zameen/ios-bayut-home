@@ -182,6 +182,12 @@ extension HomeViewController: SavedSearchesActionsDelegate {
     func savedSearchesDidTapViewAll() { }
 }
 
+extension HomeViewController: RecentSearchesActionsDelegate {
+    func recentSearchesDidTapCard(at index: Int) {
+        // Handle search card tap
+    }
+}
+
 extension HomeViewController: BlogsActionsDelegate {
     func blogsDidTapCard(at index: Int) { }
     func blogsDidTapViewAll() { }

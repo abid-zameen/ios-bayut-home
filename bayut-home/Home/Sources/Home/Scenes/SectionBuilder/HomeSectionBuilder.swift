@@ -12,6 +12,14 @@ final class HomeSectionBuilder {
     func buildSections(sectionsData: Home.HomeSections) -> [AnySection] {
         var sections: [AnySection] = []
         
+        // Recent Searches
+        let recentSearchesActions = RecentSearchesActions(delegate: sectionsData.viewController)
+        let recentSearchesGroup = RecentSearchesGroup(
+            title: "Recent Searches",
+            searches: sectionsData.recentSearches,
+            actions: recentSearchesActions
+        )
+        sections.append(contentsOf: recentSearchesGroup.buildSections())
         
         // Append TruBroker Banner
         let truBrokerBannerSection = TruBrokerBannerSection()
@@ -63,6 +71,7 @@ final class HomeSectionBuilder {
             actions: savedSearchesActions
         )
         sections.append(contentsOf: savedSearchesGroup.buildSections())
+        
         
         let popularSearchActions = PopularSearchActions(delegate: sectionsData.viewController)
         let popularSearchGroup = PopularSearchGroup(

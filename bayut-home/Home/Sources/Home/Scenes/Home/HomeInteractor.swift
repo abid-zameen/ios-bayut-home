@@ -29,6 +29,7 @@ final class HomeInteractor: HomeBusinessLogic {
         var favouriteProperties: [Property] = []
         var latestBlogs: [Blog] = []
         var savedSearches: SavedSearchesData? = nil
+        var recentSearches: [HomeScreenRecentSearch] = []
         
         var nearbyLocations: [Location] = []
         let isLocationAuthorized = adapter.environment.isLocationAuthorized
@@ -51,6 +52,7 @@ final class HomeInteractor: HomeBusinessLogic {
             }
             
             latestBlogs = try await worker.fetchLatestBlogs()
+            recentSearches = await worker.fetchRecentSearches()
             
             if isLocationAuthorized, let coords = adapter.environment.userCoordinates {
                 nearbyLocations = try await worker.fetchNearbyLocations(latitude: coords.lat, longitude: coords.lon)
@@ -75,7 +77,8 @@ final class HomeInteractor: HomeBusinessLogic {
                 popularSearches: [],
                 popularSearchConfig: config,
                 purposes: availablePurposes,
-                selectedPurpose: .rent
+                selectedPurpose: .rent,
+                recentSearches: recentSearches
             )
             presenter?.presentData(data: response)
         }

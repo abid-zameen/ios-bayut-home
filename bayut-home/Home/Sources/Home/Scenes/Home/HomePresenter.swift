@@ -31,6 +31,7 @@ final class HomePresenter: HomePresentationLogic {
         let savedSearches = mapSavedSearches(data: data?.savedSearches)
         let blogs = data?.blogs ?? []
         let nearbyLocations = mapNearbyLocations(locations: data?.nearbyLocations, isLocationEnabled: data?.isLocationEnabled ?? false)
+        let recentSearches = data?.recentSearches ?? []
         
         // Map Popular Searches
         let popularSearches = mapPopularSearches(
@@ -53,6 +54,7 @@ final class HomePresenter: HomePresentationLogic {
             popularSearchConfig: data?.popularSearchConfig,
             purposes: purposes,
             selectedPurpose: data?.selectedPurpose ?? .rent,
+            recentSearches: recentSearches,
             viewController: viewController)
         )
         

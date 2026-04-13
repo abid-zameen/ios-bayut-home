@@ -57,6 +57,9 @@ final class CellRegistry {
         collectionView.register(UINib(nibName: "PopularSearchPurposeCell", bundle: .module), forCellWithReuseIdentifier: "PopularSearchPurposeCell")
         collectionView.register(UINib(nibName: "PopularSearchCell", bundle: .module), forCellWithReuseIdentifier: "PopularSearchCell")
         
+        let recentSearchesCellNib = UINib(nibName: RecentSearchesViewCell.reuseId, bundle: .module)
+        collectionView.register(recentSearchesCellNib, forCellWithReuseIdentifier: RecentSearchesViewCell.reuseId)
+        
         // Add more cells to register here
     }
 }

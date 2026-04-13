@@ -16,6 +16,7 @@ protocol HomeWorkerLogic: AnyObject {
     func fetchSavedSearches(userID: String) async throws -> [SavedSearch]
     func fetchLocations(slugs: [String]) async throws -> [Location]
     func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [Location]
+    func fetchRecentSearches() async -> [HomeScreenRecentSearch]
 }
 
 final class HomeWorker: HomeWorkerLogic {
@@ -167,5 +168,9 @@ final class HomeWorker: HomeWorkerLogic {
         
         let result: SearchResult<Location> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
         return result.hits ?? []
+    }
+    
+    func fetchRecentSearches() async -> [HomeScreenRecentSearch] {
+        return await HomeModule.shared.environment.recentSearchesProvider.fetchRecentSearches(limit: 5)
     }
 }

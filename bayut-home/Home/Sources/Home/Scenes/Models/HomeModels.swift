@@ -23,6 +23,7 @@ struct Home {
         let popularSearchConfig: PopularSearchConfig?
         let purposes: [PopularSearchPurpose]
         let selectedPurpose: PopularSearchPurpose
+        let recentSearches: [HomeScreenRecentSearch]
         let viewController: HomeViewController
     }
     
@@ -38,6 +39,7 @@ struct Home {
         let popularSearchConfig: PopularSearchConfig?
         let purposes: [PopularSearchPurpose]
         let selectedPurpose: PopularSearchPurpose
+        let recentSearches: [HomeScreenRecentSearch]
     }
 }
 
