@@ -21,6 +21,14 @@ final class HomeSectionBuilder {
         )
         sections.append(contentsOf: recentSearchesGroup.buildSections())
         
+        // MARK: - Stories Section
+        if let storiesProvider = HomeModule.shared.storiesProvider,
+           storiesProvider.hasContent,
+           let storiesView = storiesProvider.getStoriesWidgetView() {
+            let storiesSection = StoriesSection(hostedView: storiesView)
+            sections.append(AnySection(storiesSection, isCustomizable: false))
+        }
+        
         // Append TruBroker Banner
         let truBrokerBannerSection = TruBrokerBannerSection()
         sections.append(AnySection(truBrokerBannerSection, isCustomizable: false))

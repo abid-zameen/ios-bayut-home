@@ -1,0 +1,53 @@
+import UIKit
+
+enum StoriesSectionId: String, SectionIdentifier {
+    case main = "stories.main"
+    
+    var displayName: String? { nil }
+    var section: HomeSection? { .main }
+}
+
+final class StoriesSection: SectionDescriptor {
+    typealias Identifier = StoriesSectionId
+    let identifier: StoriesSectionId = .main
+    
+    struct Item: Hashable {
+        let id = UUID()
+    }
+    
+    private let hostedView: UIView
+    
+    init(hostedView: UIView) {
+        self.hostedView = hostedView
+    }
+    
+    func buildItems() -> [Item] {
+        return [Item()]
+    }
+    
+    func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(260)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(260)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0)
+        return section
+    }
+    
+    func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StoriesHostingCell.reuseId, for: indexPath) as? StoriesHostingCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(with: hostedView)
+        return cell
+    }
+}

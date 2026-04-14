@@ -60,6 +60,9 @@ final class CellRegistry {
         let recentSearchesCellNib = UINib(nibName: RecentSearchesViewCell.reuseId, bundle: .module)
         collectionView.register(recentSearchesCellNib, forCellWithReuseIdentifier: RecentSearchesViewCell.reuseId)
         
+        // Stories Hosting Cell
+        collectionView.register(StoriesHostingCell.self, forCellWithReuseIdentifier: StoriesHostingCell.reuseId)
+        
         // Add more cells to register here
     }
 }

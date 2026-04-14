@@ -24,6 +24,21 @@ final class HomeInteractor: HomeBusinessLogic {
     init(adapter: HomeModuleAdapter, worker: HomeWorkerLogic) {
         self.adapter = adapter
         self.worker = worker
+        setupStoriesListener()
+    }
+    
+    private func setupStoriesListener() {
+        adapter.storiesProvider?.onVisibilityChange = { [weak self] _ in
+            Task { @MainActor in
+                self?.refreshCurrentData()
+            }
+        }
+    }
+    
+    private func refreshCurrentData() {
+        Task {
+            await self.loadData()
+        }
     }
     
     
