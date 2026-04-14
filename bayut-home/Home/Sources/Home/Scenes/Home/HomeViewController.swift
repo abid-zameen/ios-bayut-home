@@ -6,6 +6,7 @@ protocol HomeDisplayLogic: AnyObject {
 
 final class HomeViewController: UIViewController, HomeDisplayLogic {
     var interactor: HomeBusinessLogic?
+    var router: HomeRoutingLogic?
     
     // MARK: - UI Components
     private lazy var homeHeaderView: HomeHeaderView = {
@@ -41,6 +42,24 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
         setupConstraints()
         configureDataSource()
         CellRegistry.registerCells(in: collectionView)
+        setupHeaderCallbacks()
+    }
+    
+    private func setupHeaderCallbacks() {
+        homeHeaderView.onSearchTapped = { [weak self] tab in
+            switch tab {
+            case .properties:
+                self?.router?.routeToLocationSearch()
+            case .newProjects:
+                self?.router?.routeToLocationForProjects()
+            case .transactions:
+                self?.router?.routeToDubaiTransaction()
+            case .agents:
+                self?.router?.routeToFindAgents()
+            default:
+                break
+            }
+        }
     }
     
     func loadData() {
@@ -163,7 +182,6 @@ extension HomeViewController: UICollectionViewDelegate {
 // MARK: - Section Handlers
 extension HomeViewController: NewProjectsActionsDelegate {
     func newProjectsDidTapCard(at index: Int) { 
-        // Handle project card tap (navigation)
     }
     
     func newProjectsDidTapLocationChip(externalID: String) {

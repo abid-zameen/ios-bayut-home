@@ -121,10 +121,12 @@ class HomeHeaderView: UIView {
         backgroundHeightConstraint = backgroundImageView.heightAnchor.constraint(equalToConstant: HomeHeaderLayout.ViewHeight.buildings)
         backgroundTopConstraint = backgroundImageView.topAnchor.constraint(equalTo: topAnchor, constant: 64)
         
+        guard let backgroundTopConstraint, let backgroundHeightConstraint, let logoHeightConstraint, let logoTopConstraint, let bottomCurveTopConstraint else { return }
+                
         NSLayoutConstraint.activate([
-            backgroundTopConstraint!,
+            backgroundTopConstraint,
             backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            backgroundHeightConstraint!,
+            backgroundHeightConstraint,
             
             topCurveImageView.topAnchor.constraint(equalTo: topAnchor, constant: 101),
             topCurveImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -136,9 +138,9 @@ class HomeHeaderView: UIView {
             
             logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             logoImageView.widthAnchor.constraint(equalToConstant: 154),
-            logoHeightConstraint!,
-            logoTopConstraint!,
-            bottomCurveTopConstraint!
+            logoHeightConstraint,
+            logoTopConstraint,
+            bottomCurveTopConstraint
         ])
         
         bottomCurveHeightConstraint = bottomCurveImageView.heightAnchor.constraint(equalToConstant: 97)
@@ -168,6 +170,11 @@ class HomeHeaderView: UIView {
         
         contentTopConstraint?.isActive = true
         
+        searchView.onSearchTapped = { [weak self] in
+            guard let self = self else { return }
+            self.onSearchTapped?(self.currentTab)
+        }
+        
         setupLayout()
     }
     
@@ -183,8 +190,24 @@ class HomeHeaderView: UIView {
         contentStackView.spacing = 16
         contentStackView.addArrangedSubview(tabsView)
         
+        let uaeTabs: [HomeHeaderTab] = [.properties, .newProjects, .transactions, .agents]
+        tabsView.setupTabs(tabs: uaeTabs)
+        
+        tabsView.onTabSelected = { [weak self] tab in
+            self?.handleTabSelection(tab)
+        }
+        
         updateConstraintsForVariant()
         setupElements()
+    }
+    
+    private var currentTab: HomeHeaderTab = .properties
+    var onSearchTapped: ((HomeHeaderTab) -> Void)?
+    
+    private func handleTabSelection(_ tab: HomeHeaderTab) {
+        self.currentTab = tab
+        let shouldShowButtons = (tab != .newProjects)
+        searchView.showPurposeButtons(shouldShowButtons)
     }
     
     private func updateConstraintsForVariant() {
@@ -213,7 +236,6 @@ class HomeHeaderView: UIView {
         animationEngine.currentVariant = variant
         let layout = HomeHeaderLayout.make(in: self)
         
-        // Feed generic offsets into the search view based on the current variant Context
         searchView.animationConfig.targetContainerTop = (variant == .uae) ? -70 : -40
         
         let logoElement = AnimatableElement(

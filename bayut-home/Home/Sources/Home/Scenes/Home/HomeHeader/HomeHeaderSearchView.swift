@@ -168,6 +168,16 @@ class HomeHeaderSearchView: UIView {
         
         buyButton.addTarget(self, action: #selector(buyTapped), for: .touchUpInside)
         rentButton.addTarget(self, action: #selector(rentTapped), for: .touchUpInside)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(searchContainerTapped))
+        searchContainer.addGestureRecognizer(tap)
+        searchContainer.isUserInteractionEnabled = true
+    }
+    
+    var onSearchTapped: (() -> Void)?
+    
+    @objc private func searchContainerTapped() {
+        onSearchTapped?()
     }
     
     @objc private func buyTapped() {
@@ -225,5 +235,12 @@ class HomeHeaderSearchView: UIView {
     
     func setCollapsedState(_ isCollapsed: Bool) {
         setProgress(isCollapsed ? 1 : 0)
+    }
+    
+    func showPurposeButtons(_ show: Bool) {
+        toggleStackView.isHidden = !show
+        separatorView.isHidden = !show
+        searchTopConstraint?.constant = show ? 70 : 12
+        layoutIfNeeded()
     }
 }
