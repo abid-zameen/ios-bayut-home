@@ -22,7 +22,7 @@ private enum BlogsLayout {
     static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
     
-    static let cardWidth: CGFloat = 280
+    static let cardWidth: CGFloat = 10
     static let estimatedCardHeight: CGFloat = 260
 }
 
@@ -78,17 +78,17 @@ final class BlogsCarouselSection: SectionDescriptor {
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
+            widthDimension: .fractionalWidth(0.85),
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPaging
-        section.interGroupSpacing = BlogsLayout.spacing
+        section.interGroupSpacing = 0
         section.contentInsets = NSDirectionalEdgeInsets(
             top: BlogsLayout.spacing,
             leading: 0,
@@ -106,7 +106,8 @@ final class BlogsCarouselSection: SectionDescriptor {
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.blogsDidTapCard(at: indexPath.row)
+
+        actions.delegate?.blogsDidTapCard(with: item.blog.blogUrl, title: item.blog.title)
     }
 }
 

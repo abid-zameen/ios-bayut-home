@@ -1,10 +1,14 @@
 import UIKit
 
 protocol HomeRoutingLogic: AnyObject {
-    func routeToLocationSearch()
+    func routeToLocationSearch(purpose: HomePurpose)
     func routeToLocationForProjects()
     func routeToDubaiTransaction()
     func routeToFindAgents()
+    func routeToBlogs(url: String, title: String?)
+    func routeToLocationForTransactions(purpose: HomePurpose)
+    func routeToAllBlogs()
+    func routeToNearbySearch(location: LocationHit)
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -16,8 +20,8 @@ final class HomeRouter: HomeRoutingLogic {
     }
     
     // MARK: - Routing logic
-    func routeToLocationSearch() {
-        navigation.navigateToLocationSearch(from: viewController)
+    func routeToLocationSearch(purpose: HomePurpose) {
+        navigation.navigateToLocationSearch(from: viewController, purpose: purpose)
     }
     
     func routeToLocationForProjects() {
@@ -30,5 +34,21 @@ final class HomeRouter: HomeRoutingLogic {
     
     func routeToFindAgents() {
         navigation.navigateToFindAgents(from: viewController)
+    }
+    
+    func routeToBlogs(url: String, title: String?) {
+        navigation.navigateToBlogs(url: url, title: title, from: viewController)
+    }
+    
+    func routeToLocationForTransactions(purpose: HomePurpose) {
+        navigation.navigateToLocationForTransactions(from: viewController, purpose: purpose)
+    }
+    
+    func routeToAllBlogs() {
+        navigation.naviagteToAllBlogs(from: viewController)
+    }
+    
+    func routeToNearbySearch(location: LocationHit) {
+        navigation.navigateToNearbySearch(location: location, from: viewController)
     }
 }

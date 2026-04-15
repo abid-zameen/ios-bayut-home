@@ -50,7 +50,7 @@ final class HomeInteractor: HomeBusinessLogic {
         var savedSearches: SavedSearchesData? = nil
         var recentSearches: [HomeScreenRecentSearch] = []
         
-        var nearbyLocations: [Location] = []
+        var nearbyLocations: [LocationHit] = []
         let isLocationAuthorized = adapter.environment.isLocationAuthorized
         
         do {
@@ -70,10 +70,9 @@ final class HomeInteractor: HomeBusinessLogic {
                 savedSearches = SavedSearchesData(searches: slicedSearches, resolvedLocations: resolvedLocations)
             }
             
-            latestBlogs = try await worker.fetchLatestBlogs()
+            latestBlogs = Array(try await worker.fetchLatestBlogs().prefix(5))
             recentSearches = await worker.fetchRecentSearches()
             
-            // CPL Logic
             let cplIDs = adapter.utilities.supportedLocIDsCPL[selectedNewProjectsLocationID]
             newProjects = await worker.fetchNewProjects(locationID: selectedNewProjectsLocationID, cplIDs: cplIDs)
             

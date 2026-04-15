@@ -14,8 +14,8 @@ protocol HomeWorkerLogic: AnyObject {
     func fetchFavoritesProperties(ids: [String]) async throws -> [Property]
     func fetchLatestBlogs() async throws -> [Blog]
     func fetchSavedSearches(userID: String) async throws -> [SavedSearch]
-    func fetchLocations(slugs: [String]) async throws -> [Location]
-    func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [Location]
+    func fetchLocations(slugs: [String]) async throws -> [LocationHit]
+    func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [LocationHit]
     func fetchRecentSearches() async -> [HomeScreenRecentSearch]
 }
 
@@ -121,7 +121,7 @@ final class HomeWorker: HomeWorkerLogic {
         return try await networking.networkingService.execute(request: request)
     }
     
-    func fetchLocations(slugs: [String]) async throws -> [Location] {
+    func fetchLocations(slugs: [String]) async throws -> [LocationHit] {
         guard !slugs.isEmpty else { return [] }
         
         let filterString = slugs.map { "slug:\"\($0)\"" }.joined(separator: " OR ")
@@ -135,11 +135,11 @@ final class HomeWorker: HomeWorkerLogic {
             attributesToRetrieve: ["id", "name", "slug", "level", "cityName"]
         )
         
-        let result: SearchResult<Location> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
+        let result: SearchResult<LocationHit> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
         return result.hits ?? []
     }
     
-    func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [Location] {
+    func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [LocationHit] {
         
         let filters = "level <= 9 AND level > 1 AND adCount > 0"
         
@@ -148,12 +148,12 @@ final class HomeWorker: HomeWorkerLogic {
             filters: filters,
             page: 0,
             hitsPerPage: 25,
-            attributesToRetrieve: ["id", "name", "slug", "level", "cityName", "geography", "adCount"],
+            attributesToRetrieve: ["*"],
             geoFilter: GeoFilter(latitude: latitude, longitude: longitude, radius: 20000),
             ranking: ["geo"]
         )
         
-        let result: SearchResult<Location> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
+        let result: SearchResult<LocationHit> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
         return result.hits ?? []
     }
     

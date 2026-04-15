@@ -104,7 +104,7 @@ final class HomeSectionBuilder {
         let blogsActions = BlogsActions(delegate: sectionsData.viewController)
         let blogsGroup = BlogsGroup(
             title: "From our Blog",
-            viewAllTitle: "View all blogs",
+            viewAllTitle: "Explore More Articles",
             blogs: sectionsData.blogs,
             actions: blogsActions
         )

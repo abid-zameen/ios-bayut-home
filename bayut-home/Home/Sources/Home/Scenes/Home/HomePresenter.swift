@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import CoreLocation
 
 protocol HomePresentationLogic: AnyObject {
     func presentData(data: Home.Response?)
@@ -33,7 +32,7 @@ final class HomePresenter: HomePresentationLogic {
         let favourites = data?.favourites ?? []
         let savedSearches = mapSavedSearches(data: data?.savedSearches)
         let blogs = data?.blogs ?? []
-        let nearbyLocations = mapNearbyLocations(locations: data?.nearbyLocations, isLocationEnabled: data?.isLocationEnabled ?? false)
+        let nearbyLocations = data?.nearbyLocations ?? []
         let recentSearches = data?.recentSearches ?? []
         
         // Map Popular Searches
@@ -76,10 +75,10 @@ final class HomePresenter: HomePresentationLogic {
         let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
             projects: projects,
             locations: locations,
-            favourites: lastResponse.favourites, // Use cached data
+            favourites: lastResponse.favourites,
             savedSearches: mapSavedSearches(data: lastResponse.savedSearches),
             blogs: lastResponse.blogs,
-            nearbyLocations: mapNearbyLocations(locations: lastResponse.nearbyLocations, isLocationEnabled: lastResponse.isLocationEnabled),
+            nearbyLocations: lastResponse.nearbyLocations,
             isLocationEnabled: lastResponse.isLocationEnabled,
             popularSearches: mapPopularSearches(config: lastResponse.popularSearchConfig, selectedPurpose: lastResponse.selectedPurpose),
             popularSearchConfig: lastResponse.popularSearchConfig,
@@ -109,37 +108,6 @@ final class HomePresenter: HomePresentationLogic {
                 title: title,
                 location: "in \(locations)",
                 iconName: advanceImagesMap[slug] ?? "adv-res-apartments"
-            )
-        }
-    }
-    
-    private func mapNearbyLocations(locations: [Location]?, isLocationEnabled: Bool) -> [NearbyLocation] {
-        guard isLocationEnabled, let locations = locations else { return [] }
-        
-        let userCoords = adapter.environment.userCoordinates
-        let userLocation = userCoords.map { CLLocation(latitude: $0.lat, longitude: $0.lon) }
-        
-        return locations.compactMap { location in
-            let name = location.name ?? ""
-            
-            var distanceString: String? = nil
-            if let userLocation = userLocation, let geo = location.geography {
-                let loc = CLLocation(latitude: geo.lat, longitude: geo.lng)
-                let distance = userLocation.distance(from: loc) // meters
-                
-                if distance >= 1000 {
-                    let km = Int(round(distance / 1000.0))
-                    distanceString = "\(km) km"
-                } else {
-                    let meters = Int(round(distance))
-                    distanceString = "\(meters) m"
-                }
-            }
-            
-            return NearbyLocation(
-                name: name,
-                distance: distanceString ?? "",
-                city: location.cityName ?? ""
             )
         }
     }

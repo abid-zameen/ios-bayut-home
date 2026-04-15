@@ -17,7 +17,7 @@ struct Home {
         let favourites: [Property]
         let savedSearches: [SavedSearchesModel]
         let blogs: [Blog]
-        let nearbyLocations: [NearbyLocation]
+        let nearbyLocations: [LocationHit]
         let isLocationEnabled: Bool
         let popularSearches: [PopularSearch]
         let popularSearchConfig: PopularSearchConfig?
@@ -33,7 +33,7 @@ struct Home {
         let favourites: [Property]
         let savedSearches: SavedSearchesData?
         let blogs: [Blog]
-        let nearbyLocations: [Location]
+        let nearbyLocations: [LocationHit]
         let isLocationEnabled: Bool
         let popularSearches: [PopularSearch]
         let popularSearchConfig: PopularSearchConfig?
@@ -45,7 +45,7 @@ struct Home {
 
 struct SavedSearchesData {
     let searches: [SavedSearch]
-    let resolvedLocations: [Location]
+    let resolvedLocations: [LocationHit]
 }
 
 struct FavoriteIDItem: Codable {
@@ -61,7 +61,7 @@ struct AlgoliaPropertyHit: Codable {
     let rooms: Int?
     let baths: Int?
     let area: Double?
-    let location: [Location]?
+    let location: [LocationHit]?
     let coverPhoto: CoverPhoto?
     let purpose: Purpose?
     let rentFrequency: String?
@@ -113,17 +113,18 @@ enum Purpose: String, Codable {
     case rent = "for-rent", buy = "for-sale"
 }
 
-struct Location: Codable {
-    let id: Int?
-    let name: String?
-    let slug: String?
-    let level: Int?
-    let cityName: String?
-    let geography: Geography?
-    let adCount: Int?
+public struct LocationHit: Codable {
+    public let id: Int?
+    public let name: String?
+    public let slug: String?
+    public let level: Int?
+    public let cityName: String?
+    public let geography: Geography?
+    public let adCount: Int?
+    public let externalID: String?
 }
 
-struct Geography: Codable {
+public struct Geography: Codable {
     let lat: Double
     let lng: Double
 }

@@ -46,14 +46,14 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     }
     
     private func setupHeaderCallbacks() {
-        homeHeaderView.onSearchTapped = { [weak self] tab in
+        homeHeaderView.onSearchTapped = { [weak self] tab, purpose in
             switch tab {
             case .properties:
-                self?.router?.routeToLocationSearch()
+                self?.router?.routeToLocationSearch(purpose: purpose)
             case .newProjects:
                 self?.router?.routeToLocationForProjects()
             case .transactions:
-                self?.router?.routeToDubaiTransaction()
+                self?.router?.routeToLocationForTransactions(purpose: purpose)
             case .agents:
                 self?.router?.routeToFindAgents()
             default:
@@ -212,20 +212,25 @@ extension HomeViewController: SavedSearchesActionsDelegate {
 
 extension HomeViewController: RecentSearchesActionsDelegate {
     func recentSearchesDidTapCard(at index: Int) {
-        // Handle search card tap
+        
     }
 }
 
 extension HomeViewController: BlogsActionsDelegate {
-    func blogsDidTapCard(at index: Int) { }
-    func blogsDidTapViewAll() { }
+    func blogsDidTapCard(with url: String?, title: String?) {
+        guard let url = url else { return }
+        router?.routeToBlogs(url: url, title: title)
+    }
+    
+    func blogsDidTapViewAll() {
+        router?.routeToAllBlogs()
+    }
 }
 
 extension HomeViewController: NearbyLocationsActionsDelegate {
-    func nearbyLocationsDidTapCard(at index: Int) {
-        // Handle card tap - navigate to area detail if needed
+    func nearbyLocationsDidTapCard(with location: LocationHit) {
+        router?.routeToNearbySearch(location: location)
     }
-    
     func nearbyLocationsDidTapAllowLocation() {
         interactor?.requestLocationAuthorization()
     }
@@ -279,3 +284,4 @@ private extension HomeViewController {
         dataSource.apply(newSnapshot, animatingDifferences: animated)
     }
 }
+

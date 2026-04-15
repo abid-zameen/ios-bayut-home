@@ -8,7 +8,7 @@
 import Foundation
 
 protocol BlogsActionsDelegate: AnyObject {
-    func blogsDidTapCard(at index: Int)
+    func blogsDidTapCard(with url: String?, title: String?)
     func blogsDidTapViewAll()
 }
 

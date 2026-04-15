@@ -13,7 +13,6 @@ final class BlogCell: UICollectionViewCell {
     @IBOutlet private weak var blogTitleLabel: UILabel?
     @IBOutlet private weak var categoryLabel: UILabel?
     @IBOutlet private weak var blogImageView: UIImageView?
-    @IBOutlet private weak var cellBackgroundView: UIView?
     
     // MARK: - Properties
     private var viewModel: BlogsCellViewModelType?
@@ -39,8 +38,8 @@ private extension BlogCell {
         categoryLabel?.textColor = UIColor.AppColors.teal5
         categoryLabel?.font = UIFont.boldBody
         
-        cellBackgroundView?.setBorder(UIColor.AppColors.grey2, width: 1)
-        cellBackgroundView?.setRoundedCorner(radius: 8)
+        contentView.setBorder(UIColor.AppColors.grey2, width: 1)
+        contentView.setRoundedCorner(radius: 8)
     }
     
     func setupWithViewModel() {
