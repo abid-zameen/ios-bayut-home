@@ -57,15 +57,15 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     let identifier: NearbyLocationsSectionId = .carousel
     
     struct Item: Hashable {
-        let location: NearbyLocation
+        let location: LocationHit
         func hash(into hasher: inout Hasher) { hasher.combine(location.name) }
         static func == (lhs: Item, rhs: Item) -> Bool { lhs.location.name == rhs.location.name }
     }
     
-    private let locations: [NearbyLocation]
+    private let locations: [LocationHit]
     private let actions: NearbyLocationsActions
     
-    init(locations: [NearbyLocation], section: HomeSection?, actions: NearbyLocationsActions) {
+    init(locations: [LocationHit], section: HomeSection?, actions: NearbyLocationsActions) {
         self.locations = locations
         self.actions = actions
     }
@@ -107,7 +107,7 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.nearbyLocationsDidTapCard(at: indexPath.row)
+        actions.delegate?.nearbyLocationsDidTapCard(with: item.location)
     }
 }
 

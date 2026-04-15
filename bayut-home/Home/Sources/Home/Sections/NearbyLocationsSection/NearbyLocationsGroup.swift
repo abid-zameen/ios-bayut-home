@@ -14,13 +14,13 @@ final class NearbyLocationsGroup: SectionGroup {
     
     private let title: String
     private let isLocationEnabled: Bool
-    private let locations: [NearbyLocation]
+    private let locations: [LocationHit]
     private let actions: NearbyLocationsActions
     
     init(
         title: String,
         isLocationEnabled: Bool,
-        locations: [NearbyLocation],
+        locations: [LocationHit],
         actions: NearbyLocationsActions
     ) {
         self.title = title
