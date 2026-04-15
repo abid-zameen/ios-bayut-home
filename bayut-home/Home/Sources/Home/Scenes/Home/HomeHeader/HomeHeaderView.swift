@@ -172,7 +172,7 @@ class HomeHeaderView: UIView {
         
         searchView.onSearchTapped = { [weak self] in
             guard let self = self else { return }
-            self.onSearchTapped?(self.currentTab)
+            self.onSearchTapped?(self.currentTab, self.searchView.selectedPurpose)
         }
         
         setupLayout()
@@ -202,7 +202,7 @@ class HomeHeaderView: UIView {
     }
     
     private var currentTab: HomeHeaderTab = .properties
-    var onSearchTapped: ((HomeHeaderTab) -> Void)?
+    var onSearchTapped: ((HomeHeaderTab, HomePurpose) -> Void)?
     
     private func handleTabSelection(_ tab: HomeHeaderTab) {
         self.currentTab = tab

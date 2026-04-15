@@ -38,7 +38,7 @@ class HomeHeaderSearchView: UIView {
     
     private let buyButton: UIButton = {
         let btn = UIButton(type: .system)
-        btn.setTitle("Buy", for: .normal)
+        btn.setTitle(HomePurpose.buy.title, for: .normal)
         btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
         btn.backgroundColor = UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 0.1)
         btn.setTitleColor(UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 1.0), for: .normal)
@@ -49,7 +49,7 @@ class HomeHeaderSearchView: UIView {
     
     private let rentButton: UIButton = {
         let btn = UIButton(type: .system)
-        btn.setTitle("Rent", for: .normal)
+        btn.setTitle(HomePurpose.rent.title, for: .normal)
         btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
         btn.backgroundColor = .systemGray6
         btn.setTitleColor(.darkGray, for: .normal)
@@ -58,7 +58,8 @@ class HomeHeaderSearchView: UIView {
         return btn
     }()
     
-    var onPurposeSelected: ((String) -> Void)?
+    var onPurposeSelected: ((HomePurpose) -> Void)?
+    private(set) var selectedPurpose: HomePurpose = .buy
     
     // Search Bar
     private let searchContainer: UIView = {
@@ -181,13 +182,15 @@ class HomeHeaderSearchView: UIView {
     }
     
     @objc private func buyTapped() {
+        selectedPurpose = .buy
         updatePurposeSelection(isBuy: true)
-        onPurposeSelected?("buy")
+        onPurposeSelected?(.buy)
     }
     
     @objc private func rentTapped() {
+        selectedPurpose = .rent
         updatePurposeSelection(isBuy: false)
-        onPurposeSelected?("rent")
+        onPurposeSelected?(.rent)
     }
     
     private func updatePurposeSelection(isBuy: Bool) {
