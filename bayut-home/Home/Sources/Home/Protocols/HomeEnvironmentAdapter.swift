@@ -10,6 +10,9 @@ public protocol HomeEnvironmentAdapter {
     var userID: String? { get }
     var blogAuthorization: String { get }
     var blogAuthorizationHeaderKey: String { get }
+    var isProductTypeEnabled: Bool { get }
+    var isTuBrokerEnabled: Bool { get }
+    var shouldShowDOTWChip: Bool { get }
     
     // MARK: - Location
     var userCoordinates: (lat: Double, lon: Double)? { get }

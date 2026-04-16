@@ -68,6 +68,11 @@ struct AlgoliaPropertyHit: Codable {
     let externalID: String?
     let completionDetails: CompletionDetails?
     let paymentPlans: [PaymentPlan]?
+    let isVerified: Bool
+    let verification: Verification?
+    let completionStatus: String?
+    let offplanDetails: OffplanDetails?
+    let ownerAgent: OwnerAgent?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -83,6 +88,25 @@ struct AlgoliaPropertyHit: Codable {
         case externalID
         case completionDetails
         case paymentPlans = "paymentPlanSummaries"
+        case isVerified
+        case verification
+        case completionStatus
+        case offplanDetails
+        case ownerAgent
+    }
+}
+
+struct OwnerAgent: Codable, Hashable {
+    let externalID: String?
+    let name: String?
+    let userImage: String?
+    let isTruBroker: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case externalID
+        case name
+        case userImage = "user_image"
+        case isTruBroker
     }
 }
 
@@ -96,11 +120,17 @@ struct CompletionDetails: Codable {
     }
 }
 
+struct Verification: Codable {
+    let eligible: Bool
+}
+
+struct OffplanDetails: Codable, Hashable {
+    let saleType: String
+}
+
 struct PaymentPlan: Codable {
-    let preHandoverSum: Double?
-    let postHandoverSum: Double?
-    let preHandOverPercentageSum: Double?
-    let postHandOverPercentageSum: Double?
+    let preHandoverPercentageSum: Double?
+    let postHandoverPercentageSum: Double?
 }
 
 struct CoverPhoto: Codable {
@@ -138,6 +168,22 @@ struct SavedSearch: Codable {
 
 struct SavedSearchInfo: Codable {
     let category: String
+    let categories: [String]?
     let locations: [String]?
-    let purpose: String
+    let purpose: String?
+    let baths: [String]?
+    let beds: [Int]?
+    let price: SavedSearchRange?
+    let area: SavedSearchRange?
+    let videoCount: SavedSearchRange?
+    let hasFloorPlan: SavedSearchRange?
+    let rentFrequency: String?
+    let keywords: [String]?
+    let completionStatus: String?
+    let agencies: [String]?
+}
+
+struct SavedSearchRange: Codable {
+    let min: Double?
+    let max: Double?
 }

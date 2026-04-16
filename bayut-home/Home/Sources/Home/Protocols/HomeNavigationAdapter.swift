@@ -9,4 +9,8 @@ public protocol HomeNavigationAdapter {
     func navigateToLocationForTransactions(from viewController: UIViewController?, purpose: HomePurpose)
     func naviagteToAllBlogs(from viewController: UIViewController?)
     func navigateToNearbySearch(location: LocationHit, from viewController: UIViewController?)
+    func navigateToSavedSearch(savedSearchData: [String: Any], resolvedLocations: [LocationHit], from viewController: UIViewController?)
+    func navigateToAllFavorites(from viewController: UIViewController?)
+    func navigateToAllSavedSearches(from viewController: UIViewController?)
+    func navigateToPropertyDetail(with externalId: String, from viewController: UIViewController?)
 }

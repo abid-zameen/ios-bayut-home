@@ -9,6 +9,10 @@ protocol HomeRoutingLogic: AnyObject {
     func routeToLocationForTransactions(purpose: HomePurpose)
     func routeToAllBlogs()
     func routeToNearbySearch(location: LocationHit)
+    func routeToSavedSearch(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
+    func routeToAllFavorites()
+    func routeToAllSavedSearches()
+    func routeToPropertyDetail(with externalId: String)
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -50,5 +54,21 @@ final class HomeRouter: HomeRoutingLogic {
     
     func routeToNearbySearch(location: LocationHit) {
         navigation.navigateToNearbySearch(location: location, from: viewController)
+    }
+    
+    func routeToSavedSearch(savedSearchData: [String: Any], resolvedLocations: [LocationHit]) {
+        navigation.navigateToSavedSearch(savedSearchData: savedSearchData, resolvedLocations: resolvedLocations, from: viewController)
+    }
+    
+    func routeToAllFavorites() {
+        navigation.navigateToAllFavorites(from: viewController)
+    }
+    
+    func routeToAllSavedSearches() {
+        navigation.navigateToAllSavedSearches(from: viewController)
+    }
+    
+    func routeToPropertyDetail(with externalId: String) {
+        navigation.navigateToPropertyDetail(with: externalId, from: viewController)
     }
 }

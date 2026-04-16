@@ -10,6 +10,7 @@ import Foundation
 protocol HomePresentationLogic: AnyObject {
     func presentData(data: Home.Response?)
     func presentNewProjects(projects: [ProjectHit], selectedLocationID: String)
+    func presentSavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
 }
 
 final class HomePresenter: HomePresentationLogic {
@@ -92,6 +93,11 @@ final class HomePresenter: HomePresentationLogic {
         viewController.displaySections(viewModel: viewModel)
     }
     
+    @MainActor
+    func presentSavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit]) {
+        viewController?.displaySavedSearchRouting(savedSearchData: savedSearchData, resolvedLocations: resolvedLocations)
+    }
+    
     // MARK: - Helpers
     private func mapPopularSearches(config: PopularSearchConfig?, selectedPurpose: PopularSearchPurpose) -> [PopularSearch] {
         guard let config = config else { return [] }
@@ -127,7 +133,7 @@ final class HomePresenter: HomePresentationLogic {
         guard let data = data else { return [] }
         return data.searches.map { search in
             let info = search.params
-            let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category)
+            let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category ?? "")
             
             let displayTitle = propertyTypeInfo?.titlePlural ?? search.name
             
@@ -149,7 +155,7 @@ final class HomePresenter: HomePresentationLogic {
             
             let isParent = propertyTypeInfo?.isParent ?? true
             let showIcon = !isParent
-            let imageName = showIcon ? advanceImagesMap[info.category] : nil
+            let imageName = showIcon ? advanceImagesMap[info.category ?? ""] : nil
             
             return SavedSearchesModel(
                 name: search.name,

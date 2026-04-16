@@ -132,7 +132,7 @@ final class HomeWorker: HomeWorkerLogic {
             filters: algoliaFilters,
             page: 0,
             hitsPerPage: slugs.count,
-            attributesToRetrieve: ["id", "name", "slug", "level", "cityName"]
+            attributesToRetrieve: ["*"]
         )
         
         let result: SearchResult<LocationHit> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)

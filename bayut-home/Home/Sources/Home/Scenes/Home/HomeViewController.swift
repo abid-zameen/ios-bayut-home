@@ -2,6 +2,7 @@ import UIKit
 
 protocol HomeDisplayLogic: AnyObject {
     func displaySections(viewModel: Home.HomeViewModel)
+    func displaySavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
 }
 
 final class HomeViewController: UIViewController, HomeDisplayLogic {
@@ -43,6 +44,7 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
         configureDataSource()
         CellRegistry.registerCells(in: collectionView)
         setupHeaderCallbacks()
+        self.loadData()
     }
     
     private func setupHeaderCallbacks() {
@@ -71,7 +73,6 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
-        self.loadData()
     }
     
     override func viewDidLayoutSubviews() {
@@ -130,6 +131,10 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     // MARK: - Display Logic
     func displaySections(viewModel: Home.HomeViewModel) {
         applySnapshot(sections: viewModel.sections, animated: viewModel.animated)
+    }
+    
+    func displaySavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit]) {
+        router?.routeToSavedSearch(savedSearchData: savedSearchData, resolvedLocations: resolvedLocations)
     }
 }
 
@@ -201,13 +206,23 @@ extension HomeViewController: RailingActionsDelegate {
 }
 
 extension HomeViewController: FavouritesActionsDelegate {
-    func favouritesDidTapCard(at index: Int) { }
-    func favouritesDidTapViewAll() { }
+    func favouritesDidTapCard(at index: Int, with externalId: String) {
+        router?.routeToPropertyDetail(with: externalId)
+    }
+    
+    func favouritesDidTapViewAll() {
+        router?.routeToAllFavorites()
+    }
 }
 
 extension HomeViewController: SavedSearchesActionsDelegate {
-    func savedSearchesDidTapCard(at index: Int) { }
-    func savedSearchesDidTapViewAll() { }
+    func savedSearchesDidTapCard(at index: Int) {
+        interactor?.didSelectSavedSearch(at: index)
+    }
+    
+    func savedSearchesDidTapViewAll() {
+        router?.routeToAllSavedSearches()
+    }
 }
 
 extension HomeViewController: RecentSearchesActionsDelegate {
@@ -237,8 +252,13 @@ extension HomeViewController: NearbyLocationsActionsDelegate {
 }
 
 extension HomeViewController: PopularSearchActionsDelegate {
-    func popularSearchDidSelectPurpose(_ purpose: PopularSearchPurpose) { }
-    func popularSearchDidSelectSearchItem(at index: Int) { }
+    func popularSearchDidSelectPurpose(_ purpose: PopularSearchPurpose) {
+        interactor?.updatePopularSearchPurpose(purpose: purpose)
+    }
+    
+    func popularSearchDidSelectSearchItem(at index: Int) {
+        
+    }
 }
 
 // MARK: - Layout & Data Source
