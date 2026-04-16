@@ -15,9 +15,16 @@ struct Property: Hashable {
     let beds: String?
     let baths: String?
     let area: String?
+    let isTruChecked: Bool
     let imageURL: URL?
+    let completionStatus: String?
     let handoverDate: NSAttributedString?
     let paymentPlanPercentage: NSAttributedString?
+    let offPlanDetails: OffplanDetails?
+    let ownerAgent: OwnerAgent?
+    let rawPrice: Double?
+    let purpose: Purpose?
+    let rentFrequency: String?
     
     init(hit: AlgoliaPropertyHit) {
         self.id = hit.externalID ?? "\(hit.id ?? 0)"
@@ -35,10 +42,10 @@ struct Property: Hashable {
         // Payment Plan
         if let paymentPlan = hit.paymentPlans?.first {
             let title = "Payment Plan"
-            let pre = Int(paymentPlan.preHandoverSum ?? paymentPlan.preHandOverPercentageSum ?? 0.0)
-            let post = Int(paymentPlan.postHandoverSum ?? paymentPlan.postHandOverPercentageSum ?? 0.0)
+            let pre = Int(paymentPlan.preHandoverPercentageSum ?? 0.0)
+            let post = Int(paymentPlan.postHandoverPercentageSum ?? 0.0)
             let value = "\(pre)/\(post)"
-            self.paymentPlanPercentage = "\(title): \(value)".makeBold(text: value, font: .boldBodyS1)
+            self.paymentPlanPercentage = (pre > 0 && post > 0) ? "\(title): \(value)".makeBold(text: value, font: .boldBodyS1) : nil
         } else {
             self.paymentPlanPercentage = nil
         }
@@ -103,5 +110,13 @@ struct Property: Hashable {
         } else {
             self.imageURL = nil
         }
+        
+        isTruChecked = hit.isVerified && (hit.verification?.eligible ?? false)
+        completionStatus = hit.completionStatus
+        offPlanDetails = hit.offplanDetails
+        ownerAgent = hit.ownerAgent
+        rawPrice = hit.price
+        purpose = hit.purpose
+        rentFrequency = hit.rentFrequency
     }
 }

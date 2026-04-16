@@ -113,7 +113,7 @@ final class FavouritesCarouselSection: SectionDescriptor {
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.favouritesDidTapCard(at: indexPath.row)
+        actions.delegate?.favouritesDidTapCard(at: indexPath.row, with: item.property.id)
     }
 }
 

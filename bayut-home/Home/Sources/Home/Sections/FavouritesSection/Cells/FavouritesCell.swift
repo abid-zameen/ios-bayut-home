@@ -14,7 +14,6 @@ final class FavouritesCell: UICollectionViewCell {
     @IBOutlet private weak var propertyImageBgView: UIView?
     @IBOutlet private weak var propertyImageView: UIImageView?
     @IBOutlet private weak var trueCheckButton: UIButton?
-    @IBOutlet private weak var offPlanBadgeView: UIView?
     @IBOutlet private weak var favoriteButton: UIButton?
     @IBOutlet private weak var currencyPriceAndFrequencyLabel: UILabel?
     @IBOutlet private weak var bedsImageView: UIImageView?
@@ -44,13 +43,10 @@ final class FavouritesCell: UICollectionViewCell {
     @IBOutlet private weak var potwView: UIView?
     @IBOutlet private weak var potwLabel: UILabel?
     @IBOutlet private weak var potwButton: UIButton?
-    @IBOutlet private weak var truBrokerBadge: TruBrokerBadge?
-    @IBOutlet private weak var imagesContainerHeightConstraint: NSLayoutConstraint?
+    @IBOutlet private weak var truBrokerBadge: TruBrokerBadgeView?
     @IBOutlet private weak var offPlanInformationView: UIView?
     @IBOutlet private weak var offPlanDetailView: OffPlanPropertyCardView?
     @IBOutlet private weak var offplanResaleTransparentButton: UIButton?
-    @IBOutlet private weak var offplanTransparentButton: UIButton?
-    @IBOutlet private weak var offPlanTitle: UILabel?
 
     // MARK: - Properties
     private var viewModel: FavoritesCellViewModelType?
@@ -98,11 +94,9 @@ final class FavouritesCell: UICollectionViewCell {
 private extension FavouritesCell {
     
     func setupViews() {
-        let isProductTypeEnabled = true
-        let isTruBrokerEnabled = true
         let cardCornerRadius: CGFloat = 8
         
-        hotView?.isHidden = !isProductTypeEnabled
+        hotView?.isHidden = !HomeModule.shared.environment.isProductTypeEnabled
         
         bgView?.setRoundedCorner(radius: cardCornerRadius)
         bgView?.setBorder(.clear, width: 1)
@@ -112,10 +106,6 @@ private extension FavouritesCell {
         propertyImageView?.setRoundedCorner(radius: cardCornerRadius)
         
         
-        offPlanBadgeView?.backgroundColor = UIColor.AppColors.blackTextColor.withAlphaComponent(0.8)
-        offPlanBadgeView?.layer.cornerRadius = 12
-        offPlanBadgeView?.addBadgeShadow()
-        
         offPlanResaleBadgeView?.backgroundColor = UIColor.AppColors.blue1
         offPlanResaleBadgeView?.layer.cornerRadius = 12
         offPlanResaleBadgeView?.addBadgeShadow()
@@ -124,12 +114,13 @@ private extension FavouritesCell {
         potwView?.addBadgeShadow()
         potwView?.layer.borderWidth = 1.0
         potwView?.layer.borderColor = UIColor.AppColors.purpleOutlineColor.cgColor
+        potwView?.isHidden = !HomeModule.shared.environment.shouldShowDOTWChip
+        potwLabel?.text = "Property of the Week".localized()
+        potwLabel?.font = UIFont.headingL6
+        potwLabel?.textColor = UIColor.AppColors.purpleTitleColor
         
-        // 4. Texts and Fonts
-        offPlanTitle?.text = "offplan".localized()
-        offPlanTitle?.textColor = UIColor.AppColors.grey1
-        offPlanResaleLabel?.text = "offplan".localized()
-        resaleLabel?.text = "resale".localized()
+        offPlanResaleLabel?.text = "Off Plan".localized()
+        resaleLabel?.text = "Resale".localized()
         resaleLabel?.font = UIFont.appRegularFont(ofSize: 12.0)
         
         bedsLabel?.textColor = UIColor.AppColors.grey7
@@ -150,23 +141,21 @@ private extension FavouritesCell {
         areaImageView?.tintColor = iconTint
         
         // 6. Interaction Elements
-        offplanTransparentButton?.setTitle("", for: .normal)
         offplanResaleTransparentButton?.setTitle("", for: .normal)
         potwButton?.setTitle("", for: .normal)
         
-        favoriteButton?.isSelected = true
-        imagesContainerHeightConstraint?.constant = 228
         
         downPaymentInfoView?.isHidden = true
         
         setupViewedButtonAttributes()
         setupForViewedListing()
+        bookUntilDailyRentalTagView?.isHidden = true
     }
     
     func setupWithViewModel() {
         guard let viewModel else { return }
         
-        currencyPriceAndFrequencyLabel?.text = viewModel.price
+        currencyPriceAndFrequencyLabel?.attributedText = viewModel.price
         propertyTitleLabel?.text = viewModel.title
         propertyAddressLabel?.text = viewModel.location
         
@@ -175,13 +164,26 @@ private extension FavouritesCell {
         areaLabel?.text = viewModel.area
         
         propertyImageView?.loadImage(with: viewModel.imageUrl)
-        trueCheckButton?.isHidden = true
+        
+        let truCheckButtomImage = UIImage(named: viewModel.isPropertyTruChecked ? "truCheckShadow" : "checkedGrey", in: .module, compatibleWith: nil)
+        trueCheckButton?.setImage(truCheckButtomImage, for: .normal)
+        
         setupForViewedListing()
         setBadgeComponent()
         
-        offPlanDetailView?.property = viewModel.property
-        let hasOffPlanInfo = viewModel.property.handoverDate != nil || viewModel.property.paymentPlanPercentage != nil
-        offPlanInformationView?.isHidden = !hasOffPlanInfo
+        if viewModel.showOffPlanInfo {
+            offPlanResaleBadgeView?.isHidden = false
+            offPlanDetailView?.property = viewModel.property
+            resaleLabel?.text = viewModel.resaleLabelText
+            resaleLabelStackView?.isHidden = !viewModel.showResaleInfo
+            let hasOffPlanInfo = viewModel.property.handoverDate != nil || viewModel.property.paymentPlanPercentage != nil
+            offPlanInformationView?.isHidden = !hasOffPlanInfo
+        } else {
+            offPlanResaleBadgeView?.isHidden = true
+            offPlanInformationView?.isHidden = true
+            resaleLabelStackView?.isHidden = true
+        }
+        
     }
     
     func setupViewedButtonAttributes() {
@@ -201,6 +203,17 @@ private extension FavouritesCell {
     }
     
     func setBadgeComponent() {
-        truBrokerBadge?.isHidden = true
+        guard let ownerAgent = viewModel?.property.ownerAgent,
+              ownerAgent.isTruBroker == true else {
+            truBrokerBadge?.isHidden = true
+            return
+        }
+        
+        truBrokerBadge?.isHidden = false
+        let agentImageUrl = URL(string: ownerAgent.userImage ?? "")
+        truBrokerBadge?.set(imageUrl: agentImageUrl, 
+                           hasStories: false, 
+                           action: nil, 
+                           currentThumbnailIndex: 0)
     }
 }

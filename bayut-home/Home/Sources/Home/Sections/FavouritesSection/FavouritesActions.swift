@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Delegate Protocol
 protocol FavouritesActionsDelegate: AnyObject {
-    func favouritesDidTapCard(at index: Int)
+    func favouritesDidTapCard(at index: Int, with externalId: String)
     func favouritesDidTapViewAll()
 }
 
