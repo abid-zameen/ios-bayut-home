@@ -18,6 +18,7 @@ protocol RailingCardCellViewModelType: AnyObject {
     var backgroundViewColor: UIColor { get }
     var itemImage: String { get }
     var ctaText: String { get }
+    var onCTATap: (() -> Void)? { get set }
 }
 
 final class RailingCardCellViewModel: RailingCardCellViewModelType {
@@ -27,6 +28,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
     let itemImage: String
     let ctaText: String
     let backgroundViewColor: UIColor
+    var onCTATap: (() -> Void)?
     
     init(type: RailingCellType) {
         switch type {

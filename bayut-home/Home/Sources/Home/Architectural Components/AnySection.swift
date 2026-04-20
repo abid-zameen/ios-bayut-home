@@ -14,8 +14,11 @@ struct AnySection: SectionIdentifier, Hashable {
     let displayName: String?
     let section: HomeSection?
     let isCustomizable: Bool
+    var autoscrollable: SectionAutoscrollable? { _autoscrollable?() }
     
     private let identifier: AnyHashable
+    private let descriptorIdentity: ObjectIdentifier?
+    private let _autoscrollable: (() -> SectionAutoscrollable?)?
     private let _layoutSection: (NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection
     private let _buildItems: () -> [AnyHashable]
     private let _configureCell: (UICollectionView, IndexPath, AnyHashable) -> UICollectionViewCell
@@ -24,10 +27,12 @@ struct AnySection: SectionIdentifier, Hashable {
     
     init<S: SectionDescriptor>(_ descriptor: S, isCustomizable: Bool = true) {
         self.identifier = AnyHashable(descriptor.identifier)
+        self.descriptorIdentity = (S.self as? AnyClass) != nil ? ObjectIdentifier(descriptor as AnyObject) : nil
         self.identifierString = descriptor.identifier.rawValue
         self.displayName = descriptor.identifier.displayName
         self.section = descriptor.identifier.section
         self.isCustomizable = isCustomizable
+        self._autoscrollable = { descriptor as? SectionAutoscrollable }
         
         self._layoutSection = descriptor.layoutSection
         self._buildItems = { descriptor.buildItems().map { AnyHashable($0) } }
@@ -62,6 +67,12 @@ struct AnySection: SectionIdentifier, Hashable {
         _didSelectItem(indexPath, item)
     }
     
-    func hash(into hasher: inout Hasher) { hasher.combine(identifier) }
-    static func == (lhs: AnySection, rhs: AnySection) -> Bool { lhs.identifier == rhs.identifier }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
+        hasher.combine(descriptorIdentity)
+    }
+    
+    static func == (lhs: AnySection, rhs: AnySection) -> Bool {
+        lhs.identifier == rhs.identifier && lhs.descriptorIdentity == rhs.descriptorIdentity
+    }
 }

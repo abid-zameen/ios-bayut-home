@@ -7,16 +7,18 @@
 
 import Foundation
 
-// MARK: - Shared Sync State
-/// Passed to both sections to handle live state updates without rebuilding VIP arrays
 final class RailingSyncState {
     var currentPage: Int = 0 {
         didSet {
-            // Signal directly back to the PageControlCell
             onPageChangedHandler?(currentPage)
         }
     }
+    
+    var currentVirtualIndex: Int = 0
+    var realCount: Int = 0
     var onPageChangedHandler: ((Int) -> Void)?
+    var onInteractionBegan: (() -> Void)?
+    var onInteractionEnded: (() -> Void)?
 }
 
 // MARK: - Section Group
@@ -27,8 +29,6 @@ final class RailingGroup: SectionGroup {
     
     private let cellTypes: [RailingCellType]
     private let actions: RailingActions
-    
-    // Create shared sync state reference owned safely by the group during its lifecycle
     private let syncState = RailingSyncState()
     
     init(
@@ -43,13 +43,13 @@ final class RailingGroup: SectionGroup {
         self.section = section
         self.cellTypes = cellTypes
         self.actions = actions
+        self.syncState.realCount = cellTypes.count
     }
     
     func buildSections() -> [AnySection] {
         guard !cellTypes.isEmpty else { return [] }
         var sections: [AnySection] = []
         
-        // 1. Carousel Section (Continuously writes to SyncState)
         let carouselSection = RailingCarouselSection(
             cellTypes: cellTypes,
             syncState: syncState,
@@ -58,7 +58,6 @@ final class RailingGroup: SectionGroup {
         )
         sections.append(AnySection(carouselSection, isCustomizable: false))
         
-        // 2. Page Control Footer Cell (Continuously reads from SyncState)
         let pageControlSection = RailingPageControlSection(
             numberOfPages: cellTypes.count,
             syncState: syncState,

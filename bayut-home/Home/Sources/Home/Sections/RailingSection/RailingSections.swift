@@ -16,27 +16,79 @@ enum RailingSectionId: String, SectionIdentifier {
     var section: HomeSection? { .main }
 }
 
-final class RailingCarouselSection: SectionDescriptor {
-    typealias Identifier = RailingSectionId
+final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
     
+    typealias Identifier = RailingSectionId
     let identifier: RailingSectionId = .carousel
+    static let infiniteMultiplier = 1000
+    var autoscrollInterval: TimeInterval { 4.0 }
+    var onInteractionBegan: (() -> Void)?
     
     struct Item: Hashable {
         let type: RailingCellType
+        let virtualIndex: Int
     }
     
     private let cellTypes: [RailingCellType]
-    private let syncState: RailingSyncState
+    let syncState: RailingSyncState
     private let actions: RailingActions
     
     init(cellTypes: [RailingCellType], syncState: RailingSyncState, section: HomeSection?, actions: RailingActions) {
         self.cellTypes = cellTypes
         self.syncState = syncState
         self.actions = actions
+        
+        self.syncState.onInteractionBegan = { [weak self] in
+            self?.onInteractionBegan?()
+        }
+    }
+    
+    func scrollToNext(in collectionView: UICollectionView, at sectionIndex: Int) {
+        let nextItemIndex = syncState.currentVirtualIndex + 1
+        let indexPath = IndexPath(item: nextItemIndex, section: sectionIndex)
+        
+        let numberOfItems = collectionView.numberOfItems(inSection: sectionIndex)
+        if nextItemIndex < numberOfItems {
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        }
+    }
+    
+    func scrollToPage(_ page: Int, in collectionView: UICollectionView, at sectionIndex: Int) {
+        guard cellTypes.count > 0 else { return }
+        
+        let currentItem = syncState.currentVirtualIndex
+        let currentSet = Int(currentItem / cellTypes.count)
+        let targetItem = (currentSet * cellTypes.count) + page
+        
+        let indexPath = IndexPath(item: targetItem, section: sectionIndex)
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+    }
+    
+    func centerIfNeeded(in collectionView: UICollectionView, at sectionIndex: Int) {
+        let middleIndex = (RailingCarouselSection.infiniteMultiplier / 2)
+        let realCount = cellTypes.count
+        
+        guard realCount > 0 else { return }
+        
+        let targetItem = middleIndex * realCount
+        let indexPath = IndexPath(item: targetItem, section: sectionIndex)
+        
+        DispatchQueue.main.async {
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+        }
     }
     
     func buildItems() -> [Item] {
-        cellTypes.map { Item(type: $0) }
+        var items: [Item] = []
+        let totalVirtualItems = cellTypes.count * Self.infiniteMultiplier
+        
+        for i in 0..<totalVirtualItems {
+            let type = cellTypes[i % cellTypes.count]
+            items.append(Item(type: type, virtualIndex: i))
+        }
+        
+        syncState.realCount = cellTypes.count
+        return items
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
@@ -69,16 +121,22 @@ final class RailingCarouselSection: SectionDescriptor {
             trailing: horizontalInset / 2
         )
         
-        // MARK: Native Auto-Sync -> Write index downstream dynamically
-        section.visibleItemsInvalidationHandler = { [weak syncState] (visibleItems, offset, env) in
+        section.visibleItemsInvalidationHandler = { [weak syncState, cellCount = cellTypes.count] (visibleItems, offset, env) in
+            guard cellCount > 0, let syncState = syncState else { return }
+            
+            syncState.onInteractionBegan?()
+            
             let collectionCenterX = offset.x + (env.container.contentSize.width / 2)
             guard let centeredItem = visibleItems.min(by: {
                 abs($0.frame.midX - collectionCenterX) < abs($1.frame.midX - collectionCenterX)
             }) else { return }
             
-            let index = centeredItem.indexPath.item
-            if syncState?.currentPage != index { // Prevent duplicate firing freezes
-                syncState?.currentPage = index
+            let virtualIndex = centeredItem.indexPath.item
+            syncState.currentVirtualIndex = virtualIndex
+            
+            let realIndex = virtualIndex % cellCount
+            if syncState.currentPage != realIndex {
+                syncState.currentPage = realIndex
             }
         }
         
@@ -92,12 +150,15 @@ final class RailingCarouselSection: SectionDescriptor {
             return UICollectionViewCell()
         }
         let viewModel = RailingCardCellViewModel(type: item.type)
+        viewModel.onCTATap = { [weak self] in
+            self?.actions.delegate?.railingDidTapCard(type: item.type)
+        }
         cell.configure(with: viewModel)
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.railingDidTapCard(at: indexPath.item)
+        actions.delegate?.railingDidTapCard(type: item.type)
     }
 }
 
@@ -138,12 +199,9 @@ final class RailingPageControlSection: SectionDescriptor {
             return UICollectionViewCell()
         }
         
-        // Primary Initialization Binding
         cell.configure(numberOfPages: item.numberOfPages, currentPage: syncState.currentPage) { [weak self] page in
             self?.actions.delegate?.railingDidTapPageControl(index: page)
         }
-        
-        // Reverse Listener - Carousel writes to syncState -> Updates cell UI in real-time
         syncState.onPageChangedHandler = { [weak cell] newPage in
             cell?.updateCurrentPage(newPage)
         }

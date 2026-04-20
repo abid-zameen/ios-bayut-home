@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Delegate Protocol
 protocol RailingActionsDelegate: AnyObject {
-    func railingDidTapCard(at index: Int)
+    func railingDidTapCard(type: RailingCellType)
     func railingDidTapPageControl(index: Int)
 }
 

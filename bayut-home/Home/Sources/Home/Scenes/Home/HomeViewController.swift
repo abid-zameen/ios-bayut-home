@@ -3,6 +3,7 @@ import UIKit
 protocol HomeDisplayLogic: AnyObject {
     func displaySections(viewModel: Home.HomeViewModel)
     func displaySavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
+    func displayRecentSearchRouting(search: HomeScreenRecentSearch)
 }
 
 final class HomeViewController: UIViewController, HomeDisplayLogic {
@@ -35,6 +36,9 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     private var initialHeaderHeight: CGFloat = 350
     private var isInitialInsetSet = false
     private var variant: HeaderVariant = .uae
+    private var autoscrollTimers: [AnySection: Timer] = [:]
+    private var resumeAutoscrollWorkItems: [AnySection: DispatchWorkItem] = [:]
+    private let autoscrollResumeDelay: TimeInterval = 2.0
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -131,18 +135,87 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     // MARK: - Display Logic
     func displaySections(viewModel: Home.HomeViewModel) {
         applySnapshot(sections: viewModel.sections, animated: viewModel.animated)
+        setupAutoscrolling(for: viewModel.sections)
     }
     
     func displaySavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit]) {
         router?.routeToSavedSearch(savedSearchData: savedSearchData, resolvedLocations: resolvedLocations)
     }
-}
+    
+    func displayRecentSearchRouting(search: HomeScreenRecentSearch) {
+        router?.routeToRecentSearch(recentSearch: search)
+    }
 
+    private func setupAutoscrolling(for sections: [AnySection]) {
+        stopAllAutoscrolling()
+        
+        for section in sections {
+            guard let autoscrollable = section.autoscrollable else { continue }
+            
+            let latestSnapshot = dataSource.snapshot()
+            if let index = latestSnapshot.indexOfSection(section) {
+                autoscrollable.centerIfNeeded(in: collectionView, at: index)
+            }
+            
+            autoscrollable.onInteractionBegan = { [weak self, section] in
+                guard let self = self else { return }
+                self.pauseAutoscrolling(for: section)
+            }
+            
+            startAutoscrolling(for: autoscrollable, in: section)
+        }
+    }
+
+    private func startAutoscrolling(for autoscrollable: SectionAutoscrollable, in section: AnySection) {
+        autoscrollTimers[section]?.invalidate()
+        
+        let timer = Timer(timeInterval: autoscrollable.autoscrollInterval, repeats: true) { [weak self, weak autoscrollable, section] _ in
+            guard let self = self, let autoscrollable = autoscrollable else { return }
+            
+            let snapshot = self.dataSource.snapshot()
+            guard let index = snapshot.indexOfSection(section) else { return }
+            
+            autoscrollable.scrollToNext(in: self.collectionView, at: index)
+        }
+        autoscrollTimers[section] = timer
+        RunLoop.main.add(timer, forMode: .common)
+    }
+
+    private func pauseAutoscrolling(for section: AnySection) {
+        autoscrollTimers[section]?.invalidate()
+        autoscrollTimers[section] = nil
+        
+        resumeAutoscrollWorkItems[section]?.cancel()
+        let task = DispatchWorkItem { [weak self, section] in
+            guard let self = self else { return }
+            
+            let snapshot = self.dataSource.snapshot()
+            guard snapshot.sectionIdentifiers.contains(section),
+                  let autoscrollable = section.autoscrollable else { return }
+            
+            self.startAutoscrolling(for: autoscrollable, in: section)
+        }
+        resumeAutoscrollWorkItems[section] = task
+        DispatchQueue.main.asyncAfter(deadline: .now() + autoscrollResumeDelay, execute: task)
+    }
+    
+    private func stopAllAutoscrolling() {
+        autoscrollTimers.values.forEach { $0.invalidate() }
+        autoscrollTimers.removeAll()
+        resumeAutoscrollWorkItems.values.forEach { $0.cancel() }
+        resumeAutoscrollWorkItems.removeAll()
+    }
+
+}
 
 // MARK: - UICollectionViewDelegate (Scroll Logic)
 extension HomeViewController: UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.isTracking || scrollView.isDragging {
+            stopAllAutoscrolling()
+        }
+
         let stickyHeight: CGFloat = 140
         let bottomGap = scrollView.contentInset.top - initialHeaderHeight
         let maxCollapseOffset = initialHeaderHeight - stickyHeight
@@ -175,6 +248,18 @@ extension HomeViewController: UICollectionViewDelegate {
             }
         }
     }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            let snapshot = dataSource.snapshot()
+            setupAutoscrolling(for: snapshot.sectionIdentifiers)
+        }
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let snapshot = dataSource.snapshot()
+        setupAutoscrolling(for: snapshot.sectionIdentifiers)
+    }
    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let snapshot = dataSource.snapshot()
@@ -186,7 +271,8 @@ extension HomeViewController: UICollectionViewDelegate {
 
 // MARK: - Section Handlers
 extension HomeViewController: NewProjectsActionsDelegate {
-    func newProjectsDidTapCard(at index: Int) { 
+    func newProjectsDidTapCard(hit: ProjectHit) {
+        router?.routeToProjectDetail(hit: hit)
     }
     
     func newProjectsDidTapLocationChip(externalID: String) {
@@ -195,14 +281,27 @@ extension HomeViewController: NewProjectsActionsDelegate {
         }
     }
     
-    func newProjectsDidTapViewAll() {
-        // Handle View All navigation
+    func newProjectsDidTapViewAll(externalID: String, displayName: String) {
+        router?.routeToProjectsScreen(externalID: externalID, displayName: displayName)
     }
 }
     
 extension HomeViewController: RailingActionsDelegate {
-    func railingDidTapCard(at index: Int) { }
-    func railingDidTapPageControl(index: Int) { }
+    func railingDidTapCard(type: RailingCellType) {
+        router?.routeToRailing(type: type)
+    }
+    
+    func railingDidTapPageControl(index: Int) {
+        let snapshot = dataSource.snapshot()
+        guard let sectionIndex = snapshot.sectionIdentifiers.firstIndex(where: { $0.rawValue == RailingSectionId.carousel.rawValue }) else { return }
+        let section = snapshot.sectionIdentifiers[sectionIndex]
+        
+        section.autoscrollable?.scrollToPage(index, in: collectionView, at: sectionIndex)
+        
+        if let autoscrollable = section.autoscrollable {
+            pauseAutoscrolling(for: section)
+        }
+    }
 }
 
 extension HomeViewController: FavouritesActionsDelegate {
@@ -227,7 +326,7 @@ extension HomeViewController: SavedSearchesActionsDelegate {
 
 extension HomeViewController: RecentSearchesActionsDelegate {
     func recentSearchesDidTapCard(at index: Int) {
-        
+        interactor?.didSelectRecentSearch(at: index)
     }
 }
 

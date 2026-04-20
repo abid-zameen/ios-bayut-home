@@ -33,6 +33,12 @@ final class RailingCardCell: UICollectionViewCell {
         self.viewModel = viewModel
         setupWithViewModel()
     }
+    
+    // MARK: - Actions
+    
+    @IBAction private func ctaAction(_ sender: Any) {
+        viewModel?.onCTATap?()
+    }
 }
 
 private extension RailingCardCell {
