@@ -13,6 +13,7 @@ protocol HomeBusinessLogic: AnyObject {
     func didSelectNewProjectsLocation(id: String) async
     func updatePopularSearchPurpose(purpose: PopularSearchPurpose)
     func didSelectSavedSearch(at index: Int)
+    func didSelectRecentSearch(at index: Int)
 }
 
 final class HomeInteractor: HomeBusinessLogic {
@@ -151,5 +152,11 @@ final class HomeInteractor: HomeBusinessLogic {
            let dict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
             presenter?.presentSavedSearchRouting(savedSearchData: dict, resolvedLocations: savedSearches.resolvedLocations)
         }
+    }
+    
+    func didSelectRecentSearch(at index: Int) {
+        guard index < recentSearches.count else { return }
+        let search = recentSearches[index]
+        presenter?.presentRecentSearchRouting(search: search)
     }
 }

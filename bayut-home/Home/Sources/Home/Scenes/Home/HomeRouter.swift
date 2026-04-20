@@ -13,6 +13,13 @@ protocol HomeRoutingLogic: AnyObject {
     func routeToAllFavorites()
     func routeToAllSavedSearches()
     func routeToPropertyDetail(with externalId: String)
+    func routeToProjectDetail(hit: ProjectHit)
+    func routeToProjectsScreen(externalID: String, displayName: String)
+    func routeToRecentSearch(recentSearch: HomeScreenRecentSearch)
+    func routeToRailing(type: RailingCellType)
+    func routeToCommuteSearch()
+    func routeToTruEstimate()
+    func routeToGPT()
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -70,5 +77,49 @@ final class HomeRouter: HomeRoutingLogic {
     
     func routeToPropertyDetail(with externalId: String) {
         navigation.navigateToPropertyDetail(with: externalId, from: viewController)
+    }
+    
+    func routeToProjectDetail(hit: ProjectHit) {
+        let jsonDict = hit.tojsonDict(imageBaseUrl: HomeModule.shared.environment.imageBaseUrl)
+        navigation.navigateToProjectDetail(hit: hit, jsonDict: jsonDict, from: viewController)
+    }
+    
+    func routeToProjectsScreen(externalID: String, displayName: String) {
+        navigation.navigateToProjectsScreen(externalID: externalID, displayName: displayName, from: viewController)
+    }
+    
+    func routeToRecentSearch(recentSearch: HomeScreenRecentSearch) {
+        navigation.navigateToRecentSearch(recentSearch: recentSearch, from: viewController)
+    }
+    
+    func routeToRailing(type: RailingCellType) {
+        switch type {
+        case .truEstimate:
+            routeToTruEstimate()
+        case .truBroker:
+            routeToFindAgents()
+        case .dubaiTransactions:
+            routeToDubaiTransaction()
+        case .commuteSearch:
+            routeToCommuteSearch()
+        case .bayutGPT:
+            routeToGPT()
+        case .findAnAgency:
+             routeToFindAgents()
+        default:
+            break
+        }
+    }
+    
+    func routeToCommuteSearch() {
+        navigation.navigateToCommuteSearch(from: viewController)
+    }
+    
+    func routeToTruEstimate() {
+        navigation.navigateToTruEstimate(from: viewController)
+    }
+    
+    func routeToGPT() {
+        navigation.navigateToGPT(from: viewController)
     }
 }

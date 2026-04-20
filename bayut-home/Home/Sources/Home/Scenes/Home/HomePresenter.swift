@@ -11,6 +11,7 @@ protocol HomePresentationLogic: AnyObject {
     func presentData(data: Home.Response?)
     func presentNewProjects(projects: [ProjectHit], selectedLocationID: String)
     func presentSavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
+    func presentRecentSearchRouting(search: HomeScreenRecentSearch)
 }
 
 final class HomePresenter: HomePresentationLogic {
@@ -96,6 +97,11 @@ final class HomePresenter: HomePresentationLogic {
     @MainActor
     func presentSavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit]) {
         viewController?.displaySavedSearchRouting(savedSearchData: savedSearchData, resolvedLocations: resolvedLocations)
+    }
+    
+    @MainActor
+    func presentRecentSearchRouting(search: HomeScreenRecentSearch) {
+        viewController?.displayRecentSearchRouting(search: search)
     }
     
     // MARK: - Helpers

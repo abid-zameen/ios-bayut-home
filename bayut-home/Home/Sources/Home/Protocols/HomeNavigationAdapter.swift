@@ -13,4 +13,10 @@ public protocol HomeNavigationAdapter {
     func navigateToAllFavorites(from viewController: UIViewController?)
     func navigateToAllSavedSearches(from viewController: UIViewController?)
     func navigateToPropertyDetail(with externalId: String, from viewController: UIViewController?)
+    func navigateToProjectDetail(hit: ProjectHit, jsonDict: [String: Any], from viewController: UIViewController?)
+    func navigateToProjectsScreen(externalID: String, displayName: String, from viewController: UIViewController?)
+    func navigateToRecentSearch(recentSearch: HomeScreenRecentSearch, from viewController: UIViewController?)
+    func navigateToCommuteSearch(from viewController: UIViewController?)
+    func navigateToTruEstimate(from viewController: UIViewController?)
+    func navigateToGPT(from viewController: UIViewController?)
 }
