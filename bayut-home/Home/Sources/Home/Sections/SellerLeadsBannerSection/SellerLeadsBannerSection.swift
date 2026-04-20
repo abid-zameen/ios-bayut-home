@@ -20,38 +20,38 @@ final class SellerLeadsBannerSection: SectionDescriptor {
     typealias Identifier = SellerLeadsBannerSectionId
     
     let identifier: SellerLeadsBannerSectionId = .main
+    private let actions: SellerLeadsBannerActions
+    
+    init(actions: SellerLeadsBannerActions) {
+        self.actions = actions
+    }
     
     // MARK: - Item
     struct Item: Hashable {
-        let id: String = "sellerLeads_banner_unique_id" // Static identity per banner
+        let id: String = "sellerLeads_banner_unique_id"
     }
     
-    // MARK: - Build Items
     func buildItems() -> [Item] {
-        // Single cell driving the banner
         [Item()]
     }
     
-    // MARK: - Layout Configuration
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
-        // 16 px spacing around all sides as requested
         return .fullWidthList(
-            estimatedHeight: 180, // Estimated starting height for self-sizing wrapper
+            estimatedHeight: 180,
             sectionInsets: NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
         )
     }
     
-    // MARK: - Cell Rendering
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SellerLeadsBannerCell.reuseId, for: indexPath
         ) as? SellerLeadsBannerCell else {
             return UICollectionViewCell()
         }
-        
-        // Data bindings go here if the API starts returning dynamic banner text.
-        // Currently handled statically inside SellerLeadsBannerCell.awakeFromNib()
-        
         return cell
+    }
+    
+    func didSelectItem(at indexPath: IndexPath, with item: Item) {
+        actions.delegate?.sellerLeadsBannerDidTap()
     }
 }

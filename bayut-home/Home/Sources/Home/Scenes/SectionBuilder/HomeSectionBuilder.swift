@@ -30,11 +30,13 @@ final class HomeSectionBuilder {
         }
         
         // Append TruBroker Banner
-        let truBrokerBannerSection = TruBrokerBannerSection()
+        let truBrokerActions = TruBrokerBannerActions(delegate: sectionsData.viewController)
+        let truBrokerBannerSection = TruBrokerBannerSection(actions: truBrokerActions)
         sections.append(AnySection(truBrokerBannerSection, isCustomizable: false))
         
         // Append SellerLeads Banner
-        let sellerLeadsBannerSection = SellerLeadsBannerSection()
+        let sellerLeadsActions = SellerLeadsBannerActions(delegate: sectionsData.viewController)
+        let sellerLeadsBannerSection = SellerLeadsBannerSection(actions: sellerLeadsActions)
         sections.append(AnySection(sellerLeadsBannerSection, isCustomizable: false))
 
         // MARK: - Build Railing Carousel

@@ -20,6 +20,7 @@ protocol HomeRoutingLogic: AnyObject {
     func routeToCommuteSearch()
     func routeToTruEstimate()
     func routeToGPT()
+    func routeToSellerLeadsForm(purpose: HomePurpose?)
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -121,5 +122,9 @@ final class HomeRouter: HomeRoutingLogic {
     
     func routeToGPT() {
         navigation.navigateToGPT(from: viewController)
+    }
+    
+    func routeToSellerLeadsForm(purpose: HomePurpose?) {
+        navigation.navigateToSellerLeadsForm(with: purpose, from: viewController)
     }
 }

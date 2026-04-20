@@ -360,6 +360,18 @@ extension HomeViewController: PopularSearchActionsDelegate {
     }
 }
 
+extension HomeViewController: TruBrokerBannerActionsDelegate {
+    func truBrokerBannerDidTap() {
+        router?.routeToFindAgents()
+    }
+}
+
+extension HomeViewController: SellerLeadsBannerActionsDelegate {
+    func sellerLeadsBannerDidTap() {
+        router?.routeToSellerLeadsForm(purpose: .rent)
+    }
+}
+
 // MARK: - Layout & Data Source
 private extension HomeViewController {
     

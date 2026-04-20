@@ -20,23 +20,26 @@ final class TruBrokerBannerSection: SectionDescriptor {
     typealias Identifier = TruBrokerBannerSectionId
     
     let identifier: TruBrokerBannerSectionId = .main
+    private let actions: TruBrokerBannerActions
+    
+    init(actions: TruBrokerBannerActions) {
+        self.actions = actions
+    }
     
     // MARK: - Item
     struct Item: Hashable {
-        let id: String = "truBroker_banner_unique_id" // Only one static identity needed per banner
+        let id: String = "truBroker_banner_unique_id"
     }
     
     // MARK: - Build Items
     func buildItems() -> [Item] {
-        // Single cell driving the banner
         [Item()]
     }
     
     // MARK: - Layout Configuration
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
-        // 16 px spacing around all sides as requested
         return .fullWidthList(
-            estimatedHeight: 100, // Estimated starting height for self-sizing
+            estimatedHeight: 100,
             sectionInsets: NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
         )
     }
@@ -49,9 +52,10 @@ final class TruBrokerBannerSection: SectionDescriptor {
             return UICollectionViewCell()
         }
         
-        // Data bindings go here if the API starts returning dynamic banner text.
-        // Currently handled statically inside TruBrokerBannerCell.awakeFromNib()
-        
         return cell
+    }
+    
+    func didSelectItem(at indexPath: IndexPath, with item: Item) {
+        actions.delegate?.truBrokerBannerDidTap()
     }
 }
