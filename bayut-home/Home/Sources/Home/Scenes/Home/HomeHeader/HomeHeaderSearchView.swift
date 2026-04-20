@@ -11,6 +11,7 @@ class HomeHeaderSearchView: UIView {
     
     private var searchTopConstraint: NSLayoutConstraint?
     private var containerTopConstraint: NSLayoutConstraint?
+    private var isPurposeHidden = false
     
     private let containerView: UIView = {
         let view = UIView()
@@ -39,22 +40,23 @@ class HomeHeaderSearchView: UIView {
     private let buyButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.setTitle(HomePurpose.buy.title, for: .normal)
-        btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-        btn.backgroundColor = UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 0.1)
-        btn.setTitleColor(UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 1.0), for: .normal)
-        btn.layer.cornerRadius = 8
-        btn.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        btn.titleLabel?.font = .headingL4
+        btn.backgroundColor = .AppColors.green1
+        btn.setTitleColor(.AppColors.green5 ,for: .normal)
+        btn.layer.cornerRadius = 4
+        btn.heightAnchor.constraint(equalToConstant: 32).isActive = true
         return btn
     }()
     
     private let rentButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.setTitle(HomePurpose.rent.title, for: .normal)
-        btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-        btn.backgroundColor = .systemGray6
-        btn.setTitleColor(.darkGray, for: .normal)
-        btn.layer.cornerRadius = 8
-        btn.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        btn.titleLabel?.font = .bodyL0
+        btn.backgroundColor = .white
+        btn.setTitleColor(.AppColors.grey5, for: .normal)
+        btn.layer.cornerRadius = 4
+        btn.setBorder(.AppColors.grey1, width: 1)
+        btn.heightAnchor.constraint(equalToConstant: 32).isActive = true
         return btn
     }()
     
@@ -176,6 +178,7 @@ class HomeHeaderSearchView: UIView {
     }
     
     var onSearchTapped: (() -> Void)?
+    var onHeightChanged: (() -> Void)?
     
     @objc private func searchContainerTapped() {
         onSearchTapped?()
@@ -194,46 +197,56 @@ class HomeHeaderSearchView: UIView {
     }
     
     private func updatePurposeSelection(isBuy: Bool) {
-        let activeColor = UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 1.0)
-        let inactiveColor = UIColor.systemGray6
+        let (activeButton, inactiveButton) = isBuy ? (buyButton, rentButton) : (rentButton, buyButton)
         
-        buyButton.backgroundColor = isBuy ? activeColor.withAlphaComponent(0.1) : inactiveColor
-        buyButton.setTitleColor(isBuy ? activeColor : .darkGray, for: .normal)
+        activeButton.backgroundColor = .AppColors.green1
+        activeButton.setTitleColor(.AppColors.green5, for: .normal)
+        activeButton.titleLabel?.font = .headingL4
+        activeButton.layer.borderWidth = 0
         
-        rentButton.backgroundColor = !isBuy ? activeColor.withAlphaComponent(0.1) : inactiveColor
-        rentButton.setTitleColor(!isBuy ? activeColor : .darkGray, for: .normal)
+        inactiveButton.backgroundColor = .white
+        inactiveButton.setTitleColor(.AppColors.grey5, for: .normal)
+        inactiveButton.titleLabel?.font = .bodyL0
+        inactiveButton.setBorder(.AppColors.grey1, width: 1)
     }
     
     struct AnimationConfig {
         var initialContainerTop: CGFloat = 25
         var targetContainerTop: CGFloat = -40
-        var internalSearchTop: CGFloat = 55
+        var internalSearchTop: CGFloat = 70
     }
     
     var animationConfig = AnimationConfig()
     
     // MARK: - Animation Support
     func setProgress(_ progress: CGFloat) {
-        let activeColor = UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 1.0)
-        
         let fadeStart: CGFloat = 0.5
         let fadeAlpha: CGFloat = progress < fadeStart ? 1.0 : (1.0 - (progress - fadeStart) / (1.0 - fadeStart))
         
         containerView.backgroundColor = .white.withAlphaComponent(fadeAlpha)
         layer.shadowOpacity = 0.1 * Float(fadeAlpha)
         
-        toggleStackView.alpha = fadeAlpha
-        toggleStackView.isHidden = progress == 1
+        if isPurposeHidden {
+            toggleStackView.alpha = 0
+            toggleStackView.isHidden = true
+            separatorView.alpha = 0
+            separatorView.isHidden = true
+        } else {
+            toggleStackView.alpha = fadeAlpha
+            toggleStackView.isHidden = progress == 1
+            separatorView.alpha = fadeAlpha
+            separatorView.isHidden = progress == 1
+        }
         
-        separatorView.alpha = fadeAlpha
-        separatorView.isHidden = progress == 1
-        
-        // Container top animation (The whole box moves as one) using generic offset
         let initial = animationConfig.initialContainerTop
-        let target = animationConfig.targetContainerTop
-        containerTopConstraint?.constant = initial + (target - initial) * progress
+        var target = animationConfig.targetContainerTop
         
-        searchTopConstraint?.constant = animationConfig.internalSearchTop
+        if isPurposeHidden {
+            target = target + (animationConfig.internalSearchTop)
+        }
+        
+        containerTopConstraint?.constant = initial + (target - initial) * progress
+        searchTopConstraint?.constant = isPurposeHidden ? 0 : animationConfig.internalSearchTop
     }
     
     func setCollapsedState(_ isCollapsed: Bool) {
@@ -241,9 +254,34 @@ class HomeHeaderSearchView: UIView {
     }
     
     func showPurposeButtons(_ show: Bool) {
-        toggleStackView.isHidden = !show
-        separatorView.isHidden = !show
-        searchTopConstraint?.constant = show ? 70 : 12
-        layoutIfNeeded()
+        isPurposeHidden = !show
+        searchTopConstraint?.constant = show ? animationConfig.internalSearchTop : 0
+        onHeightChanged?()
+    }
+    
+    func preparePurposeAnimation() {
+        if !isPurposeHidden {
+            toggleStackView.isHidden = false
+            separatorView.isHidden = false
+        }
+    }
+    
+    func applyPurposeAlpha() {
+        let show = !isPurposeHidden
+        toggleStackView.alpha = show ? 1.0 : 0.0
+        separatorView.alpha = show ? 1.0 : 0.0
+    }
+    
+    func finalizePurposeVisibility() {
+        if isPurposeHidden {
+            toggleStackView.isHidden = true
+            separatorView.isHidden = true
+        }
+    }
+    
+    var contentHeight: CGFloat {
+        let containerTop = containerTopConstraint?.constant ?? animationConfig.initialContainerTop
+        let searchTop = isPurposeHidden ? 0 : (searchTopConstraint?.constant ?? animationConfig.internalSearchTop)
+        return containerTop + searchTop + 48
     }
 }

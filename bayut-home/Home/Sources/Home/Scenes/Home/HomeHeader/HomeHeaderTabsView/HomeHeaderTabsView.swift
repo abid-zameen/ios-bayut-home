@@ -65,7 +65,9 @@ final class HomeHeaderTabsView: UIView {
     func setupTabs(tabs: [HomeHeaderTab]) {
         self.tabs = tabs
         self.selectedIndex = 0
-        collectionView.reloadData()
+        UIView.performWithoutAnimation {
+            collectionView.reloadData()
+        }
     }
 }
 
@@ -85,9 +87,13 @@ extension HomeHeaderTabsView: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard selectedIndex != indexPath.item else { return }
+        let oldIndex = selectedIndex
+        guard oldIndex != indexPath.item else { return }
         selectedIndex = indexPath.item
-        collectionView.reloadData()
+        
+        let indexPaths = [IndexPath(item: oldIndex, section: 0), indexPath]
+        collectionView.reconfigureItems(at: indexPaths)
+        
         onTabSelected?(tabs[selectedIndex])
     }
     

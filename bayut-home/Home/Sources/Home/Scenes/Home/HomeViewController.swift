@@ -35,7 +35,7 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     private var headerHeightConstraint: NSLayoutConstraint?
     private var initialHeaderHeight: CGFloat = 350
     private var isInitialInsetSet = false
-    private var variant: HeaderVariant = .uae
+    private var variant: HeaderVariant = .gcc
     private var autoscrollTimers: [AnySection: Timer] = [:]
     private var resumeAutoscrollWorkItems: [AnySection: DispatchWorkItem] = [:]
     private let autoscrollResumeDelay: TimeInterval = 2.0
@@ -65,6 +65,10 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
             default:
                 break
             }
+        }
+        
+        homeHeaderView.onHeaderHeightChanged = { [weak self] in
+            self?.recalculateHeaderInsets()
         }
     }
     
@@ -116,20 +120,37 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
         homeHeaderView.update(progress: 0)
         homeHeaderView.layoutIfNeeded()
         
-        let frameHeight = homeHeaderView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
-        guard frameHeight > 0 else { return }
+        let contentHeight = homeHeaderView.expandedContentHeight
+        guard contentHeight > 0 else { return }
         
-        let visualBottom = homeHeaderView.visibleContentBottom
-        initialHeaderHeight = visualBottom + 12
-        headerHeightConstraint?.constant = visualBottom
+        initialHeaderHeight = contentHeight + 12
+        headerHeightConstraint?.constant = initialHeaderHeight
         headerHeightConstraint?.priority = .required
         
         let bottomGap: CGFloat = 8
-        let totalInset = visualBottom + bottomGap
+        let totalInset = initialHeaderHeight + bottomGap
         collectionView.contentInset = UIEdgeInsets(top: totalInset, left: 0, bottom: 0, right: 0)
         collectionView.contentOffset = CGPoint(x: 0, y: -totalInset)
         
         isInitialInsetSet = true
+    }
+    
+    private func recalculateHeaderInsets() {
+        let contentHeight = homeHeaderView.expandedContentHeight
+        let newHeight = contentHeight + 12
+        initialHeaderHeight = newHeight
+        headerHeightConstraint?.constant = newHeight
+        
+        let bottomGap: CGFloat = 8
+        let totalInset = newHeight + bottomGap
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) { [self] in
+            collectionView.contentInset = UIEdgeInsets(top: totalInset, left: 0, bottom: 0, right: 0)
+            collectionView.contentOffset = CGPoint(x: 0, y: -totalInset)
+            view.layoutIfNeeded()
+        }
+        
+        homeHeaderView.update(progress: 0)
     }
     
     // MARK: - Display Logic

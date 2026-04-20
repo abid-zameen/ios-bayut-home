@@ -24,11 +24,11 @@ struct HomeHeaderLayout {
     // MARK: - View Heights (from Figma — screen-independent)
 
     enum ViewHeight {
-        static let logo:       CGFloat = 38
+        static let logo:       CGFloat = 32
         static let tabs:       CGFloat = 44
         static let aiSearch:   CGFloat = 52
         static let gccSearch:  CGFloat = 48
-        static let buildings:  CGFloat = 114
+        static let buildings:  CGFloat = 137
     }
 
     // MARK: - Design Offsets (XIB-relative offsets from statusBarHeight)
@@ -36,8 +36,8 @@ struct HomeHeaderLayout {
 
     private enum DesignOffset {
         static let logo:         CGFloat = 46   // 44 + 46 = 90
-        static let buildings:    CGFloat = 20   // 44 + 20 = 64
-        static let tabs:         CGFloat = 121  // 44 + 121 = 165
+        static let buildings:    CGFloat = 10   // 44 + 20 = 64
+        static let tabs:         CGFloat = 140  // 44 + 121 = 165
         static let bottomCurve:  CGFloat = 134  // 44 + 134 = 178
         static let topCurve:     CGFloat = 57   // 44 + 57 = 101 (fixed, not animated)
         static let aiSearchGap:  CGFloat = 8

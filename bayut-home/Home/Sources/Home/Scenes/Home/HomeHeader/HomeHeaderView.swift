@@ -25,7 +25,14 @@ class HomeHeaderView: UIView {
         return iv
     }()
     
-    private let bottomCurveImageView: UIImageView = {
+    private let bottomCurveGradientImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.image = UIImage(named: "home-header-bottom-curve-uae", in: .module, compatibleWith: nil)
+        iv.contentMode = .scaleToFill
+        return iv
+    }()
+    
+    private let bottomCurveSolidImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "Home-Header-Bottom-Curve", in: .module, compatibleWith: nil)
         iv.contentMode = .scaleToFill
@@ -92,14 +99,25 @@ class HomeHeaderView: UIView {
         setupView()
     }
     
+    private var hasSetupElementsInWindow = false
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window != nil, !hasSetupElementsInWindow else { return }
+        hasSetupElementsInWindow = true
+        // Re-compute animation positions with real safe area insets
+        setupElements()
+    }
+    
     // MARK: - Setup
     private func setupView() {
         backgroundColor = .clear
-        clipsToBounds = true
+        clipsToBounds = false
         
         addSubview(backgroundImageView)
         addSubview(topCurveImageView)
-        addSubview(bottomCurveImageView)
+        addSubview(bottomCurveSolidImageView)
+        addSubview(bottomCurveGradientImageView)
         addSubview(logoImageView)
         addSubview(contentStackView)
         addSubview(aiSearchView)
@@ -108,7 +126,8 @@ class HomeHeaderView: UIView {
         
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         topCurveImageView.translatesAutoresizingMaskIntoConstraints = false
-        bottomCurveImageView.translatesAutoresizingMaskIntoConstraints = false
+        bottomCurveGradientImageView.translatesAutoresizingMaskIntoConstraints = false
+        bottomCurveSolidImageView.translatesAutoresizingMaskIntoConstraints = false
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         contentStackView.translatesAutoresizingMaskIntoConstraints = false
         aiSearchView.translatesAutoresizingMaskIntoConstraints = false
@@ -116,10 +135,13 @@ class HomeHeaderView: UIView {
         searchView.translatesAutoresizingMaskIntoConstraints = false
         
         logoHeightConstraint = logoImageView.heightAnchor.constraint(equalToConstant: HomeHeaderLayout.ViewHeight.logo)
-        logoTopConstraint = logoImageView.topAnchor.constraint(equalTo: topAnchor, constant: 90)
-        bottomCurveTopConstraint = bottomCurveImageView.topAnchor.constraint(equalTo: topAnchor, constant: 178)
+        
+        let initialLayout = HomeHeaderLayout.make(in: self)
+        
+        logoTopConstraint = logoImageView.topAnchor.constraint(equalTo: topAnchor, constant: initialLayout.logoExpandedTop)
+        bottomCurveTopConstraint = bottomCurveGradientImageView.topAnchor.constraint(equalTo: topAnchor, constant: initialLayout.bottomCurveExpandedTop)
         backgroundHeightConstraint = backgroundImageView.heightAnchor.constraint(equalToConstant: HomeHeaderLayout.ViewHeight.buildings)
-        backgroundTopConstraint = backgroundImageView.topAnchor.constraint(equalTo: topAnchor, constant: 64)
+        backgroundTopConstraint = backgroundImageView.topAnchor.constraint(equalTo: topAnchor, constant: initialLayout.buildingsExpandedTop)
         
         guard let backgroundTopConstraint, let backgroundHeightConstraint, let logoHeightConstraint, let logoTopConstraint, let bottomCurveTopConstraint else { return }
                 
@@ -128,13 +150,18 @@ class HomeHeaderView: UIView {
             backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
             backgroundHeightConstraint,
             
-            topCurveImageView.topAnchor.constraint(equalTo: topAnchor, constant: 101),
+            topCurveImageView.topAnchor.constraint(equalTo: topAnchor, constant: initialLayout.statusBarHeight + 57),
             topCurveImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             topCurveImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
             topCurveImageView.heightAnchor.constraint(equalToConstant: 125),
             
-            bottomCurveImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            bottomCurveImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            bottomCurveGradientImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            bottomCurveGradientImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            
+            bottomCurveSolidImageView.topAnchor.constraint(equalTo: bottomCurveGradientImageView.topAnchor),
+            bottomCurveSolidImageView.leadingAnchor.constraint(equalTo: bottomCurveGradientImageView.leadingAnchor),
+            bottomCurveSolidImageView.trailingAnchor.constraint(equalTo: bottomCurveGradientImageView.trailingAnchor),
+            bottomCurveSolidImageView.bottomAnchor.constraint(equalTo: bottomCurveGradientImageView.bottomAnchor),
             
             logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             logoImageView.widthAnchor.constraint(equalToConstant: 154),
@@ -143,13 +170,13 @@ class HomeHeaderView: UIView {
             bottomCurveTopConstraint
         ])
         
-        bottomCurveHeightConstraint = bottomCurveImageView.heightAnchor.constraint(equalToConstant: 97)
+        bottomCurveHeightConstraint = bottomCurveGradientImageView.heightAnchor.constraint(equalToConstant: initialLayout.bottomCurveExpandedHeight)
         bottomCurveHeightConstraint?.isActive = true
         
-        contentTopConstraint = contentStackView.topAnchor.constraint(equalTo: topAnchor, constant: 165)
-        aiSearchTopConstraint = aiSearchView.topAnchor.constraint(equalTo: topAnchor, constant: 221)
+        contentTopConstraint = contentStackView.topAnchor.constraint(equalTo: topAnchor, constant: initialLayout.tabsExpandedTop)
+        aiSearchTopConstraint = aiSearchView.topAnchor.constraint(equalTo: topAnchor, constant: initialLayout.aiSearchExpandedTop)
         dividerTopConstraint = dividerLabel.topAnchor.constraint(equalTo: aiSearchView.bottomAnchor, constant: 8)
-        searchTopConstraint = searchView.topAnchor.constraint(equalTo: dividerLabel.bottomAnchor, constant: -17)
+        searchTopConstraint = searchView.topAnchor.constraint(equalTo: dividerLabel.bottomAnchor, constant: -8)
         
         let bottomPin = searchView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 20)
         bottomPin.priority = .defaultLow
@@ -175,6 +202,10 @@ class HomeHeaderView: UIView {
             self.onSearchTapped?(self.currentTab, self.searchView.selectedPurpose)
         }
         
+        searchView.onHeightChanged = { [weak self] in
+            self?.onHeaderHeightChanged?()
+        }
+        
         setupLayout()
     }
     
@@ -182,6 +213,24 @@ class HomeHeaderView: UIView {
         layoutIfNeeded()
         let subviewBottoms = subviews.map { $0.frame.maxY }
         return (subviewBottoms.max() ?? frame.height)
+    }
+    
+    /// Computes the expanded header content height from constraint constants
+    /// rather than from frame measurements, to avoid feedback loops.
+    var expandedContentHeight: CGFloat {
+        let layout = HomeHeaderLayout.make(in: self)
+        
+        if variant == .gcc {
+            // In GCC, searchView top is relative to the header top
+            return layout.gccSearchExpandedTop + searchView.contentHeight
+        } else {
+            // In UAE, searchView top is relative to the dividerLabel
+            let aiBottom = layout.aiSearchExpandedTop + HomeHeaderLayout.ViewHeight.aiSearch
+            let dividerHeight: CGFloat = 16
+            let dividerBottom = aiBottom + dividerHeight
+            let searchViewTop = dividerBottom - 8
+            return searchViewTop + searchView.contentHeight
+        }
     }
 
     
@@ -203,6 +252,7 @@ class HomeHeaderView: UIView {
     
     private var currentTab: HomeHeaderTab = .properties
     var onSearchTapped: ((HomeHeaderTab, HomePurpose) -> Void)?
+    var onHeaderHeightChanged: (() -> Void)?
     
     private func handleTabSelection(_ tab: HomeHeaderTab) {
         self.currentTab = tab
@@ -226,7 +276,7 @@ class HomeHeaderView: UIView {
             searchTopConstraint?.isActive = true
         } else {
             searchTopConstraint?.isActive = false
-            searchTopConstraint = searchView.topAnchor.constraint(equalTo: dividerLabel.bottomAnchor, constant: -21)
+            searchTopConstraint = searchView.topAnchor.constraint(equalTo: dividerLabel.bottomAnchor, constant: -8)
             searchTopConstraint?.isActive = true
             aiSearchTopConstraint?.isActive = true
         }
@@ -236,7 +286,7 @@ class HomeHeaderView: UIView {
         animationEngine.currentVariant = variant
         let layout = HomeHeaderLayout.make(in: self)
         
-        searchView.animationConfig.targetContainerTop = (variant == .uae) ? -70 : -40
+        searchView.animationConfig.targetContainerTop = (variant == .uae) ? -70 : -50
         
         let logoElement = AnimatableElement(
             view: logoImageView,
@@ -265,12 +315,24 @@ class HomeHeaderView: UIView {
         )
         
         
-        let bottomCurveElement = AnimatableElement(
-            view: bottomCurveImageView,
+        let bottomCurveGradientElement = AnimatableElement(
+            view: bottomCurveGradientImageView,
             topConstraint: bottomCurveTopConstraint,
             expandedTop: layout.bottomCurveExpandedTop, collapsedTop: layout.bottomCurveCollapsedTop,
             secondaryConstraint: bottomCurveHeightConstraint,
-            expandedSecondary: layout.bottomCurveExpandedHeight, collapsedSecondary: layout.bottomCurveCollapsedHeight
+            expandedSecondary: layout.bottomCurveExpandedHeight, collapsedSecondary: layout.bottomCurveCollapsedHeight,
+            expandedAlpha: (variant == .uae) ? 1 : 0,
+            collapsedAlpha: 0,
+            alphaStartProgress: 0.8, alphaEndProgress: 1.0
+        )
+        
+        let bottomCurveSolidElement = AnimatableElement(
+            view: bottomCurveSolidImageView,
+            topConstraint: nil, // Moves with the gradient one via AutoLayout
+            expandedTop: 0, collapsedTop: 0,
+            expandedAlpha: (variant == .uae) ? 0 : 1,
+            collapsedAlpha: 1,
+            alphaStartProgress: 0.8, alphaEndProgress: 1.0
         )
                 
         let tabsElement: AnimatableElement
@@ -315,15 +377,15 @@ class HomeHeaderView: UIView {
                 view: dividerLabel,
                 topConstraint: nil, expandedTop: 0, collapsedTop: 0,
                 expandedAlpha: 1, collapsedAlpha: 0,
-                alphaStartProgress: 0, alphaEndProgress: 0.35,
-                hideThreshold: 0.5
+                alphaStartProgress: 0, alphaEndProgress: 0.3,
+                hideThreshold: 0.4
             )
             
             let searchElement = AnimatableElement(
                 view: searchView,
                 topConstraint: nil, expandedTop: 0, collapsedTop: 0,
                 expandedAlpha: 1, collapsedAlpha: 0,
-                alphaStartProgress: 0, alphaEndProgress: 0.35,
+                alphaStartProgress: 0.1, alphaEndProgress: 0.4,
                 hideThreshold: 0.5
             )
             
@@ -334,7 +396,8 @@ class HomeHeaderView: UIView {
             logoElement,
             buildingsElement,
             topCurveElement,
-            bottomCurveElement,
+            bottomCurveGradientElement,
+            bottomCurveSolidElement,
             tabsElement
         ] + variantElements
     }
@@ -348,10 +411,6 @@ class HomeHeaderView: UIView {
         if variant == .uae {
             aiSearchView.setProgress(p)
         }
-        
-        bottomCurveImageView.image = p > 0.9
-            ? UIImage(named: "Home-Header-Bottom-Curve", in: .module, compatibleWith: nil)
-            : UIImage(named: "home-header-bottom-curve-uae", in: .module, compatibleWith: nil)
     }
     
     func setCollapsedState(_ isCollapsed: Bool) {
