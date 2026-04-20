@@ -9,9 +9,9 @@ import Foundation
 
 // MARK: - Delegate Protocol
 protocol NewProjectsActionsDelegate: AnyObject {
-    func newProjectsDidTapCard(at index: Int)
+    func newProjectsDidTapCard(hit: ProjectHit)
     func newProjectsDidTapLocationChip(externalID: String)
-    func newProjectsDidTapViewAll()
+    func newProjectsDidTapViewAll(externalID: String, displayName: String)
 }
 
 // MARK: - Actions Container

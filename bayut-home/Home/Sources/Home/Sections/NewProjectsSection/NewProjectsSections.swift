@@ -31,7 +31,7 @@ private enum NewProjectsLayout {
     
     // Project cards
     static let cardWidth: CGFloat = 280
-    static let cardHeight: CGFloat = 280
+    static let cardHeight: CGFloat = 340
 }
 
 final class NewProjectsTitleSection: SectionDescriptor {
@@ -166,10 +166,12 @@ final class NewProjectsCarouselSection: SectionDescriptor {
     }
     
     private let projects: [ProjectHit]
+    private let showWhatsappButton: Bool
     private let actions: NewProjectsActions
     
-    init(projects: [ProjectHit], section: HomeSection?, actions: NewProjectsActions) {
+    init(projects: [ProjectHit], showWhatsappButton: Bool, section: HomeSection?, actions: NewProjectsActions) {
         self.projects = projects
+        self.showWhatsappButton = showWhatsappButton
         self.actions = actions
     }
     
@@ -208,13 +210,13 @@ final class NewProjectsCarouselSection: SectionDescriptor {
         ) as? ProjectsCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let viewModel = NewProjectCellViewModel(hit: item.data)
+        let viewModel = NewProjectCellViewModel(hit: item.data, showWhatsappButton: showWhatsappButton)
         cell.configure(with: viewModel)
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.newProjectsDidTapCard(at: indexPath.row)
+        actions.delegate?.newProjectsDidTapCard(hit: item.data)
     }
 }
 
@@ -228,10 +230,14 @@ final class NewProjectsViewAllSection: SectionDescriptor {
     }
     
     private let buttonTitle: String
+    private let externalID: String
+    private let displayName: String
     private let actions: NewProjectsActions
     
-    init(buttonTitle: String, section: HomeSection?, actions: NewProjectsActions) {
+    init(buttonTitle: String, externalID: String, displayName: String, section: HomeSection?, actions: NewProjectsActions) {
         self.buttonTitle = buttonTitle
+        self.externalID = externalID
+        self.displayName = displayName
         self.actions = actions
     }
     
@@ -242,7 +248,7 @@ final class NewProjectsViewAllSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
-                top: NewProjectsLayout.spacing,
+                top: 0,
                 leading: 0,
                 bottom: NewProjectsLayout.spacing,
                 trailing: 0
@@ -256,8 +262,9 @@ final class NewProjectsViewAllSection: SectionDescriptor {
         ) as? ViewMoreCell else {
             return UICollectionViewCell()
         }
-        cell.configure(buttonTitle: item.buttonTitle) { [weak delegate = actions.delegate] in
-            delegate?.newProjectsDidTapViewAll()
+        cell.configure(buttonTitle: item.buttonTitle) { [weak self] in
+            guard let self = self else { return }
+            self.actions.delegate?.newProjectsDidTapViewAll(externalID: self.externalID, displayName: self.displayName)
         }
         return cell
     }

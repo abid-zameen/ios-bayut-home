@@ -28,11 +28,17 @@ final class NewProjectCellViewModel: NewProjectCellViewModelType {
     let imageURL: URL?
     let showWhatsappButton: Bool
     
-    init(hit: ProjectHit) {
+    init(hit: ProjectHit, showWhatsappButton: Bool) {
         self.id = hit.externalID ?? hit.objectID
         self.title = hit.title ?? ""
         self.type = hit.unitCategories?.first?.last?.name ?? "Project"
-        self.location = hit.location?.compactMap { $0.name }.joined(separator: ", ") ?? ""
+        
+        let locationNames = hit.location?
+            .filter { ($0.level ?? 0) > 0 }
+            .sorted(by: { ($0.level ?? 0) > ($1.level ?? 0) })
+            .compactMap { $0.name } ?? []
+        
+        self.location = locationNames.joined(separator: ", ")
         
         if let price = hit.price, price > 0 {
             if price >= 1_000_000 {
@@ -48,9 +54,11 @@ final class NewProjectCellViewModel: NewProjectCellViewModelType {
         
         if let completionDate = hit.completionDetails?.completionDate {
             let date = Date(timeIntervalSince1970: completionDate)
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM yyyy"
-            self.handoverValue = formatter.string(from: date)
+            if NewProjectCellViewModel.isInCurrentOrFutureQuarter(date: date) {
+                self.handoverValue = NewProjectCellViewModel.getHandoverDate(date: date)
+            } else {
+                self.handoverValue = nil
+            }
         } else {
             self.handoverValue = nil
         }
@@ -63,6 +71,29 @@ final class NewProjectCellViewModel: NewProjectCellViewModelType {
             self.imageURL = nil
         }
         
-        self.showWhatsappButton = true
+        self.showWhatsappButton = showWhatsappButton
+    }
+    
+    private static func getHandoverDate(date: Date) -> String {
+        return "Q\(date.quarter) \(date.yearInt)"
+    }
+    
+    private static func isInCurrentOrFutureQuarter(date: Date) -> Bool {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let inputYear = date.yearInt
+        let inputQuarter = date.quarter
+
+        let currentYear = now.yearInt
+        let currentQuarter = now.quarter
+
+        if inputYear > currentYear {
+            return true
+        } else if inputYear == currentYear {
+            return inputQuarter >= currentQuarter
+        } else {
+            return false
+        }
     }
 }

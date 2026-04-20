@@ -60,18 +60,30 @@ final class NewProjectsGroup: SectionGroup {
         }
         
         // 3. Projects carousel (horizontal scroll)
+        let selectedLocation = locations.first(where: { $0.isSelected })
+        let selectedLocationID = selectedLocation?.externalID ?? ""
+        
+        let isWhatsAppEnabledHome = HomeModule.shared.environment.isProjectWhatsAppEnabledHome
+        let isSupportedLoc = HomeModule.shared.utilities.supportedLocIDsCPL.keys.contains(selectedLocationID)
+        let showWhatsappButton = isWhatsAppEnabledHome && isSupportedLoc
+        
         if !projects.isEmpty {
             let projectsSection = NewProjectsCarouselSection(
                 projects: projects,
+                showWhatsappButton: showWhatsappButton,
                 section: section,
                 actions: actions
             )
             sections.append(AnySection(projectsSection, isCustomizable: false))
         }
         
-        // 4. View all (footer) section
+        let selectedLocationName = selectedLocation?.localizedName ?? ""
+        let viewAllTitle = String(format: "View All Projects in %@", selectedLocationName)
+        
         let viewAllSection = NewProjectsViewAllSection(
             buttonTitle: viewAllTitle,
+            externalID: selectedLocationID,
+            displayName: selectedLocationName,
             section: section,
             actions: actions
         )

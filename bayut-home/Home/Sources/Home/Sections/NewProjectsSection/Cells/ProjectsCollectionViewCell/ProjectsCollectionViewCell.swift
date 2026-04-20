@@ -62,6 +62,7 @@ private extension ProjectsCollectionViewCell {
         projectType?.text = viewModel.type
         projectLocation?.text = viewModel.location
         handOverValue?.text = viewModel.handoverValue
+        handOverPriceView?.isHidden = viewModel.handoverValue == nil
         
         if let price = viewModel.startingPrice, !price.isEmpty {
             startingPrice?.text = price
