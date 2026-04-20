@@ -49,12 +49,10 @@ struct FavouriteCellViewModel: FavoritesCellViewModelType {
         
         let attributedString = NSMutableAttributedString()
         
-        // 1. Currency & Price Number (headingL20)
         let priceAttr: [NSAttributedString.Key: Any] = [.font: UIFont.headingL20]
         let priceString = "AED \(formattedPrice)"
         attributedString.append(NSAttributedString(string: priceString, attributes: priceAttr))
         
-        // 2. Frequency (bodyL1)
         if property.purpose == .rent, let frequency = property.rentFrequency {
             let freqAttr: [NSAttributedString.Key: Any] = [.font: UIFont.bodyL1]
             attributedString.append(NSAttributedString(string: " \(frequency.capitalized)", attributes: freqAttr))

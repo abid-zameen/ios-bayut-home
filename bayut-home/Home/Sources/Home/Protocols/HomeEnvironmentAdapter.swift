@@ -13,6 +13,7 @@ public protocol HomeEnvironmentAdapter {
     var isProductTypeEnabled: Bool { get }
     var isTuBrokerEnabled: Bool { get }
     var shouldShowDOTWChip: Bool { get }
+    var isProjectWhatsAppEnabledHome: Bool { get }
     
     // MARK: - Location
     var userCoordinates: (lat: Double, lon: Double)? { get }

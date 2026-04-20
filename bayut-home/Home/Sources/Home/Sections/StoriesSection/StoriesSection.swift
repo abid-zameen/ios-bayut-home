@@ -12,7 +12,7 @@ final class StoriesSection: SectionDescriptor {
     let identifier: StoriesSectionId = .main
     
     struct Item: Hashable {
-        let id = UUID()
+        let id = "stories.mian.item"
     }
     
     private let hostedView: UIView
@@ -28,13 +28,13 @@ final class StoriesSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(260)
+            heightDimension: .estimated(240)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(260)
+            heightDimension: .estimated(240)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         

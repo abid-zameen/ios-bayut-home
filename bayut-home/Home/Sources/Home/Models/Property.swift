@@ -50,16 +50,13 @@ struct Property: Hashable {
             self.paymentPlanPercentage = nil
         }
         
-        // 1. Location Breadcrumb (Level 3, Level 2)
         let locationNames = hit.location?
-            .sorted(by: { ($0.level ?? 0) > ($1.level ?? 0) }) // Sort by specificity
+            .filter { ($0.level ?? 0) > 0 }
+            .sorted(by: { ($0.level ?? 0) > ($1.level ?? 0) })
             .compactMap { $0.name } ?? []
         
-        // In Algolia hits, level 3 is often more specific than level 2
-        // We'll join the first two most specific ones for the card
-        self.location = Array(locationNames.prefix(2)).reversed().joined(separator: ", ")
+        self.location = locationNames.joined(separator: ", ")
         
-        // 2. Price Formatting
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         let formattedPrice = formatter.string(from: NSNumber(value: hit.price ?? 0)) ?? "0"
@@ -70,7 +67,6 @@ struct Property: Hashable {
             self.price = "\(formattedPrice) AED"
         }
         
-        // 3. Rooms/Beds
         if let rooms = hit.rooms {
             if rooms == 0 {
                 self.beds = "Studio"
