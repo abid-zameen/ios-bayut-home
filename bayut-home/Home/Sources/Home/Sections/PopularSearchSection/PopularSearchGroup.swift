@@ -15,14 +15,14 @@ final class PopularSearchGroup: SectionGroup {
     private let title: String
     private let purposes: [PopularSearchPurpose]
     private let selectedPurpose: PopularSearchPurpose
-    private let searches: [PopularSearch]
+    private let searches: Home.DataState<[PopularSearch]>
     private let actions: PopularSearchActions
     
     init(
         title: String,
         purposes: [PopularSearchPurpose],
         selectedPurpose: PopularSearchPurpose,
-        searches: [PopularSearch],
+        searches: Home.DataState<[PopularSearch]>,
         actions: PopularSearchActions
     ) {
         self.title = title
@@ -35,14 +35,15 @@ final class PopularSearchGroup: SectionGroup {
     func buildSections() -> [AnySection] {
         var sections: [AnySection] = []
         
+        if case .empty = searches {
+            return []
+        }
+        
         // 1. Title Header
-        let titleSection = PopularSearchTitleSection(
-            title: title,
-            section: section
-        )
+        let titleSection = PopularSearchTitleSection(title: title, section: section)
         sections.append(AnySection(titleSection, isCustomizable: false))
         
-        // 2. Purposes (Horizontal Row)
+        // 2. Purposes (Selectable chips)
         let purposeSection = PopularSearchPurposeSection(
             purposes: purposes,
             selectedPurpose: selectedPurpose,
@@ -51,9 +52,9 @@ final class PopularSearchGroup: SectionGroup {
         )
         sections.append(AnySection(purposeSection, isCustomizable: false))
         
-        // 3. Searches Carousel
+        // 3. Carousel Section (Handles loading/data internally)
         let carouselSection = PopularSearchCarouselSection(
-            searches: searches,
+            state: searches,
             section: section,
             actions: actions
         )

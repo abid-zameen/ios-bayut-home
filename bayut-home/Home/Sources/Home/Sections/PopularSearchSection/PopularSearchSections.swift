@@ -110,21 +110,29 @@ final class PopularSearchCarouselSection: SectionDescriptor {
     let identifier: PopularSearchSectionId = .carousel
     
     struct Item: Hashable {
-        let search: PopularSearch
-        func hash(into hasher: inout Hasher) { hasher.combine(search.title) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.search.title == rhs.search.title }
+        let id: String
+        let search: PopularSearch?
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
+        static func == (lhs: Item, rhs: Item) -> Bool { lhs.id == rhs.id }
     }
     
-    private let searches: [PopularSearch]
+    private let state: Home.DataState<[PopularSearch]>
     private let actions: PopularSearchActions
     
-    init(searches: [PopularSearch], section: HomeSection?, actions: PopularSearchActions) {
-        self.searches = searches
+    init(state: Home.DataState<[PopularSearch]>, section: HomeSection?, actions: PopularSearchActions) {
+        self.state = state
         self.actions = actions
     }
     
     func buildItems() -> [Item] {
-        searches.map { Item(search: $0) }
+        switch state {
+        case .loading:
+            return (0..<3).map { Item(id: "shimmer.\($0)", search: nil) }
+        case .data(let searches):
+            return searches.map { Item(id: $0.title, search: $0) }
+        case .empty:
+            return []
+        }
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
@@ -153,13 +161,21 @@ final class PopularSearchCarouselSection: SectionDescriptor {
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        if case .loading = state {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: "PopularSearchShimmerCell", for: indexPath)
+        }
+        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PopularSearchCell", for: indexPath) as? PopularSearchCell else { return UICollectionViewCell() }
-        let vm = PopularSearchCellViewModel(search: item.search)
-        cell.configure(with: vm)
+        if let search = item.search {
+            let vm = PopularSearchCellViewModel(search: search)
+            cell.configure(with: vm)
+        }
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.popularSearchDidSelectSearchItem(at: indexPath.row)
+        if case .data = state, let _ = item.search {
+            actions.delegate?.popularSearchDidSelectSearchItem(at: indexPath.row)
+        }
     }
 }
