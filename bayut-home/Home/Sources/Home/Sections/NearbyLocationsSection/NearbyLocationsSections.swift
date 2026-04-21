@@ -74,7 +74,7 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     func buildItems() -> [Item] {
         switch state {
         case .loading:
-            return (0..<2).map { Item(id: "shimmer.\($0)", location: nil) }
+            return (0..<4).map { Item(id: "shimmer.\($0)", location: nil) }
         case .data(let locations):
             return locations.map { Item(id: $0.name ?? "", location: $0) }
         case .empty:
