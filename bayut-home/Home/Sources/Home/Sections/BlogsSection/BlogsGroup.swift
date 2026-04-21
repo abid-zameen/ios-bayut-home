@@ -14,13 +14,13 @@ final class BlogsGroup: SectionGroup {
     
     private let title: String
     private let viewAllTitle: String
-    private let blogs: [Blog]
+    private let blogs: Home.DataState<[Blog]>
     private let actions: BlogsActions
     
     init(
         title: String,
         viewAllTitle: String,
-        blogs: [Blog],
+        blogs: Home.DataState<[Blog]>,
         actions: BlogsActions
     ) {
         self.title = title
@@ -30,31 +30,33 @@ final class BlogsGroup: SectionGroup {
     }
     
     func buildSections() -> [AnySection] {
-        guard !blogs.isEmpty else { return [] }
         var sections: [AnySection] = []
         
+        if case .empty = blogs {
+            return []
+        }
+        
         // 1. Title Header
-        let titleSection = BlogsTitleSection(
-            title: title,
-            section: section
-        )
+        let titleSection = BlogsTitleSection(title: title, section: section)
         sections.append(AnySection(titleSection, isCustomizable: false))
         
-        // 2. Blogs Carousel
+        // 2. Carousel Section (Handles loading/data internally)
         let carouselSection = BlogsCarouselSection(
-            blogs: blogs,
+            state: blogs,
             section: section,
             actions: actions
         )
         sections.append(AnySection(carouselSection, isCustomizable: false))
         
-        // 3. View All Footer
-        let viewAllSection = BlogsViewAllSection(
-            buttonTitle: viewAllTitle,
-            section: section,
-            actions: actions
-        )
-        sections.append(AnySection(viewAllSection, isCustomizable: false))
+        // 3. View All Section (Only if data is present)
+        if case .data(let items) = blogs, !items.isEmpty {
+            let viewAllSection = BlogsViewAllSection(
+                buttonTitle: viewAllTitle,
+                section: section,
+                actions: actions
+            )
+            sections.append(AnySection(viewAllSection, isCustomizable: false))
+        }
         
         return sections
     }

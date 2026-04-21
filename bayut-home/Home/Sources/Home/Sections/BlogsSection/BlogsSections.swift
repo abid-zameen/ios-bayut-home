@@ -55,24 +55,36 @@ final class BlogsCarouselSection: SectionDescriptor {
     let identifier: BlogsSectionId = .carousel
     
     struct Item: Hashable {
-        let blog: Blog
-        func hash(into hasher: inout Hasher) { hasher.combine(blog.title) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.blog.title == rhs.blog.title }
+        let id: String
+        let blog: Blog?
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
+        static func == (lhs: Item, rhs: Item) -> Bool { lhs.id == rhs.id }
     }
     
-    private let blogs: [Blog]
+    private let state: Home.DataState<[Blog]>
     private let actions: BlogsActions
     
-    init(blogs: [Blog], section: HomeSection?, actions: BlogsActions) {
-        self.blogs = blogs
+    init(state: Home.DataState<[Blog]>, section: HomeSection?, actions: BlogsActions) {
+        self.state = state
         self.actions = actions
     }
     
     func buildItems() -> [Item] {
-        blogs.map { Item(blog: $0) }
+        switch state {
+        case .loading:
+            return (0..<3).map { Item(id: "shimmer.\($0)", blog: nil) }
+        case .data(let blogs):
+            return blogs.map { Item(id: String($0.blogPostId), blog: $0) }
+        case .empty:
+            return []
+        }
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        Self.getLayout(environment: environment)
+    }
+
+    static func getLayout(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
@@ -99,15 +111,22 @@ final class BlogsCarouselSection: SectionDescriptor {
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        if case .loading = state {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: BlogsShimmerCell.reuseId, for: indexPath)
+        }
+        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BlogCell.reuseId, for: indexPath) as? BlogCell else { return UICollectionViewCell() }
-        let vm = BlogsCellViewModel(blog: item.blog)
-        cell.configure(with: vm)
+        if let blog = item.blog {
+            let vm = BlogsCellViewModel(blog: blog)
+            cell.configure(with: vm)
+        }
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-
-        actions.delegate?.blogsDidTapCard(with: item.blog.blogUrl, title: item.blog.title)
+        if case .data = state, let blog = item.blog {
+            actions.delegate?.blogsDidTapCard(with: blog.blogUrl, title: blog.title)
+        }
     }
 }
 
