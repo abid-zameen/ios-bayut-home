@@ -15,7 +15,7 @@ final class NewProjectsGroup: SectionGroup {
     
     private let headerTitle: String
     private let viewAllTitle: String
-    private let projects: [ProjectHit]
+    private let projects: Home.DataState<[ProjectHit]>
     private let locations: [LocationChipViewModel]
     private let actions: NewProjectsActions
     
@@ -25,7 +25,7 @@ final class NewProjectsGroup: SectionGroup {
         section: HomeSection? = .main,
         headerTitle: String,
         viewAllTitle: String,
-        projects: [ProjectHit],
+        projects: Home.DataState<[ProjectHit]>,
         locations: [LocationChipViewModel],
         actions: NewProjectsActions
     ) {
@@ -42,52 +42,49 @@ final class NewProjectsGroup: SectionGroup {
     func buildSections() -> [AnySection] {
         var sections: [AnySection] = []
         
-        // 1. Title (header) section
-        let titleSection = NewProjectsTitleSection(
-            title: headerTitle,
-            section: section
-        )
-        sections.append(AnySection(titleSection, isCustomizable: false))
+        if case .empty = projects {
+            return []
+        }
         
-        // 2. Location chips (horizontal scroll)
+        // 1. Header Section
+        let header = NewProjectsTitleSection(title: headerTitle, section: section)
+        sections.append(AnySection(header, isCustomizable: false))
+        
+        // 2. Location chips (always show if available)
         if !locations.isEmpty {
-            let locationsSection = NewProjectsLocationsSection(
-                locations: locations,
-                section: section,
-                actions: actions
-            )
+            let locationsSection = NewProjectsLocationsSection(locations: locations, section: section, actions: actions)
             sections.append(AnySection(locationsSection, isCustomizable: false))
         }
         
-        // 3. Projects carousel (horizontal scroll)
+        // 3. Projects carousel (Handles loading/data internally)
         let selectedLocation = locations.first(where: { $0.isSelected })
         let selectedLocationID = selectedLocation?.externalID ?? ""
-        
         let isWhatsAppEnabledHome = HomeModule.shared.environment.isProjectWhatsAppEnabledHome
         let isSupportedLoc = HomeModule.shared.utilities.supportedLocIDsCPL.keys.contains(selectedLocationID)
         let showWhatsappButton = isWhatsAppEnabledHome && isSupportedLoc
         
-        if !projects.isEmpty {
-            let projectsSection = NewProjectsCarouselSection(
-                projects: projects,
-                showWhatsappButton: showWhatsappButton,
-                section: section,
-                actions: actions
-            )
-            sections.append(AnySection(projectsSection, isCustomizable: false))
-        }
-        
-        let selectedLocationName = selectedLocation?.localizedName ?? ""
-        let viewAllTitle = String(format: "View All Projects in %@", selectedLocationName)
-        
-        let viewAllSection = NewProjectsViewAllSection(
-            buttonTitle: viewAllTitle,
-            externalID: selectedLocationID,
-            displayName: selectedLocationName,
+        let projectsSection = NewProjectsCarouselSection(
+            state: projects,
+            showWhatsappButton: showWhatsappButton,
             section: section,
             actions: actions
         )
-        sections.append(AnySection(viewAllSection, isCustomizable: false))
+        sections.append(AnySection(projectsSection, isCustomizable: false))
+        
+        // 4. View All Section (Only if data is present)
+        if case .data(let hits) = projects, !hits.isEmpty {
+            let selectedLocationName = selectedLocation?.localizedName ?? ""
+            let viewAllTitle = String(format: "View All Projects in %@", selectedLocationName)
+            
+            let viewAllSection = NewProjectsViewAllSection(
+                buttonTitle: viewAllTitle,
+                externalID: selectedLocationID,
+                displayName: selectedLocationName,
+                section: section,
+                actions: actions
+            )
+            sections.append(AnySection(viewAllSection, isCustomizable: false))
+        }
         
         return sections
     }

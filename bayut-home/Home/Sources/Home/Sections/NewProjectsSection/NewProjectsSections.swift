@@ -154,32 +154,44 @@ final class NewProjectsCarouselSection: SectionDescriptor {
     let identifier: NewProjectsSectionId = .projects
     
     struct Item: Hashable {
-        let data: ProjectHit
+        let id: String
+        let data: ProjectHit?
         
         func hash(into hasher: inout Hasher) {
-            hasher.combine(data.externalID ?? data.objectID)
+            hasher.combine(id)
         }
         
         static func == (lhs: Item, rhs: Item) -> Bool {
-            (lhs.data.externalID ?? lhs.data.objectID) == (rhs.data.externalID ?? rhs.data.objectID)
+            lhs.id == rhs.id
         }
     }
     
-    private let projects: [ProjectHit]
+    private let state: Home.DataState<[ProjectHit]>
     private let showWhatsappButton: Bool
     private let actions: NewProjectsActions
     
-    init(projects: [ProjectHit], showWhatsappButton: Bool, section: HomeSection?, actions: NewProjectsActions) {
-        self.projects = projects
+    init(state: Home.DataState<[ProjectHit]>, showWhatsappButton: Bool, section: HomeSection?, actions: NewProjectsActions) {
+        self.state = state
         self.showWhatsappButton = showWhatsappButton
         self.actions = actions
     }
     
     func buildItems() -> [Item] {
-        projects.map { Item(data: $0) }
+        switch state {
+        case .loading:
+            return (0..<2).map { Item(id: "shimmer.\($0)", data: nil) }
+        case .data(let projects):
+            return projects.map { Item(id: $0.externalID ?? $0.objectID, data: $0) }
+        case .empty:
+            return []
+        }
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        Self.getLayout(environment: environment)
+    }
+
+    static func getLayout(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .estimated(NewProjectsLayout.cardHeight)
@@ -205,18 +217,26 @@ final class NewProjectsCarouselSection: SectionDescriptor {
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        if case .loading = state {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: ProjectsShimmerCell.reuseId, for: indexPath)
+        }
+        
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ProjectsCollectionViewCell.reuseId, for: indexPath
         ) as? ProjectsCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let viewModel = NewProjectCellViewModel(hit: item.data, showWhatsappButton: showWhatsappButton)
-        cell.configure(with: viewModel)
+        if let data = item.data {
+            let viewModel = NewProjectCellViewModel(hit: data, showWhatsappButton: showWhatsappButton)
+            cell.configure(with: viewModel)
+        }
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.newProjectsDidTapCard(hit: item.data)
+        if case .data = state, let data = item.data {
+            actions.delegate?.newProjectsDidTapCard(hit: data)
+        }
     }
 }
 
