@@ -14,13 +14,13 @@ final class NearbyLocationsGroup: SectionGroup {
     
     private let title: String
     private let isLocationEnabled: Bool
-    private let locations: [LocationHit]
+    private let locations: Home.DataState<[LocationHit]>
     private let actions: NearbyLocationsActions
     
     init(
         title: String,
         isLocationEnabled: Bool,
-        locations: [LocationHit],
+        locations: Home.DataState<[LocationHit]>,
         actions: NearbyLocationsActions
     ) {
         self.title = title
@@ -30,34 +30,32 @@ final class NearbyLocationsGroup: SectionGroup {
     }
     
     func buildSections() -> [AnySection] {
-        if isLocationEnabled && locations.isEmpty {
+        var sections: [AnySection] = []
+        
+        if case .empty = locations, isLocationEnabled {
             return []
         }
         
-        var sections: [AnySection] = []
+        if case .data(let items) = locations, isLocationEnabled, items.isEmpty {
+            return []
+        }
         
         // 1. Title Header
-        let titleSection = NearbyLocationsTitleSection(
-            title: title,
-            section: section
-        )
+        let titleSection = NearbyLocationsTitleSection(title: title, section: section)
         sections.append(AnySection(titleSection, isCustomizable: false))
         
-        // 2. Conditional Content
+        // 2. Main Content
         if isLocationEnabled {
-            // Show Carousel
+            // Carousel (Handles loading/data internally)
             let carouselSection = NearbyLocationsCarouselSection(
-                locations: locations,
+                state: locations,
                 section: section,
                 actions: actions
             )
             sections.append(AnySection(carouselSection, isCustomizable: false))
         } else {
-            // Show Map Cell
-            let mapSection = NearbyLocationMapSection(
-                section: section,
-                actions: actions
-            )
+            // Map Cell (Static UI when location disabled)
+            let mapSection = NearbyLocationMapSection(section: section, actions: actions)
             sections.append(AnySection(mapSection, isCustomizable: false))
         }
         

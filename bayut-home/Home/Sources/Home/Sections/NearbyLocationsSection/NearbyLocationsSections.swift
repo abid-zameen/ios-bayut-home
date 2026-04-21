@@ -57,24 +57,36 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     let identifier: NearbyLocationsSectionId = .carousel
     
     struct Item: Hashable {
-        let location: LocationHit
-        func hash(into hasher: inout Hasher) { hasher.combine(location.name) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.location.name == rhs.location.name }
+        let id: String
+        let location: LocationHit?
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
+        static func == (lhs: Item, rhs: Item) -> Bool { lhs.id == rhs.id }
     }
     
-    private let locations: [LocationHit]
+    private let state: Home.DataState<[LocationHit]>
     private let actions: NearbyLocationsActions
     
-    init(locations: [LocationHit], section: HomeSection?, actions: NearbyLocationsActions) {
-        self.locations = locations
+    init(state: Home.DataState<[LocationHit]>, section: HomeSection?, actions: NearbyLocationsActions) {
+        self.state = state
         self.actions = actions
     }
     
     func buildItems() -> [Item] {
-        locations.map { Item(location: $0) }
+        switch state {
+        case .loading:
+            return (0..<2).map { Item(id: "shimmer.\($0)", location: nil) }
+        case .data(let locations):
+            return locations.map { Item(id: $0.name ?? "", location: $0) }
+        case .empty:
+            return []
+        }
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        Self.getLayout(environment: environment)
+    }
+
+    static func getLayout(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .absolute(NearbyLocationsLayout.cardHeight)
@@ -100,14 +112,22 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        if case .loading = state {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: "NearbyLocationShimmerCell", for: indexPath)
+        }
+        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NearbyLocationCell.reuseId, for: indexPath) as? NearbyLocationCell else { return UICollectionViewCell() }
-        let vm = NearbyLocationCellViewModel(location: item.location)
-        cell.configure(with: vm)
+        if let location = item.location {
+            let vm = NearbyLocationCellViewModel(location: location)
+            cell.configure(with: vm)
+        }
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.nearbyLocationsDidTapCard(with: item.location)
+        if case .data = state, let location = item.location {
+            actions.delegate?.nearbyLocationsDidTapCard(with: location)
+        }
     }
 }
 
