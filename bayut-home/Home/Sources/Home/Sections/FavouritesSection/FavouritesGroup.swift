@@ -15,13 +15,13 @@ final class FavouritesGroup: SectionGroup {
     
     private let title: String
     private let viewAllTitle: String
-    private let properties: [Property]
+    private let properties: Home.DataState<[Property]>
     private let actions: FavouritesActions
     
     init(
         title: String,
         viewAllTitle: String,
-        properties: [Property],
+        properties: Home.DataState<[Property]>,
         actions: FavouritesActions
     ) {
         self.title = title
@@ -31,31 +31,33 @@ final class FavouritesGroup: SectionGroup {
     }
     
     func buildSections() -> [AnySection] {
-        guard !properties.isEmpty else { return [] }
         var sections: [AnySection] = []
         
+        if case .empty = properties {
+            return []
+        }
+        
         // 1. Title Header
-        let titleSection = FavouritesTitleSection(
-            title: title,
-            section: section
-        )
+        let titleSection = FavouritesTitleSection(title: title, section: section)
         sections.append(AnySection(titleSection, isCustomizable: false))
         
-        // 2. Properties Carousel
+        // 2. Carousel Section (Handles loading/data internally)
         let carouselSection = FavouritesCarouselSection(
-            properties: properties,
+            state: properties,
             section: section,
             actions: actions
         )
         sections.append(AnySection(carouselSection, isCustomizable: false))
         
-        // 3. View All Footer
-        let viewAllSection = FavouritesViewAllSection(
-            buttonTitle: viewAllTitle,
-            section: section,
-            actions: actions
-        )
-        sections.append(AnySection(viewAllSection, isCustomizable: false))
+        // 3. View All Section (Only if data is present)
+        if case .data(let items) = properties, !items.isEmpty {
+            let viewAllSection = FavouritesViewAllSection(
+                buttonTitle: viewAllTitle,
+                section: section,
+                actions: actions
+            )
+            sections.append(AnySection(viewAllSection, isCustomizable: false))
+        }
         
         return sections
     }

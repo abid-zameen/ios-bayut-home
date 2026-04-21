@@ -62,24 +62,36 @@ final class FavouritesCarouselSection: SectionDescriptor {
     let identifier: FavouritesSectionId = .carousel
     
     struct Item: Hashable {
-        let property: Property
-        func hash(into hasher: inout Hasher) { hasher.combine(property.id) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.property.id == rhs.property.id }
+        let id: String
+        let property: Property?
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
+        static func == (lhs: Item, rhs: Item) -> Bool { lhs.id == rhs.id }
     }
     
-    private let properties: [Property]
+    private let state: Home.DataState<[Property]>
     private let actions: FavouritesActions
     
-    init(properties: [Property], section: HomeSection?, actions: FavouritesActions) {
-        self.properties = properties
+    init(state: Home.DataState<[Property]>, section: HomeSection?, actions: FavouritesActions) {
+        self.state = state
         self.actions = actions
     }
     
     func buildItems() -> [Item] {
-        properties.map { Item(property: $0) }
+        switch state {
+        case .loading:
+            return (0..<3).map { Item(id: "shimmer.\($0)", property: nil) }
+        case .data(let properties):
+            return properties.map { Item(id: $0.id, property: $0) }
+        case .empty:
+            return []
+        }
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        Self.getLayout(environment: environment)
+    }
+
+    static func getLayout(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .estimated(FavouritesLayout.cardHeight)
@@ -106,14 +118,22 @@ final class FavouritesCarouselSection: SectionDescriptor {
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        if case .loading = state {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: "FavoritesShimmerCell", for: indexPath)
+        }
+        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FavouritesCell.reuseId, for: indexPath) as? FavouritesCell else { return UICollectionViewCell() }
-        let vm = FavouriteCellViewModel(property: item.property)
-        cell.configure(with: vm)
+        if let property = item.property {
+            let vm = FavouriteCellViewModel(property: property)
+            cell.configure(with: vm)
+        }
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.favouritesDidTapCard(at: indexPath.row, with: item.property.id)
+        if case .data = state, let property = item.property {
+            actions.delegate?.favouritesDidTapCard(at: indexPath.row, with: property.id)
+        }
     }
 }
 
