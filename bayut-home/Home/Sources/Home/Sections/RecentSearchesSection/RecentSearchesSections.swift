@@ -59,24 +59,36 @@ final class RecentSearchesCarouselSection: SectionDescriptor {
     let identifier: RecentSearchesSectionId = .carousel
     
     struct Item: Hashable {
-        let model: HomeScreenRecentSearch
-        func hash(into hasher: inout Hasher) { hasher.combine(model.id) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.model.id == rhs.model.id }
+        let id: String
+        let model: HomeScreenRecentSearch?
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
+        static func == (lhs: Item, rhs: Item) -> Bool { lhs.id == rhs.id }
     }
     
-    private let searches: [HomeScreenRecentSearch]
+    private let state: Home.DataState<[HomeScreenRecentSearch]>
     private let actions: RecentSearchesActions
     
-    init(searches: [HomeScreenRecentSearch], section: HomeSection?, actions: RecentSearchesActions) {
-        self.searches = searches
+    init(state: Home.DataState<[HomeScreenRecentSearch]>, section: HomeSection?, actions: RecentSearchesActions) {
+        self.state = state
         self.actions = actions
     }
     
     func buildItems() -> [Item] {
-        searches.map { Item(model: $0) }
+        switch state {
+        case .loading:
+            return (0..<5).map { Item(id: "shimmer.\($0)", model: nil) }
+        case .data(let searches):
+            return searches.map { Item(id: $0.id, model: $0) }
+        case .empty:
+            return []
+        }
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        Self.getLayout(environment: environment)
+    }
+
+    static func getLayout(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .absolute(RecentSearchesLayout.cardWidth),
             heightDimension: .absolute(RecentSearchesLayout.cardHeight)
@@ -102,12 +114,20 @@ final class RecentSearchesCarouselSection: SectionDescriptor {
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        if case .loading = state {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: "RecentSearchShimmerCell", for: indexPath)
+        }
+        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RecentSearchesViewCell.reuseId, for: indexPath) as? RecentSearchesViewCell else { return UICollectionViewCell() }
-        cell.configure(with: item.model)
+        if let model = item.model {
+            cell.configure(with: model)
+        }
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.recentSearchesDidTapCard(at: indexPath.row)
+        if case .data = state, let _ = item.model {
+            actions.delegate?.recentSearchesDidTapCard(at: indexPath.row)
+        }
     }
 }

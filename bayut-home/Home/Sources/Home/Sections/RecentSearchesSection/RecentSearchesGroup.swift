@@ -14,12 +14,12 @@ final class RecentSearchesGroup: SectionGroup {
     let section: HomeSection? = .main
     
     private let title: String
-    private let searches: [HomeScreenRecentSearch]
+    private let searches: Home.DataState<[HomeScreenRecentSearch]>
     private let actions: RecentSearchesActions
     
     init(
         title: String,
-        searches: [HomeScreenRecentSearch],
+        searches: Home.DataState<[HomeScreenRecentSearch]>,
         actions: RecentSearchesActions
     ) {
         self.title = title
@@ -28,19 +28,19 @@ final class RecentSearchesGroup: SectionGroup {
     }
     
     func buildSections() -> [AnySection] {
-        guard !searches.isEmpty else { return [] }
         var sections: [AnySection] = []
         
+        if case .empty = searches {
+            return []
+        }
+        
         // 1. Title Header
-        let titleSection = RecentSearchesTitleSection(
-            title: title,
-            section: section
-        )
+        let titleSection = RecentSearchesTitleSection(title: title, section: section)
         sections.append(AnySection(titleSection, isCustomizable: false))
         
-        // 2. Recent Searches Carousel
+        // 2. Carousel Section (Handles loading/data internally)
         let carouselSection = RecentSearchesCarouselSection(
-            searches: searches,
+            state: searches,
             section: section,
             actions: actions
         )
