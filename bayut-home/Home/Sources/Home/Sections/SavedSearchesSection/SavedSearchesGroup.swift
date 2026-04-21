@@ -14,13 +14,13 @@ final class SavedSearchesGroup: SectionGroup {
     
     private let title: String
     private let viewAllTitle: String
-    private let searches: [SavedSearchesModel]
+    private let searches: Home.DataState<[SavedSearchesModel]>
     private let actions: SavedSearchesActions
     
     init(
         title: String,
         viewAllTitle: String,
-        searches: [SavedSearchesModel],
+        searches: Home.DataState<[SavedSearchesModel]>,
         actions: SavedSearchesActions
     ) {
         self.title = title
@@ -30,31 +30,33 @@ final class SavedSearchesGroup: SectionGroup {
     }
     
     func buildSections() -> [AnySection] {
-        guard !searches.isEmpty else { return [] }
         var sections: [AnySection] = []
         
+        if case .empty = searches {
+            return []
+        }
+        
         // 1. Title Header
-        let titleSection = SavedSearchesTitleSection(
-            title: title,
-            section: section
-        )
+        let titleSection = SavedSearchesTitleSection(title: title, section: section)
         sections.append(AnySection(titleSection, isCustomizable: false))
         
-        // 2. Searches Carousel
+        // 2. Carousel Section (Handles loading/data internally)
         let carouselSection = SavedSearchesCarouselSection(
-            searches: searches,
+            state: searches,
             section: section,
             actions: actions
         )
         sections.append(AnySection(carouselSection, isCustomizable: false))
         
-        // 3. View All Footer
-        let viewAllSection = SavedSearchesViewAllSection(
-            buttonTitle: viewAllTitle,
-            section: section,
-            actions: actions
-        )
-        sections.append(AnySection(viewAllSection, isCustomizable: false))
+        // 3. View All Section (Only if data is present)
+        if case .data(let items) = searches, !items.isEmpty {
+            let viewAllSection = SavedSearchesViewAllSection(
+                buttonTitle: viewAllTitle,
+                section: section,
+                actions: actions
+            )
+            sections.append(AnySection(viewAllSection, isCustomizable: false))
+        }
         
         return sections
     }

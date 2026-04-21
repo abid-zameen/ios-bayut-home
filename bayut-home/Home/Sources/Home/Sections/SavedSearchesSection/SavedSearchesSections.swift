@@ -54,24 +54,36 @@ final class SavedSearchesCarouselSection: SectionDescriptor {
     let identifier: SavedSearchesSectionId = .carousel
     
     struct Item: Hashable {
-        let search: SavedSearchesModel
-        func hash(into hasher: inout Hasher) { hasher.combine(search.name) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.search.name == rhs.search.name }
+        let id: String
+        let search: SavedSearchesModel?
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
+        static func == (lhs: Item, rhs: Item) -> Bool { lhs.id == rhs.id }
     }
     
-    private let searches: [SavedSearchesModel]
+    private let state: Home.DataState<[SavedSearchesModel]>
     private let actions: SavedSearchesActions
     
-    init(searches: [SavedSearchesModel], section: HomeSection?, actions: SavedSearchesActions) {
-        self.searches = searches
+    init(state: Home.DataState<[SavedSearchesModel]>, section: HomeSection?, actions: SavedSearchesActions) {
+        self.state = state
         self.actions = actions
     }
     
     func buildItems() -> [Item] {
-        searches.map { Item(search: $0) }
+        switch state {
+        case .loading:
+            return (0..<4).map { Item(id: "shimmer.\($0)", search: nil) }
+        case .data(let searches):
+            return searches.map { Item(id: $0.name, search: $0) }
+        case .empty:
+            return []
+        }
     }
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
+        Self.getLayout(environment: environment)
+    }
+
+    static func getLayout(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .estimated(SavedSearchesLayout.estimatedCardHeight)
@@ -98,14 +110,22 @@ final class SavedSearchesCarouselSection: SectionDescriptor {
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
+        if case .loading = state {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: "SavedSearchesShimmerCell", for: indexPath)
+        }
+        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SavedSearchesCell.reuseId, for: indexPath) as? SavedSearchesCell else { return UICollectionViewCell() }
-        let vm = SavedSearchesCellViewModel(search: item.search)
-        cell.configure(with: vm)
+        if let search = item.search {
+            let vm = SavedSearchesCellViewModel(search: search)
+            cell.configure(with: vm)
+        }
         return cell
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.savedSearchesDidTapCard(at: indexPath.row)
+        if case .data = state, let _ = item.search {
+            actions.delegate?.savedSearchesDidTapCard(at: indexPath.row)
+        }
     }
 }
 
