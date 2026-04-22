@@ -16,9 +16,11 @@ final class StoriesSection: SectionDescriptor {
     }
     
     private let hostedView: UIView
+    private let viewHeight: CGFloat
     
-    init(hostedView: UIView) {
+    init(hostedView: UIView, viewHeight: CGFloat) {
         self.hostedView = hostedView
+        self.viewHeight = viewHeight
     }
     
     func buildItems() -> [Item] {
@@ -28,13 +30,13 @@ final class StoriesSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(240)
+            heightDimension: .estimated(viewHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(240)
+            heightDimension: .estimated(viewHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
@@ -47,7 +49,7 @@ final class StoriesSection: SectionDescriptor {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StoriesHostingCell.reuseId, for: indexPath) as? StoriesHostingCell else {
             return UICollectionViewCell()
         }
-        cell.configure(with: hostedView)
+        cell.configure(with: hostedView, height: viewHeight)
         return cell
     }
 }

@@ -14,6 +14,7 @@ public protocol HomeEnvironmentAdapter {
     var isTuBrokerEnabled: Bool { get }
     var shouldShowDOTWChip: Bool { get }
     var isProjectWhatsAppEnabledHome: Bool { get }
+    var storiesViewHeight: CGFloat { get }
     
     // MARK: - Location
     var userCoordinates: (lat: Double, lon: Double)? { get }
