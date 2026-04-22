@@ -16,7 +16,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/SectorLabs/ios-network-core", from: "1.0.4"),
-        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.10.0")
+        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.10.0"),
+        .package(url: "https://github.com/Juanpe/SkeletonView.git", from: "1.7.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -25,12 +26,14 @@ let package = Package(
             name: "Home",
             dependencies: [
                 .product(name: "NetworkLayer", package: "ios-network-core"),
-                "Kingfisher"
+                "Kingfisher",
+                .product(name: "SkeletonView", package: "SkeletonView")
             ],
             path: "Sources/Home",
             resources: [
                 .process("Resources/Assets.xcassets"),
-                .process("Resources/Lato")
+                .process("Resources/Lato"),
+                .process("Resources/Localizable.xcstrings")
             ]
         ),
     ]

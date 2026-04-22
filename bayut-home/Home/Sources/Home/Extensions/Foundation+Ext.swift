@@ -34,4 +34,8 @@ extension String {
         }
         return attributedString
     }
+    
+    func localized() -> String {
+        return NSLocalizedString(self, bundle: .module, comment: "")
+    }
 }
