@@ -40,7 +40,7 @@ private extension TruBrokerBannerCell {
     func setupViews() {
         mainContentView?.setRoundedCorner(radius: 8)
         
-        backgroundImage?.image = "language" == "arabic" ? UIImage(named: Constants.backgroundImage, in: .module, compatibleWith: nil)?.imageFlippedForRightToLeftLayoutDirection() : UIImage(named: Constants.backgroundImage, in: .module, compatibleWith: nil)
+        backgroundImage?.image = UIImage(named: Constants.backgroundImage, in: .module, compatibleWith: nil)?.localized()
         
         truBrokerBadgeView?.clipsToBounds = false
         truBrokerBadgeView?.layer.shadowColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5).cgColor
@@ -58,7 +58,7 @@ private extension TruBrokerBannerCell {
         descriptionLabel?.font = UIFont.body
         descriptionLabel?.add(lineHeight: 1.25, alignment: "language" == "arabic" ? .right : .left, lineBreakMode: .byWordWrapping)
         
-        arrowImage?.image = "language" == "arabic" ? UIImage(named: Constants.arrowImage, in: .module, compatibleWith: nil)?.imageFlippedForRightToLeftLayoutDirection() : UIImage(named: Constants.arrowImage, in: .module, compatibleWith: nil)
+        arrowImage?.image = UIImage(named: Constants.arrowImage, in: .module, compatibleWith: nil)?.localized()
         
         newView?.backgroundColor = UIColor.AppColors.secondaryRedColor
         newView?.setRoundedWithRespectToHeight()

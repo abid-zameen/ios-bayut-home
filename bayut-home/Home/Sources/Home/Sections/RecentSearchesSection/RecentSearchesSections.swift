@@ -51,9 +51,6 @@ final class RecentSearchesTitleSection: SectionDescriptor {
     }
 }
 
-// MARK: ─────────────────────────────────────────────────────────────
-// MARK: 2. Carousel Section
-// MARK: ─────────────────────────────────────────────────────────────
 final class RecentSearchesCarouselSection: SectionDescriptor {
     typealias Identifier = RecentSearchesSectionId
     let identifier: RecentSearchesSectionId = .carousel
@@ -115,7 +112,7 @@ final class RecentSearchesCarouselSection: SectionDescriptor {
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         if case .loading = state {
-            return collectionView.dequeueReusableCell(withReuseIdentifier: "RecentSearchShimmerCell", for: indexPath)
+            return collectionView.dequeueReusableCell(withReuseIdentifier: RecentSearchShimmerCell.reuseId, for: indexPath)
         }
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RecentSearchesViewCell.reuseId, for: indexPath) as? RecentSearchesViewCell else { return UICollectionViewCell() }

@@ -74,7 +74,7 @@ private extension SellerLeadsBannerCell {
         descriptionLabel?.add(lineHeight: 1.25, alignment: .natural, lineBreakMode: .byTruncatingTail)
         descriptionLabel?.setContentCompressionResistancePriority(.required, for: .vertical)
         
-        let bottomEdgeMask: CACornerMask = "language" == "arabic" ? .layerMaxXMaxYCorner : .layerMinXMaxYCorner
+        let bottomEdgeMask: CACornerMask = (Locale.current.languageCode == "ar" || Locale.current.identifier.hasPrefix("ar")) ? .layerMaxXMaxYCorner : .layerMinXMaxYCorner
         newBadgeView?.setRoundedCorner(radius: (newBadgeView?.frame.height ?? 1) / 2, maskedCorners: [.layerMinXMinYCorner, .layerMaxXMinYCorner, bottomEdgeMask])
         newBadgeView?.backgroundColor = .AppColors.secondaryRedColor
         newLabel?.textColor = .white
@@ -87,7 +87,7 @@ private extension SellerLeadsBannerCell {
         
 //        parentView?.setSemanticContentAttribute()
 //        mainView?.setSemanticContentAttribute()
-//        triangle3dImage?.localize()
-//        backgroundImage?.localize()
+//        triangle3dImage?.localized()
+//        backgroundImage?.localized()
     }
 }

@@ -80,7 +80,7 @@ extension UIButton {
         if let iconName,
            let image = UIImage(named: iconName, in: .module, compatibleWith: nil) {
             
-            config.image = image
+            config.image = image.localized()
             config.imagePlacement = imagePlacement
             config.imagePadding = imagePadding
             config.baseForegroundColor = iconColor
