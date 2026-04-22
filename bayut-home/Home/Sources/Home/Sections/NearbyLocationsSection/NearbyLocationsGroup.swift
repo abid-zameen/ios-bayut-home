@@ -9,7 +9,7 @@ import Foundation
 
 final class NearbyLocationsGroup: SectionGroup {
     let groupId: String = "nearbyLocationsGroup"
-    let displayName: String = "Nearby Locations"
+    let displayName: String = "lookupNearbyLocations".localized()
     let section: HomeSection? = .main
     
     private let title: String

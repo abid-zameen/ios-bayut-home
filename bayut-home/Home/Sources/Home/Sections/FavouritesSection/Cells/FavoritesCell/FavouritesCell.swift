@@ -115,12 +115,12 @@ private extension FavouritesCell {
         potwView?.layer.borderWidth = 1.0
         potwView?.layer.borderColor = UIColor.AppColors.purpleOutlineColor.cgColor
         potwView?.isHidden = !HomeModule.shared.environment.shouldShowDOTWChip
-        potwLabel?.text = "Property of the Week".localized()
+        potwLabel?.text = "potw".localized()
         potwLabel?.font = UIFont.headingL6
         potwLabel?.textColor = UIColor.AppColors.purpleTitleColor
         
-        offPlanResaleLabel?.text = "Off Plan".localized()
-        resaleLabel?.text = "Resale".localized()
+        offPlanResaleLabel?.text = "offplan".localized()
+        resaleLabel?.text = "resale".localized()
         resaleLabel?.font = UIFont.appRegularFont(ofSize: 12.0)
         
         bedsLabel?.textColor = UIColor.AppColors.grey7

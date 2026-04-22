@@ -33,28 +33,28 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
     init(type: RailingCellType) {
         switch type {
         case .truEstimate:
-            self.headingText = "TruEstimate™"
-            self.descriptionText = "Find out how much your property is worth"
+            self.headingText = "truEstimate".localized()
+            self.descriptionText = "FindOutYourPropertyWorth".localized()
             self.backgroundImage = "truEstimate_entryPoint_background"
             self.itemImage = "truEstimate_entryPoint_backgroundImage"
             self.backgroundViewColor = .AppColors.lightGreenBackgroundColor
-            self.ctaText = "Get Started"
+            self.ctaText = "getStarted".localized()
             
         case .truBroker:
-            self.headingText = "truBroker™"
-            self.descriptionText = "Find verified and trustworthy brokers"
+            self.headingText = "truBroker".localized()
+            self.descriptionText = "findVerifiedAgents".localized()
             self.backgroundImage = "trubroker_bg"
             self.itemImage = "trubroker_icon"
             self.backgroundViewColor = .white
-            self.ctaText = "Find Broker"
+            self.ctaText = "findAgents".localized()
             
         case .dubaiTransactions:
-            self.headingText = "Dubai Transactions"
-            self.descriptionText = "Stay updated on the latest property transactions in Dubai"
+            self.headingText = "dubaiTransaction".localized()
+            self.descriptionText = "entryPointHomeDescription".localized()
             self.backgroundImage = nil
             self.itemImage = "Transactions-Card-Icon"
             self.backgroundViewColor = .AppColors.green1
-            self.ctaText = "Start Search"
+            self.ctaText = "start_search".localized()
             
         case .commuteSearch:
             self.headingText = "Search 2.0"

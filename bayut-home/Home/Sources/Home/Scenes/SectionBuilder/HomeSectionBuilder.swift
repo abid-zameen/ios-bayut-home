@@ -25,7 +25,7 @@ final class HomeSectionBuilder {
         if let storiesProvider = HomeModule.shared.storiesProvider,
            storiesProvider.hasContent,
            let storiesView = storiesProvider.getStoriesWidgetView() {
-            let storiesSection = StoriesSection(hostedView: storiesView)
+            let storiesSection = StoriesSection(hostedView: storiesView, viewHeight: HomeModule.shared.environment.storiesViewHeight)
             sections.append(AnySection(storiesSection, isCustomizable: false))
         }
         
@@ -54,8 +54,8 @@ final class HomeSectionBuilder {
         // MARK: - Build New Projects Group
         let newProjectsActions = NewProjectsActions(delegate: sectionsData.viewController)
         let newProjectsGroup = NewProjectsGroup(
-            headerTitle: "New Projects",
-            viewAllTitle: "View all projects",
+            headerTitle: "browseNewProjectsInUAE".localized(),
+            viewAllTitle: "",
             projects: sectionsData.projects,
             locations: sectionsData.locations,
             actions: newProjectsActions
@@ -66,26 +66,26 @@ final class HomeSectionBuilder {
         
         let favouritesActions = FavouritesActions(delegate: sectionsData.viewController)
         let favouritesGroup = FavouritesGroup(
-            title: "Favourites",
-            viewAllTitle: "View all favourites",
+            title: "favourites".localized(),
+            viewAllTitle: "viewAllFavourites".localized(),
             properties: sectionsData.favourites,
             actions: favouritesActions
         )
         sections.append(contentsOf: favouritesGroup.buildSections())
         
         let savedSearchesActions = SavedSearchesActions(delegate: sectionsData.viewController)
-        let savedSearchesGroup = SavedSearchesGroup(
-            title: "Saved Searches",
-            viewAllTitle: "View all saved searches",
+        let savedSearchGroup = SavedSearchesGroup(
+            title: "savedSearches".localized(),
+            viewAllTitle: "viewAllSavedSearches".localized(),
             searches: sectionsData.savedSearches,
             actions: savedSearchesActions
         )
-        sections.append(contentsOf: savedSearchesGroup.buildSections())
+        sections.append(contentsOf: savedSearchGroup.buildSections())
         
         
         let popularSearchActions = PopularSearchActions(delegate: sectionsData.viewController)
         let popularSearchGroup = PopularSearchGroup(
-            title: "Popular Searches",
+            title: "popularIn".localized(),
             purposes: sectionsData.purposes,
             selectedPurpose: sectionsData.selectedPurpose,
             searches: sectionsData.popularSearches,
@@ -95,7 +95,7 @@ final class HomeSectionBuilder {
         
         let nearbyActions = NearbyLocationsActions(delegate: sectionsData.viewController)
         let nearbyGroup = NearbyLocationsGroup(
-            title: "Nearby Locations",
+            title: "lookupNearbyLocations".localized(),
             isLocationEnabled: sectionsData.isLocationEnabled,
             locations: sectionsData.nearbyLocations,
             actions: nearbyActions
@@ -105,8 +105,8 @@ final class HomeSectionBuilder {
         
         let blogsActions = BlogsActions(delegate: sectionsData.viewController)
         let blogsGroup = BlogsGroup(
-            title: "From our Blog",
-            viewAllTitle: "Explore More Articles",
+            title: "fromOurBlogs".localized(),
+            viewAllTitle: "exploreArticles".localized(),
             blogs: sectionsData.blogs,
             actions: blogsActions
         )

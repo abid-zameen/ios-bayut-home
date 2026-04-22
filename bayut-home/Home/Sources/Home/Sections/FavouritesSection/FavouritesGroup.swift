@@ -10,7 +10,7 @@ import Foundation
 // MARK: - Section Group
 final class FavouritesGroup: SectionGroup {
     let groupId: String = "favouritesGroup"
-    let displayName: String = "Favourites"
+    let displayName: String = "favourites".localized()
     let section: HomeSection? = .main
     
     private let title: String

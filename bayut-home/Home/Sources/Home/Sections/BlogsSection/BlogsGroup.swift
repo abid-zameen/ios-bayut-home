@@ -9,7 +9,7 @@ import Foundation
 
 final class BlogsGroup: SectionGroup {
     let groupId: String = "blogsGroup"
-    let displayName: String = "From our Blog"
+    let displayName: String = "fromOurBlogs".localized()
     let section: HomeSection? = .main
     
     private let title: String

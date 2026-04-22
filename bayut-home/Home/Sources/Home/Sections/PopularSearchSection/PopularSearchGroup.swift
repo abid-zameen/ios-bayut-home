@@ -9,7 +9,7 @@ import Foundation
 
 final class PopularSearchGroup: SectionGroup {
     let groupId: String = "popularSearchGroup"
-    let displayName: String = "Popular Searches"
+    let displayName: String = "popularIn".localized()
     let section: HomeSection? = .main
     
     private let title: String

@@ -60,7 +60,7 @@
       }
     },
     "buy" : {
-      "extractionState" : "migrated",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -698,7 +698,7 @@
       }
     },
     "rent" : {
-      "extractionState" : "migrated",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

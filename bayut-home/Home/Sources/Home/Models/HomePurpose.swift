@@ -13,8 +13,8 @@ public enum HomePurpose: String, CaseIterable {
     
     public var title: String {
         switch self {
-        case .buy: return "Buy"
-        case .rent: return "Rent"
+        case .buy: return "buy".localized()
+        case .rent: return "rent".localized()
         }
     }
 }

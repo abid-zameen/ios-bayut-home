@@ -18,8 +18,3 @@ extension UIView {
     func scaleDown() {}
     func scaleUp() {}
 }
-
-extension String {
-    func localized() -> String { self }
-}
-

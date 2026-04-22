@@ -22,9 +22,9 @@ final class TruBrokerBannerCell: UICollectionViewCell {
     // MARK: - Constants
     private enum Constants {
         static let backgroundImage = "truBroker_entry_bg"
-        static let descriptionText = "Find trusted agents awarded for their excellent performance"
-        static let headingText = "TruBroker™"
-        static let new = "NEW"
+        static let descriptionText = "findVerifiedAgents".localized()
+        static let headingText = "truBroker".localized()
+        static let new = "new".localized()
         static let arrowImage = "icon_right_arrow_white"
     }
 
@@ -52,7 +52,7 @@ private extension TruBrokerBannerCell {
         headingLabel?.font = UIFont.body
         headingLabel?.text = Constants.headingText
         headingLabel?.textColor = UIColor.white
-        headingLabel?.highlight(text: "Broker", font: UIFont.headingL4)
+        headingLabel?.highlight(text: "broker".localized(), font: UIFont.headingL4)
         
         descriptionLabel?.text = Constants.descriptionText
         descriptionLabel?.font = UIFont.body

@@ -68,7 +68,7 @@ struct FavouriteCellViewModel: FavoritesCellViewModelType {
         self.isPropertyTruChecked = property.isTruChecked
         self.showOffPlanInfo = property.completionStatus?.contains("under-construction") ?? false
         if let saleType = property.offPlanDetails?.saleType, !saleType.contains("direct_from_developer") {
-            self.resaleLabelText = saleType == "new" ? "Off Plan New" : "Resale"
+            self.resaleLabelText = saleType == "new" ? "offplanNew".localized() : "resale".localized()
             self.showResaleInfo = true
         }
     }

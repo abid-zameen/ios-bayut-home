@@ -23,9 +23,9 @@ final class SellerLeadsBannerCell: UICollectionViewCell {
     // MARK: - Constants
     private enum Constants {
         static let backgroundImage = "seller-leads-banner-image"
-        static let readyToSellHomeTitle = "Sell or Rent Your Property"
-        static let descriptionText = "Connect with a trusted agent to secure the best deal, faster"
-        static let new = "New"
+        static let readyToSellHomeTitle = "ready_to_sell_or_rent".localized()
+        static let descriptionText = "share_your_details".localized()
+        static let new = "new".localized()
         static let triangleImage = "triangle-vector"
 
         static let gradientColor1: UIColor = .AppColors.forestGreenTeal

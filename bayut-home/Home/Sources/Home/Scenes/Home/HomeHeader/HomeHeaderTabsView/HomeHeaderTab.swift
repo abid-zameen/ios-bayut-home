@@ -9,13 +9,13 @@ public enum HomeHeaderTab: String, CaseIterable {
     public var title: String {
         switch self {
         case .properties:
-            return "Properties"
+            return "properties".localized()
         case .newProjects:
-            return "New Projects"
+            return "newProjectHeadingHome".localized()
         case .transactions:
-            return "Transactions"
+            return "dldTransactions".localized()
         case .agents:
-            return "Agents"
+            return "agents".localized()
         }
     }
 }

@@ -82,7 +82,7 @@ class HomeHeaderSearchView: UIView {
     
     private let searchLabel: UILabel = {
         let lbl = UILabel()
-        lbl.text = "Search for a locality, area or city"
+        lbl.text = "searchLocation".localized()
         lbl.textColor = .lightGray
         lbl.font = .systemFont(ofSize: 14)
         return lbl

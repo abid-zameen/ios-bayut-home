@@ -21,7 +21,7 @@ final class NewProjectsGroup: SectionGroup {
     
     init(
         groupId: String = "newProjects",
-        displayName: String = "New Projects",
+        displayName: String = "browseNewProjectsInUAE".localized(),
         section: HomeSection? = .main,
         headerTitle: String,
         viewAllTitle: String,
@@ -74,7 +74,7 @@ final class NewProjectsGroup: SectionGroup {
         // 4. View All Section (Only if data is present)
         if case .data(let hits) = projects, !hits.isEmpty {
             let selectedLocationName = selectedLocation?.localizedName ?? ""
-            let viewAllTitle = String(format: "View All Projects in %@", selectedLocationName)
+            let viewAllTitle = String(format: "viewAllProjects".localized(), selectedLocationName)
             
             let viewAllSection = NewProjectsViewAllSection(
                 buttonTitle: viewAllTitle,
