@@ -5,6 +5,7 @@
 //  Created by Hammad Shahid on 31/03/2026.
 //
 import UIKit
+import SkeletonView
 
 extension UIView {
     
@@ -238,5 +239,31 @@ extension UIView {
             let rect = bounds.insetBy(dx: dx, dy: dx)
             self.layer.shadowPath = UIBezierPath(rect: rect).cgPath
         }
+    }
+    
+    func showShimmer(
+        baseColor: UIColor = UIColor.AppColors.grey1,
+        secondaryColor: UIColor = UIColor.AppColors.grey1.withAlphaComponent(0.2),
+        cornerRadius: CGFloat = 4.0,
+           direction: GradientDirection = .leftRight,
+           duration: CFTimeInterval = 1.5,
+           backgroundColor: UIColor = .white
+    ) {
+        self.isSkeletonable = true
+        self.backgroundColor = backgroundColor
+        self.layer.cornerRadius = cornerRadius
+        self.clipsToBounds = true
+        
+        let gradient = SkeletonGradient(
+            baseColor: baseColor,
+            secondaryColor: secondaryColor
+        )
+        
+        let animation = direction.slidingAnimation(duration: duration)
+        
+        self.showAnimatedGradientSkeleton(
+            usingGradient: gradient,
+            animation: animation
+        )
     }
 }

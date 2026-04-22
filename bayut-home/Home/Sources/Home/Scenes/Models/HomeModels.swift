@@ -6,40 +6,54 @@
 //
 
 struct Home {
+    enum DataState<T> {
+        case loading
+        case data(T)
+        case empty
+        
+        var value: T? {
+            switch self {
+            case .data(let value): return value
+            default: return nil
+            }
+        }
+    }
+
     struct HomeViewModel {
         let sections: [AnySection]
         let animated: Bool
     }
     
     struct HomeSections {
-        let projects: [ProjectHit]
+        let projects: DataState<[ProjectHit]>
         let locations: [LocationChipViewModel]
-        let favourites: [Property]
-        let savedSearches: [SavedSearchesModel]
-        let blogs: [Blog]
-        let nearbyLocations: [LocationHit]
+        let favourites: DataState<[Property]>
+        let savedSearches: DataState<[SavedSearchesModel]>
+        let blogs: DataState<[Blog]>
+        let nearbyLocations: DataState<[LocationHit]>
         let isLocationEnabled: Bool
-        let popularSearches: [PopularSearch]
+        let popularSearches: DataState<[PopularSearch]>
         let popularSearchConfig: PopularSearchConfig?
         let purposes: [PopularSearchPurpose]
         let selectedPurpose: PopularSearchPurpose
-        let recentSearches: [HomeScreenRecentSearch]
+        let recentSearches: DataState<[HomeScreenRecentSearch]>
         let viewController: HomeViewController
     }
     
     struct Response {
-        let projects: [ProjectHit]
-        let locations: [LocationChipViewModel]
-        let favourites: [Property]
-        let savedSearches: SavedSearchesData?
-        let blogs: [Blog]
-        let nearbyLocations: [LocationHit]
-        let isLocationEnabled: Bool
-        let popularSearches: [PopularSearch]
-        let popularSearchConfig: PopularSearchConfig?
-        let purposes: [PopularSearchPurpose]
-        let selectedPurpose: PopularSearchPurpose
-        let recentSearches: [HomeScreenRecentSearch]
+        var projects: DataState<[ProjectHit]> = .loading
+        var locations: [LocationChipViewModel] = []
+        var selectedNewProjectsLocationID: String = ""
+        var favourites: DataState<[Property]> = .loading
+        var savedSearches: DataState<SavedSearchesData> = .loading
+        var blogs: DataState<[Blog]> = .loading
+        var nearbyLocations: DataState<[LocationHit]> = .loading
+        var isLocationEnabled: Bool = false
+        var popularSearches: [PopularSearch] = []
+        var popularSearchConfig: PopularSearchConfig? = nil
+        var purposes: [PopularSearchPurpose] = []
+        var selectedPurpose: PopularSearchPurpose = .rent
+        var recentSearches: DataState<[HomeScreenRecentSearch]> = .loading
     }
 }
 
@@ -152,6 +166,21 @@ public struct LocationHit: Codable {
     public let geography: Geography?
     public let adCount: Int?
     public let externalID: String?
+    public let hierarchy: [LocationHierarchy]?
+}
+
+public struct LocationHierarchy: Codable {
+    public let externalID: String?
+    public let id: Int?
+    public let level: Int?
+    public let name: String?
+    public let name_l1: String?
+    public let name_l2: String?
+    public let name_l3: String?
+    public let slug: String?
+    public let slug_l1: String?
+    public let slug_l2: String?
+    public let slug_l3: String?
 }
 
 public struct Geography: Codable {

@@ -63,6 +63,15 @@ final class CellRegistry {
         // Stories Hosting Cell
         collectionView.register(StoriesHostingCell.self, forCellWithReuseIdentifier: StoriesHostingCell.reuseId)
         
+        // Shimmers
+        collectionView.register(UINib(nibName: "ProjectsShimmerCell", bundle: .module), forCellWithReuseIdentifier: "ProjectsShimmerCell")
+        collectionView.register(UINib(nibName: "RecentSearchShimmerCell", bundle: .module), forCellWithReuseIdentifier: "RecentSearchShimmerCell")
+        collectionView.register(UINib(nibName: "NearbyLocationShimmerCell", bundle: .module), forCellWithReuseIdentifier: "NearbyLocationShimmerCell")
+        collectionView.register(UINib(nibName: "FavoritesShimmerCell", bundle: .module), forCellWithReuseIdentifier: "FavoritesShimmerCell")
+        collectionView.register(UINib(nibName: "SavedSearchesShimmerCell", bundle: .module), forCellWithReuseIdentifier: "SavedSearchesShimmerCell")
+        collectionView.register(UINib(nibName: "PopularSearchShimmerCell", bundle: .module), forCellWithReuseIdentifier: "PopularSearchShimmerCell")
+        collectionView.register(UINib(nibName: "BlogsShimmerCell", bundle: .module), forCellWithReuseIdentifier: "BlogsShimmerCell")
+        
         // Add more cells to register here
     }
 }
