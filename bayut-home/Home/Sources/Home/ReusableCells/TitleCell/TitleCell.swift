@@ -38,7 +38,7 @@ final class TitleCell: UICollectionViewCell {
     
     // MARK: - Constants
     private enum Constants {
-        static let topMargin: CGFloat = 32
+        static let topMargin: CGFloat = 16
         static let bottomConstraintPriority: Float = 999
     }
     
