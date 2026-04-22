@@ -8,7 +8,7 @@
 import Foundation
 
 protocol PopularSearchActionsDelegate: AnyObject {
-    func popularSearchDidSelectPurpose(_ purpose: PopularSearchPurpose)
+    func popularSearchDidSelectPurpose(at index: Int, purpose: PopularSearchPurpose)
     func popularSearchDidSelectSearchItem(at index: Int)
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 
 protocol NearbyLocationsActionsDelegate: AnyObject {
-    func nearbyLocationsDidTapCard(with location: LocationHit)
+    func nearbyLocationsDidTapCard(at index: Int, with location: LocationHit)
     func nearbyLocationsDidTapAllowLocation()
 }
 

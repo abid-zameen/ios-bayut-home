@@ -126,7 +126,7 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
         if case .data = state, let location = item.location {
-            actions.delegate?.nearbyLocationsDidTapCard(with: location)
+            actions.delegate?.nearbyLocationsDidTapCard(at: indexPath.item, with: location)
         }
     }
 }

@@ -101,7 +101,7 @@ final class PopularSearchPurposeSection: SectionDescriptor {
     }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
-        actions.delegate?.popularSearchDidSelectPurpose(item.purpose)
+        actions.delegate?.popularSearchDidSelectPurpose(at: indexPath.item, purpose: item.purpose)
     }
 }
 

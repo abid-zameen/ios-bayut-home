@@ -125,7 +125,7 @@ final class BlogsCarouselSection: SectionDescriptor {
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {
         if case .data = state, let blog = item.blog {
-            actions.delegate?.blogsDidTapCard(with: blog.blogUrl, title: blog.title)
+            actions.delegate?.blogsDidTapCard(at: indexPath.item, with: blog.blogUrl, title: blog.title)
         }
     }
 }
