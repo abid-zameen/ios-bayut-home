@@ -13,9 +13,8 @@ final class PageControlCell: UICollectionViewCell {
     private lazy var pageControl: UIPageControl = {
         let pc = UIPageControl()
         pc.translatesAutoresizingMaskIntoConstraints = false
-        // Using existing App colors roughly matching the user's snippet requirement
-        pc.pageIndicatorTintColor = UIColor.lightGray
-        pc.currentPageIndicatorTintColor = UIColor.darkGray // Will map natively to AppColors later if imported
+        pc.pageIndicatorTintColor = UIColor.AppColors.DTGraphVerticalLine
+        pc.currentPageIndicatorTintColor = UIColor.AppColors.teal5
         pc.addTarget(self, action: #selector(pageChanged), for: .valueChanged)
         return pc
     }()

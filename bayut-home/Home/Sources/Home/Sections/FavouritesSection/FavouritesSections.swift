@@ -19,17 +19,12 @@ enum FavouritesSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum FavouritesLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
-    
-    // Carousel cards
     static let cardWidth: CGFloat = 280
     static let cardHeight: CGFloat = 340
 }
 
-// MARK: ─────────────────────────────────────────────────────────────
-// MARK: 1. Title Section
-// MARK: ─────────────────────────────────────────────────────────────
 final class FavouritesTitleSection: SectionDescriptor {
     typealias Identifier = FavouritesSectionId
     let identifier: FavouritesSectionId = .title
@@ -54,9 +49,6 @@ final class FavouritesTitleSection: SectionDescriptor {
     }
 }
 
-// MARK: ─────────────────────────────────────────────────────────────
-// MARK: 2. Carousel Section
-// MARK: ─────────────────────────────────────────────────────────────
 final class FavouritesCarouselSection: SectionDescriptor {
     typealias Identifier = FavouritesSectionId
     let identifier: FavouritesSectionId = .carousel
@@ -137,9 +129,6 @@ final class FavouritesCarouselSection: SectionDescriptor {
     }
 }
 
-// MARK: ─────────────────────────────────────────────────────────────
-// MARK: 3. View All Section
-// MARK: ─────────────────────────────────────────────────────────────
 final class FavouritesViewAllSection: SectionDescriptor {
     typealias Identifier = FavouritesSectionId
     let identifier: FavouritesSectionId = .viewAll
@@ -158,9 +147,9 @@ final class FavouritesViewAllSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
-                top: FavouritesLayout.spacing,
+                top: 0,
                 leading: 0,
-                bottom: FavouritesLayout.spacing,
+                bottom: 0,
                 trailing: 0
             )
         )

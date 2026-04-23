@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class LocationChipsCollectionViewCell: UICollectionViewCell {
+final class LocationChipsCollectionViewCell: HighlightableCollectionViewCell {
 
     // MARK: - IBOutlets
     @IBOutlet private weak var chipsBackgroundView: UIView?

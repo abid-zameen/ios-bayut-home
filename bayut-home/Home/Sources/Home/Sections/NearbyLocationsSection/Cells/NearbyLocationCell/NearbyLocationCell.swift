@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class NearbyLocationCell: UICollectionViewCell {
+final class NearbyLocationCell: HighlightableCollectionViewCell {
     
     // MARK: - IBOutlets
     @IBOutlet private weak var nameLabel: UILabel?

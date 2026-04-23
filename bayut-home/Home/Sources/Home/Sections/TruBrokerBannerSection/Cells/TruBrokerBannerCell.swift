@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TruBrokerBannerCell: UICollectionViewCell {
+final class TruBrokerBannerCell: HighlightableCollectionViewCell {
     
     // MARK: - IBOutlets
     @IBOutlet private weak var mainContentView: UIView?

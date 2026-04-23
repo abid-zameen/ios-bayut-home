@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BlogCell: UICollectionViewCell {
+final class BlogCell: HighlightableCollectionViewCell {
     
     // MARK: - IBOutlets
     @IBOutlet private weak var blogTitleLabel: UILabel?

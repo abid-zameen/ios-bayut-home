@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SavedSearchesCell: UICollectionViewCell {
+final class SavedSearchesCell: HighlightableCollectionViewCell {
 
     // MARK: - IBOutlets
     @IBOutlet private weak var titleLabel: UILabel?

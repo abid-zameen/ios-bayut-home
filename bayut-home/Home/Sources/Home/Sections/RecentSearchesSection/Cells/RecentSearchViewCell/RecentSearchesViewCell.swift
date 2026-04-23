@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class RecentSearchesViewCell: UICollectionViewCell {
+final class RecentSearchesViewCell: HighlightableCollectionViewCell {
         
     // MARK: - Outlets
     @IBOutlet private weak var containerView: UIView?

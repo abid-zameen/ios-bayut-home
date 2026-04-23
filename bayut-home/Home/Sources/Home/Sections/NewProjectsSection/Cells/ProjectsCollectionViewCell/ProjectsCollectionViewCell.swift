@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ProjectsCollectionViewCell: UICollectionViewCell {
+final class ProjectsCollectionViewCell: HighlightableCollectionViewCell {
     
     // MARK: - IBOutlets
     @IBOutlet private weak var launchPriceTitle: UILabel?

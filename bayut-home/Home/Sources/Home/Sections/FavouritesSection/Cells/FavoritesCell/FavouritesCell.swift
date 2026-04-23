@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class FavouritesCell: UICollectionViewCell {
+final class FavouritesCell: HighlightableCollectionViewCell {
     
     // MARK: - IBOutlets
     @IBOutlet private weak var bgView: UIView?

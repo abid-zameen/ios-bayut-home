@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class PopularSearchCell: UICollectionViewCell {
+final class PopularSearchCell: HighlightableCollectionViewCell {
     
     // MARK: - IBOutlets
     @IBOutlet private weak var contentStackView: UIStackView?

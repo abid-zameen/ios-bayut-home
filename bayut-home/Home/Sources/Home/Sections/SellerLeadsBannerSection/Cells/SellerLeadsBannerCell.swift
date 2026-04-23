@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SellerLeadsBannerCell: UICollectionViewCell {
+final class SellerLeadsBannerCell: HighlightableCollectionViewCell {
     
     // MARK: - Outlets
     @IBOutlet private weak var stackView: UIStackView?

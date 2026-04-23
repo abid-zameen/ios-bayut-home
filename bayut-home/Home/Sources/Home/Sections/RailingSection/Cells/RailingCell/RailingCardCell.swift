@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class RailingCardCell: UICollectionViewCell {
+final class RailingCardCell: HighlightableCollectionViewCell {
     
     //MARK: - IBOutlets
     @IBOutlet private weak var mainContentView: UIView?
@@ -43,10 +43,14 @@ final class RailingCardCell: UICollectionViewCell {
 
 private extension RailingCardCell {
     func setupViews() {
-        mainContentView?.backgroundColor = .white
+        self.clipsToBounds = false
+        contentView.backgroundColor = .white
+        contentView.setRoundedCorner(radius: 8)
+        contentView.clipsToBounds = false
+        contentView.sketchShadow()
+        
         mainContentView?.setRoundedCorner(radius: 8)
         mainContentView?.clipsToBounds = true
-        mainContentView?.sketchShadow()
         
         headingLabel?.font = UIFont.headingL1
         headingLabel?.textColor = UIColor.AppColors.blackTextColor
