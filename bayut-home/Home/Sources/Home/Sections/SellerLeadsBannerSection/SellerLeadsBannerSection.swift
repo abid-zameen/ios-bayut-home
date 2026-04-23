@@ -38,7 +38,7 @@ final class SellerLeadsBannerSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         return .fullWidthList(
             estimatedHeight: 180,
-            sectionInsets: NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+            sectionInsets: NSDirectionalEdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 0)
         )
     }
     

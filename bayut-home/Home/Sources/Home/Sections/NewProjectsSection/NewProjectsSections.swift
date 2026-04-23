@@ -22,7 +22,7 @@ enum NewProjectsSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum NewProjectsLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
     
     // Location chips
@@ -270,7 +270,7 @@ final class NewProjectsViewAllSection: SectionDescriptor {
             sectionInsets: NSDirectionalEdgeInsets(
                 top: 0,
                 leading: 0,
-                bottom: NewProjectsLayout.spacing,
+                bottom: 0,
                 trailing: 0
             )
         )

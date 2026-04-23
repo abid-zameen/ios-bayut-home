@@ -21,7 +21,7 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
     typealias Identifier = RailingSectionId
     let identifier: RailingSectionId = .carousel
     static let infiniteMultiplier = 1000
-    var autoscrollInterval: TimeInterval { 4.0 }
+    var autoscrollInterval: TimeInterval { 2.0 }
     var onInteractionBegan: (() -> Void)?
     
     struct Item: Hashable {
@@ -74,7 +74,7 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
         let indexPath = IndexPath(item: targetItem, section: sectionIndex)
         
         DispatchQueue.main.async {
-            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+           // collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
         }
     }
     
@@ -93,8 +93,8 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let isIpad = environment.traitCollection.horizontalSizeClass == .regular
-        let horizontalInset: CGFloat = isIpad ? 0 : 22
-        let interItemSpacing: CGFloat = 4
+        let horizontalInset: CGFloat = 16
+        let interItemSpacing: CGFloat = 16
         
         let visibleWidth = environment.container.contentSize.width - horizontalInset
         let cardWidth: CGFloat = isIpad ? visibleWidth * 0.58 : 340.0
@@ -107,7 +107,7 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .absolute(cardWidth),
-            heightDimension: .absolute(isIpad ? 220 : 190)
+            heightDimension: .absolute(157)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
@@ -115,10 +115,10 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
         section.orthogonalScrollingBehavior = .groupPaging
         section.interGroupSpacing = interItemSpacing
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: 16,
-            leading: horizontalInset / 2,
+            top: 12,
+            leading: 16,
             bottom: 0,
-            trailing: horizontalInset / 2
+            trailing: 16
         )
         
         section.visibleItemsInvalidationHandler = { [weak syncState, cellCount = cellTypes.count] (visibleItems, offset, env) in
@@ -187,8 +187,8 @@ final class RailingPageControlSection: SectionDescriptor {
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         return .fullWidthList(
-            estimatedHeight: 40,
-            sectionInsets: NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+            estimatedHeight: 12,
+            sectionInsets: NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16)
         )
     }
     

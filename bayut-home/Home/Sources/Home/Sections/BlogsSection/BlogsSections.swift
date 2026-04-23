@@ -19,7 +19,7 @@ enum BlogsSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum BlogsLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
     
     static let cardWidth: CGFloat = 10
@@ -90,7 +90,7 @@ final class BlogsCarouselSection: SectionDescriptor {
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.85),
@@ -148,7 +148,7 @@ final class BlogsViewAllSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
-                top: BlogsLayout.spacing,
+                top: 0,
                 leading: 0,
                 bottom: BlogsLayout.spacing,
                 trailing: 0

@@ -38,7 +38,6 @@ final class TitleCell: UICollectionViewCell {
     
     // MARK: - Constants
     private enum Constants {
-        static let topMargin: CGFloat = 16
         static let bottomConstraintPriority: Float = 999
     }
     
@@ -79,7 +78,7 @@ private extension TitleCell {
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.topMargin),
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).withPriority(Constants.bottomConstraintPriority),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)

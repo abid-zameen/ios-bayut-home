@@ -19,7 +19,7 @@ enum NearbyLocationsSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum NearbyLocationsLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
     
     static let cardWidth: CGFloat = 200
@@ -113,7 +113,7 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         if case .loading = state {
-            return collectionView.dequeueReusableCell(withReuseIdentifier: "NearbyLocationShimmerCell", for: indexPath)
+            return collectionView.dequeueReusableCell(withReuseIdentifier: NearbyLocationShimmerCell.reuseId, for: indexPath)
         }
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NearbyLocationCell.reuseId, for: indexPath) as? NearbyLocationCell else { return UICollectionViewCell() }

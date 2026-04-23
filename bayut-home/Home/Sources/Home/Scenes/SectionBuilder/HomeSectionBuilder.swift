@@ -15,29 +15,25 @@ final class HomeSectionBuilder {
         // Recent Searches
         let recentSearchesActions = RecentSearchesActions(delegate: sectionsData.viewController)
         let recentSearchesGroup = RecentSearchesGroup(
-            title: "Recent Searches",
+            title: "str_recent_searches".localized(),
             searches: sectionsData.recentSearches,
             actions: recentSearchesActions
         )
         sections.append(contentsOf: recentSearchesGroup.buildSections())
         
-        // MARK: - Stories Section
-        if let storiesProvider = HomeModule.shared.storiesProvider,
-           storiesProvider.hasContent,
-           let storiesView = storiesProvider.getStoriesWidgetView() {
-            let storiesSection = StoriesSection(hostedView: storiesView, viewHeight: HomeModule.shared.environment.storiesViewHeight)
-            sections.append(AnySection(storiesSection, isCustomizable: false))
+        // Append TruBroker Banner
+        if sectionsData.showTruBrokerBanner {
+            let truBrokerActions = TruBrokerBannerActions(delegate: sectionsData.viewController)
+            let truBrokerBannerSection = TruBrokerBannerSection(actions: truBrokerActions)
+            sections.append(AnySection(truBrokerBannerSection, isCustomizable: false))
         }
         
-        // Append TruBroker Banner
-        let truBrokerActions = TruBrokerBannerActions(delegate: sectionsData.viewController)
-        let truBrokerBannerSection = TruBrokerBannerSection(actions: truBrokerActions)
-        sections.append(AnySection(truBrokerBannerSection, isCustomizable: false))
-        
         // Append SellerLeads Banner
-        let sellerLeadsActions = SellerLeadsBannerActions(delegate: sectionsData.viewController)
-        let sellerLeadsBannerSection = SellerLeadsBannerSection(actions: sellerLeadsActions)
-        sections.append(AnySection(sellerLeadsBannerSection, isCustomizable: false))
+        if sectionsData.showSellerLeadsBanner {
+            let sellerLeadsActions = SellerLeadsBannerActions(delegate: sectionsData.viewController)
+            let sellerLeadsBannerSection = SellerLeadsBannerSection(actions: sellerLeadsActions)
+            sections.append(AnySection(sellerLeadsBannerSection, isCustomizable: false))
+        }
 
         // MARK: - Build Railing Carousel
         let railingCellTypes: [RailingCellType] = [
@@ -50,6 +46,23 @@ final class HomeSectionBuilder {
         let railingActions = RailingActions(delegate: sectionsData.viewController)
         let railingGroup = RailingGroup(cellTypes: railingCellTypes, actions: railingActions)
         sections.append(contentsOf: railingGroup.buildSections())
+        
+        // MARK: - Stories Section
+        if let storiesProvider = HomeModule.shared.storiesProvider,
+           storiesProvider.hasContent,
+           let storiesView = storiesProvider.getStoriesWidgetView() {
+            let storiesSection = StoriesSection(hostedView: storiesView, viewHeight: HomeModule.shared.environment.storiesViewHeight)
+            sections.append(AnySection(storiesSection, isCustomizable: false))
+        }
+        
+        let savedSearchesActions = SavedSearchesActions(delegate: sectionsData.viewController)
+        let savedSearchGroup = SavedSearchesGroup(
+            title: "savedSearches".localized(),
+            viewAllTitle: "viewAllSavedSearches".localized(),
+            searches: sectionsData.savedSearches,
+            actions: savedSearchesActions
+        )
+        sections.append(contentsOf: savedSearchGroup.buildSections())
         
         // MARK: - Build New Projects Group
         let newProjectsActions = NewProjectsActions(delegate: sectionsData.viewController)
@@ -72,16 +85,6 @@ final class HomeSectionBuilder {
             actions: favouritesActions
         )
         sections.append(contentsOf: favouritesGroup.buildSections())
-        
-        let savedSearchesActions = SavedSearchesActions(delegate: sectionsData.viewController)
-        let savedSearchGroup = SavedSearchesGroup(
-            title: "savedSearches".localized(),
-            viewAllTitle: "viewAllSavedSearches".localized(),
-            searches: sectionsData.savedSearches,
-            actions: savedSearchesActions
-        )
-        sections.append(contentsOf: savedSearchGroup.buildSections())
-        
         
         let popularSearchActions = PopularSearchActions(delegate: sectionsData.viewController)
         let popularSearchGroup = PopularSearchGroup(

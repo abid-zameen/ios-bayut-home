@@ -24,9 +24,6 @@ private enum RecentSearchesLayout {
     static let cardHeight: CGFloat = 96
 }
 
-// MARK: ─────────────────────────────────────────────────────────────
-// MARK: 1. Title Section
-// MARK: ─────────────────────────────────────────────────────────────
 final class RecentSearchesTitleSection: SectionDescriptor {
     typealias Identifier = RecentSearchesSectionId
     let identifier: RecentSearchesSectionId = .title

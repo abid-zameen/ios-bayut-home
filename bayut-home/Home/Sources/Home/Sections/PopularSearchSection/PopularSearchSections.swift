@@ -19,7 +19,7 @@ enum PopularSearchSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum PopularSearchLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 12
     static let purposeHeight: CGFloat = 40
     static let cardWidth: CGFloat = 217
@@ -89,12 +89,12 @@ final class PopularSearchPurposeSection: SectionDescriptor {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 12, bottom: 0, trailing: 12)
         return section
     }
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PopularSearchPurposeCell", for: indexPath) as? PopularSearchPurposeCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularSearchPurposeCell.reuseId, for: indexPath) as? PopularSearchPurposeCell else { return UICollectionViewCell() }
         let vm = PopularSearchPurposeCellViewModel(title: item.purpose.rawValue, isSelected: item.isSelected)
         cell.configure(with: vm)
         return cell
@@ -152,9 +152,9 @@ final class PopularSearchCarouselSection: SectionDescriptor {
         section.orthogonalScrollingBehavior = .continuous
         section.interGroupSpacing = PopularSearchLayout.spacing
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: 8,
+            top: 16,
             leading: 16,
-            bottom: 16,
+            bottom: 0,
             trailing: 16
         )
         return section
@@ -162,10 +162,10 @@ final class PopularSearchCarouselSection: SectionDescriptor {
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         if case .loading = state {
-            return collectionView.dequeueReusableCell(withReuseIdentifier: "PopularSearchShimmerCell", for: indexPath)
+            return collectionView.dequeueReusableCell(withReuseIdentifier: PopularSearchShimmerCell.reuseId, for: indexPath)
         }
         
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PopularSearchCell", for: indexPath) as? PopularSearchCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularSearchCell.reuseId, for: indexPath) as? PopularSearchCell else { return UICollectionViewCell() }
         if let search = item.search {
             let vm = PopularSearchCellViewModel(search: search)
             cell.configure(with: vm)

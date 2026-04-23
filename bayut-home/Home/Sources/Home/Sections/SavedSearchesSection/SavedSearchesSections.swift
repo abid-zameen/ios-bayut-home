@@ -19,7 +19,7 @@ enum SavedSearchesSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum SavedSearchesLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
     static let cardWidth: CGFloat = 280
     static let estimatedCardHeight: CGFloat = 100
@@ -111,7 +111,7 @@ final class SavedSearchesCarouselSection: SectionDescriptor {
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         if case .loading = state {
-            return collectionView.dequeueReusableCell(withReuseIdentifier: "SavedSearchesShimmerCell", for: indexPath)
+            return collectionView.dequeueReusableCell(withReuseIdentifier: SavedSearchesShimmerCell.reuseId, for: indexPath)
         }
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SavedSearchesCell.reuseId, for: indexPath) as? SavedSearchesCell else { return UICollectionViewCell() }
@@ -147,9 +147,9 @@ final class SavedSearchesViewAllSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
-                top: SavedSearchesLayout.spacing,
+                top: 0,
                 leading: 0,
-                bottom: SavedSearchesLayout.spacing,
+                bottom: 0,
                 trailing: 0
             )
         )
