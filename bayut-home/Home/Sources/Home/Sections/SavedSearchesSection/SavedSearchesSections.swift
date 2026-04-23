@@ -89,17 +89,17 @@ final class SavedSearchesCarouselSection: SectionDescriptor {
             heightDimension: .estimated(SavedSearchesLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 8)
         
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
+            widthDimension: .fractionalWidth(0.85),
             heightDimension: .estimated(SavedSearchesLayout.estimatedCardHeight)
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .groupPagingCentered
-        section.interGroupSpacing = SavedSearchesLayout.spacing
+        section.orthogonalScrollingBehavior = .groupPaging
+        section.interGroupSpacing = 0
         section.contentInsets = NSDirectionalEdgeInsets(
             top: SavedSearchesLayout.spacing,
             leading: 0,

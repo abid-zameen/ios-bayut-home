@@ -18,7 +18,7 @@ enum RecentSearchesSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum RecentSearchesLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 12, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
     static let cardWidth: CGFloat = 322
     static let cardHeight: CGFloat = 96

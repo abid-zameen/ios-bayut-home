@@ -163,7 +163,7 @@ class HomeHeaderView: UIView {
             bottomCurveSolidImageView.trailingAnchor.constraint(equalTo: bottomCurveGradientImageView.trailingAnchor),
             bottomCurveSolidImageView.bottomAnchor.constraint(equalTo: bottomCurveGradientImageView.bottomAnchor),
             
-            logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
             logoImageView.widthAnchor.constraint(equalToConstant: 154),
             logoHeightConstraint,
             logoTopConstraint,
@@ -248,6 +248,7 @@ class HomeHeaderView: UIView {
         
         updateConstraintsForVariant()
         setupElements()
+        handleTabSelection(currentTab)
     }
     
     private var currentTab: HomeHeaderTab = .properties
@@ -256,8 +257,8 @@ class HomeHeaderView: UIView {
     
     private func handleTabSelection(_ tab: HomeHeaderTab) {
         self.currentTab = tab
-        let shouldShowButtons = (tab != .newProjects)
-        searchView.showPurposeButtons(shouldShowButtons)
+        let searchViewModel = HomeHeaderSearchViewModel(selectedTab: tab)
+        searchView.configure(with: searchViewModel)
     }
     
     private func updateConstraintsForVariant() {
@@ -328,7 +329,7 @@ class HomeHeaderView: UIView {
         
         let bottomCurveSolidElement = AnimatableElement(
             view: bottomCurveSolidImageView,
-            topConstraint: nil, // Moves with the gradient one via AutoLayout
+            topConstraint: nil,
             expandedTop: 0, collapsedTop: 0,
             expandedAlpha: (variant == .uae) ? 0 : 1,
             collapsedAlpha: 1,

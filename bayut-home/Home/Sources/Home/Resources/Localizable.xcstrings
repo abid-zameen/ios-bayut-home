@@ -786,7 +786,7 @@
         },
         "searchLocation": {
             "comment": "Home VC",
-            "extractionState": "migrated",
+            "extractionState": "manual",
             "localizations": {
                 "ar": {
                     "stringUnit": {
@@ -897,6 +897,35 @@
                     "stringUnit": {
                         "state": "translated",
                         "value": "发布价格"
+                    }
+                }
+            }
+        },
+        "str_recent_searches": {
+            "extractionState": "migrated",
+            "localizations": {
+                "ar": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "عمليات البحث الأخيرة"
+                    }
+                },
+                "en": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Recent Searches"
+                    }
+                },
+                "ru": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Недавние поиски"
+                    }
+                },
+                "zh": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "最近搜索"
                     }
                 }
             }
@@ -1046,31 +1075,118 @@
                 }
             }
         },
-        "str_recent_searches": {
+        "str_dt_search_location": {
             "extractionState": "migrated",
             "localizations": {
                 "ar": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "عمليات البحث الأخيرة"
+                        "value": "بحث عن موقع في دبي"
                     }
                 },
                 "en": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "Recent Searches"
+                        "value": "Search for locations in Dubai"
                     }
                 },
                 "ru": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "Недавние поиски"
+                        "value": "Поиск локаций в Дубае"
                     }
                 },
                 "zh": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "最近搜索"
+                        "value": "在迪拜搜索房源地点"
+                    }
+                }
+            }
+        },
+        "searchByAgentNameOrLocation": {
+            "extractionState": "migrated",
+            "localizations": {
+                "ar": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "البحث باسم الوكيل أو الموقع"
+                    }
+                },
+                "en": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Search by Agent name or Location"
+                    }
+                },
+                "ru": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Поиск по имени агента или локации"
+                    }
+                },
+                "zh": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "按房产代理人或地点搜索"
+                    }
+                }
+            }
+        },
+        "sold": {
+            "extractionState": "migrated",
+            "localizations": {
+                "ar": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "تم بيعه"
+                    }
+                },
+                "en": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Sold"
+                    }
+                },
+                "ru": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Продано"
+                    }
+                },
+                "zh": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "已售出"
+                    }
+                }
+            }
+        },
+        "txt_text_rented": {
+            "extractionState": "migrated",
+            "localizations": {
+                "ar": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "تم تأجيره"
+                    }
+                },
+                "en": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Rented"
+                    }
+                },
+                "ru": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "Сдано"
+                    }
+                },
+                "zh": {
+                    "stringUnit": {
+                        "state": "translated",
+                        "value": "已出租"
                     }
                 }
             }

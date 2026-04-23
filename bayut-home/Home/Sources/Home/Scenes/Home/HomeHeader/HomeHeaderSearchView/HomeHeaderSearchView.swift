@@ -24,7 +24,7 @@ class HomeHeaderSearchView: UIView {
     // Separator
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
+        view.backgroundColor = .AppColors.grey1
         return view
     }()
     
@@ -74,17 +74,16 @@ class HomeHeaderSearchView: UIView {
     
     private let searchIcon: UIImageView = {
         let iv = UIImageView()
-        iv.image = UIImage(named: "Home-Search-Icon", in: .module, compatibleWith: nil)
+        iv.image = UIImage(named: "HomeSearchIcon", in: .module, compatibleWith: nil)?.localized()
         iv.contentMode = .scaleAspectFit
-        iv.tintColor = UIColor(red: 0, green: 173/255, blue: 101/255, alpha: 1.0)
         return iv
     }()
     
     private let searchLabel: UILabel = {
         let lbl = UILabel()
         lbl.text = "searchLocation".localized()
-        lbl.textColor = .lightGray
-        lbl.font = .systemFont(ofSize: 14)
+        lbl.textColor = .AppColors.grey4
+        lbl.font = .bodyL1
         return lbl
     }()
     
@@ -138,7 +137,7 @@ class HomeHeaderSearchView: UIView {
             
         ])
         
-        let searchTop = searchContainer.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 70)
+        let searchTop = searchContainer.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 60)
         self.searchTopConstraint = searchTop
         
         NSLayoutConstraint.activate([
@@ -213,7 +212,7 @@ class HomeHeaderSearchView: UIView {
     struct AnimationConfig {
         var initialContainerTop: CGFloat = 25
         var targetContainerTop: CGFloat = -40
-        var internalSearchTop: CGFloat = 70
+        var internalSearchTop: CGFloat = 60
     }
     
     var animationConfig = AnimationConfig()
@@ -245,7 +244,7 @@ class HomeHeaderSearchView: UIView {
             target = target + (animationConfig.internalSearchTop)
         }
         
-        containerTopConstraint?.constant = initial + (target - initial) * progress
+        containerTopConstraint?.constant = initial + (target - initial + 6) * progress
         searchTopConstraint?.constant = isPurposeHidden ? 0 : animationConfig.internalSearchTop
     }
     
@@ -270,6 +269,15 @@ class HomeHeaderSearchView: UIView {
         let show = !isPurposeHidden
         toggleStackView.alpha = show ? 1.0 : 0.0
         separatorView.alpha = show ? 1.0 : 0.0
+    }
+    
+    func configure(with viewModel: HomeHeaderSearchViewModel) {
+        buyButton.setTitle(viewModel.firstButtonTitle, for: .normal)
+        rentButton.setTitle(viewModel.secondButtonTitle, for: .normal)
+        searchLabel.text = viewModel.searchPlaceholder
+        isPurposeHidden = !viewModel.showButtonsView
+        searchTopConstraint?.constant = viewModel.showButtonsView ? animationConfig.internalSearchTop : 0
+        onHeightChanged?()
     }
     
     func finalizePurposeVisibility() {

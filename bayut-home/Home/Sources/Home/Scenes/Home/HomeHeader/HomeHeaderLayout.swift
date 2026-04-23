@@ -63,10 +63,10 @@ struct HomeHeaderLayout {
     var aiSearchExpandedTop: CGFloat  { tabsExpandedTop + ViewHeight.tabs + DesignOffset.aiSearchGap }
     var aiSearchCollapsedTop: CGFloat { statusBarHeight }
 
-    var gccSearchExpandedTop: CGFloat  { tabsExpandedTop + ViewHeight.tabs + DesignOffset.gccSearchGap - 25 /* Offset HomeHeaderSearchView intrinsic 25pt drop */ }
+    var gccSearchExpandedTop: CGFloat  { tabsExpandedTop + ViewHeight.tabs + DesignOffset.gccSearchGap - 25  }
     var gccSearchCollapsedTop: CGFloat { (stickyHeight - ViewHeight.gccSearch) / 2 }
 
-    static func make(in view: UIView, stickyHeight: CGFloat = 140) -> HomeHeaderLayout {
+    static func make(in view: UIView, stickyHeight: CGFloat = 155) -> HomeHeaderLayout {
         let safeTop = view.window?.safeAreaInsets.top
             ?? UIApplication.shared.connectedScenes
                 .compactMap({ $0 as? UIWindowScene })
