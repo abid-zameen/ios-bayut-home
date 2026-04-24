@@ -8,117 +8,295 @@
 import Foundation
 
 protocol HomeBusinessLogic: AnyObject {
-    func loadData() async
+    func onViewLoad()
     func requestLocationAuthorization()
     func didSelectNewProjectsLocation(id: String) async
     func updatePopularSearchPurpose(purpose: PopularSearchPurpose)
     func didSelectSavedSearch(at index: Int)
     func didSelectRecentSearch(at index: Int)
+    func didSelectPopularSearch(at index: Int)
 }
 
 final class HomeInteractor: HomeBusinessLogic {
     let adapter: HomeModuleAdapter
     var presenter: HomePresentationLogic?
     var worker: HomeWorkerLogic
+    let tracker: HomeTrackerType?
     
     var selectedNewProjectsLocationID: String = Emirates.dubai.rawValue
     
-    var newProjects: [ProjectHit] = []
-    var favouriteProperties: [Property] = []
-    var latestBlogs: [Blog] = []
-    var savedSearches: SavedSearchesData? = nil
-    var recentSearches: [HomeScreenRecentSearch] = []
+    private var projectsState: Home.DataState<[ProjectHit]> = .loading
+    var favouritesState: Home.DataState<[Property]> = .loading
+    var blogsState: Home.DataState<[Blog]> = .loading
+    var savedSearchesState: Home.DataState<SavedSearchesData> = .loading
+    var recentSearchesState: Home.DataState<[HomeScreenRecentSearch]> = .loading
+    var nearbyLocationsState: Home.DataState<[LocationHit]> = .loading
     
-    var nearbyLocations: [LocationHit] = []
     var isLocationAuthorized = false
+    
+    private var showTruBrokerBanner = true
+    private var showSellerLeadsBanner = false
     
     var popularSearchPurposes: [PopularSearchPurpose] = []
     var selectedPopularPurpose: PopularSearchPurpose = .buy
-    var popularSearchConfig = PopularSearchConfig(purposeConfigs: [])
+    private var popularSearchState: Home.DataState<PopularSearchConfig> = .loading
     
     // MARK: - Initialization
-    init(adapter: HomeModuleAdapter, worker: HomeWorkerLogic) {
+    init(adapter: HomeModuleAdapter, worker: HomeWorkerLogic, tracker: HomeTrackerType) {
         self.adapter = adapter
         self.worker = worker
+        self.tracker = tracker
         setupStoriesListener()
         isLocationAuthorized = adapter.environment.isLocationAuthorized
-        popularSearchConfig = adapter.utilities.popularSearchConfig
-        popularSearchPurposes = popularSearchConfig.purposeConfigs.map { $0.purpose }
-        selectedPopularPurpose = popularSearchPurposes.first ?? .rent
+        
+        if adapter.environment.shouldFetchPopularSectionViaElasticSearch {
+            popularSearchState = .loading
+        } else {
+            let initialConfig = adapter.utilities.popularSearchConfig
+            popularSearchState = .data(initialConfig)
+            popularSearchPurposes = initialConfig.purposeConfigs.map { $0.purpose }
+            selectedPopularPurpose = popularSearchPurposes.first ?? .rent
+        }
     }
     
     private func setupStoriesListener() {
         adapter.storiesProvider?.onVisibilityChange = { [weak self] _ in
-            Task { @MainActor in
-                self?.refreshCurrentData()
-            }
+            self?.presentData(animated: true)
         }
     }
     
-    private func refreshCurrentData() {
+    private func resetStates() {
+        projectsState = .loading
+        favouritesState = .loading
+        blogsState = .loading
+        savedSearchesState = .loading
+        recentSearchesState = .loading
+        nearbyLocationsState = .loading
+        if adapter.environment.shouldFetchPopularSectionViaElasticSearch {
+            popularSearchState = .loading
+        }
+    }
+    
+    func onViewLoad() {
+        self.presentData()
+        
         Task {
             await self.loadData()
         }
     }
     
-    
     // MARK: - HomeBusinessLogic
     func loadData() async {
-        do {
-            if let userID = adapter.environment.userID {
-                let favIds = try await worker.fetchFavoritesIDs(userID: userID)
-                let slicedFavIds = Array(favIds.prefix(5))
-                if !slicedFavIds.isEmpty {
-                    let properties = try await worker.fetchFavoritesProperties(ids: slicedFavIds)
-                    self.favouriteProperties = slicedFavIds.compactMap { id in
-                        properties.first(where: { $0.id == id })
-                    }
-                }
-                
-                let rawSearches = try await worker.fetchSavedSearches(userID: userID)
-                let slicedSearches = Array(rawSearches.prefix(5))
-                
-                let allSlugs = slicedSearches.compactMap { $0.params.locations }.flatMap { $0 }
-                let uniqueSlugs = Array(Set(allSlugs))
-                let resolvedLocations = try await worker.fetchLocations(slugs: uniqueSlugs)
-                
-                self.savedSearches = SavedSearchesData(searches: slicedSearches, resolvedLocations: resolvedLocations)
-            }
-            
-            self.latestBlogs = Array(try await worker.fetchLatestBlogs().prefix(5))
-            self.recentSearches = await worker.fetchRecentSearches()
-            
-            let cplIDs = adapter.utilities.supportedLocIDsCPL[selectedNewProjectsLocationID]
-            self.newProjects = await worker.fetchNewProjects(locationID: selectedNewProjectsLocationID, cplIDs: cplIDs)
-            
-            if isLocationAuthorized, let coords = adapter.environment.userCoordinates {
-                self.nearbyLocations = try await worker.fetchNearbyLocations(latitude: coords.lat, longitude: coords.lon)
-            }
-        } catch {
-            print("HomeInteractor: Error loading data: \(error)")
+        resetStates()
+        calculateBannerVisibility()
+        
+        DispatchQueue.main.async {
+            self.presentData()
         }
         
-        await MainActor.run {
-            presentData()
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { await self.fetchUserSpecificData() }
+            group.addTask { await self.fetchBlogs() }
+            group.addTask { await self.fetchRecentSearches() }
+            group.addTask { await self.fetchNewProjects() }
+            group.addTask { await self.fetchNearbyLocations() }
+            group.addTask { await self.fetchPopularSearchConfig() }
         }
     }
     
-    func presentData() {
+    private func fetchUserSpecificData() async {
+        guard let userID = adapter.environment.userID else {
+            favouritesState = .empty
+            savedSearchesState = .empty
+            await MainActor.run { presentData() }
+            return
+        }
+        
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                do {
+                    let favIds = try await self.worker.fetchFavoritesIDs(userID: userID)
+                    let slicedFavIds = Array(favIds.prefix(5))
+                    if !slicedFavIds.isEmpty {
+                        let properties = try await self.worker.fetchFavoritesProperties(ids: slicedFavIds)
+                        let resolved = slicedFavIds.compactMap { id in
+                            properties.first(where: { $0.id == id })
+                        }
+                        self.favouritesState = resolved.isEmpty ? .empty : .data(resolved)
+                    } else {
+                        self.favouritesState = .empty
+                    }
+                } catch {
+                    self.favouritesState = .empty
+                }
+                await MainActor.run { self.presentData() }
+            }
+            
+            group.addTask {
+                do {
+                    let rawSearches = try await self.worker.fetchSavedSearches(userID: userID)
+                    let slicedSearches = Array(rawSearches.prefix(5))
+                    
+                    if !slicedSearches.isEmpty {
+                        let allSlugs = slicedSearches.compactMap { $0.params.locations }.flatMap { $0 }
+                        let uniqueSlugs = Array(Set(allSlugs))
+                        let resolvedLocations = try await self.worker.fetchLocations(slugs: uniqueSlugs)
+                        self.savedSearchesState = .data(SavedSearchesData(searches: slicedSearches, resolvedLocations: resolvedLocations))
+                    } else {
+                        self.savedSearchesState = .empty
+                    }
+                } catch {
+                    self.savedSearchesState = .empty
+                }
+                await MainActor.run { self.presentData() }
+            }
+        }
+    }
+
+    private func fetchBlogs() async {
+        do {
+            let blogs = try await worker.fetchLatestBlogs()
+            let sliced = Array(blogs.prefix(5))
+            blogsState = sliced.isEmpty ? .empty : .data(sliced)
+        } catch {
+            blogsState = .empty
+        }
+        await MainActor.run { presentData() }
+    }
+    
+    private func fetchRecentSearches() async {
+        let recent = await worker.fetchRecentSearches()
+        recentSearchesState = recent.isEmpty ? .empty : .data(recent)
+        await MainActor.run { presentData() }
+    }
+    
+    private func fetchNewProjects() async {
+        let cplIDs = adapter.utilities.supportedLocIDsCPL[selectedNewProjectsLocationID]
+        let projects = await worker.fetchNewProjects(locationID: selectedNewProjectsLocationID, cplIDs: cplIDs)
+        projectsState = projects.isEmpty ? .empty : .data(projects)
+        await MainActor.run { presentData() }
+    }
+    
+    private func fetchNearbyLocations() async {
+        guard isLocationAuthorized, let coords = adapter.environment.userCoordinates else {
+            nearbyLocationsState = .empty
+            await MainActor.run { presentData() }
+            return
+        }
+        
+        do {
+            let locations = try await worker.fetchNearbyLocations(latitude: coords.lat, longitude: coords.lon)
+            nearbyLocationsState = locations.isEmpty ? .empty : .data(locations)
+        } catch {
+            nearbyLocationsState = .empty
+        }
+        await MainActor.run { presentData() }
+    }
+    
+    private func fetchPopularSearchConfig() async {
+        guard adapter.environment.shouldFetchPopularSectionViaElasticSearch else { return }
+        
+        var locationQuery = adapter.utilities.popularSectionLocationQuery ?? "location_id:total"
+        
+        do {
+                        
+            var metadata = try await worker.fetchPopularSectionMetadata(locationQuery: locationQuery)
+            
+            if (metadata.responses?.first?.aggregations?.group?.buckets?.isEmpty ?? true) &&
+                (metadata.responses?.count ?? 0 > 1 && metadata.responses?[1].aggregations?.group?.buckets?.isEmpty ?? true) {
+                if let parentQuery = adapter.utilities.popularSectionParentLocationQuery {
+                    locationQuery = parentQuery
+                    metadata = try await worker.fetchPopularSectionMetadata(locationQuery: locationQuery)
+                }
+            }
+            
+            // Fallback logic 2: Total
+            if (metadata.responses?.first?.aggregations?.group?.buckets?.isEmpty ?? true) &&
+                (metadata.responses?.count ?? 0 > 1 && metadata.responses?[1].aggregations?.group?.buckets?.isEmpty ?? true) &&
+                locationQuery != "location_id:total" {
+                locationQuery = "location_id:total"
+                metadata = try await worker.fetchPopularSectionMetadata(locationQuery: locationQuery)
+            }
+            
+            var saleCategories: [PopularSearchCategory] = []
+            var rentCategories: [PopularSearchCategory] = []
+            
+            if let responses = metadata.responses, responses.count > 1 {
+                if let saleBuckets = responses[0].aggregations?.group?.buckets {
+                    saleCategories = saleBuckets.compactMap { bucket in
+                        guard let idString = bucket.key, let id = Int(idString) else { return nil }
+                        return adapter.utilities.getPopularSearchCategory(for: id)
+                    }
+                }
+                
+                if let rentBuckets = responses[1].aggregations?.group?.buckets {
+                    rentCategories = rentBuckets.compactMap { bucket in
+                        guard let idString = bucket.key, let id = Int(idString) else { return nil }
+                        return adapter.utilities.getPopularSearchCategory(for: id)
+                    }
+                }
+                
+                var configs: [PopularSearchPurposeConfig] = []
+                if !saleCategories.isEmpty {
+                    configs.append(PopularSearchPurposeConfig(purpose: .buy, categories: saleCategories))
+                }
+                if !rentCategories.isEmpty {
+                    configs.append(PopularSearchPurposeConfig(purpose: .rent, categories: rentCategories))
+                }
+                
+                if !configs.isEmpty {
+                    let newConfig = PopularSearchConfig(purposeConfigs: configs)
+                    await MainActor.run {
+                        self.popularSearchState = .data(newConfig)
+                        self.popularSearchPurposes = newConfig.purposeConfigs.map { $0.purpose }
+                        if !self.popularSearchPurposes.contains(self.selectedPopularPurpose) {
+                            self.selectedPopularPurpose = self.popularSearchPurposes.first ?? .rent
+                        }
+                        self.presentData()
+                    }
+                }
+            }
+        } catch {
+            let initialConfig = adapter.utilities.popularSearchConfig
+            self.popularSearchState = .data(initialConfig)
+            self.popularSearchPurposes = initialConfig.purposeConfigs.map { $0.purpose }
+            if !self.popularSearchPurposes.contains(self.selectedPopularPurpose) {
+                self.selectedPopularPurpose = self.popularSearchPurposes.first ?? .rent
+            }
+            await MainActor.run { self.presentData() }
+        }
+    }
+    
+    private func calculateBannerVisibility() {
+        guard adapter.environment.isSellerLeadsEnabled else {
+            showTruBrokerBanner = true
+            showSellerLeadsBanner = false
+            return
+        }
+        
+        let randomValue = Int.random(in: 0...100)
+        showTruBrokerBanner = randomValue <= 40
+        showSellerLeadsBanner = !showTruBrokerBanner
+    }
+    
+    func presentData(animated: Bool = false) {
         let response = Home.Response(
-            projects: newProjects,
+            projects: projectsState,
             locations: [],
-            favourites: favouriteProperties,
-            savedSearches: savedSearches,
-            blogs: latestBlogs,
-            nearbyLocations: nearbyLocations,
+            selectedNewProjectsLocationID: selectedNewProjectsLocationID,
+            favourites: favouritesState,
+            savedSearches: savedSearchesState,
+            blogs: blogsState,
+            nearbyLocations: nearbyLocationsState,
             isLocationEnabled: isLocationAuthorized,
-            popularSearches: [],
-            popularSearchConfig: popularSearchConfig,
+            popularSearchState: popularSearchState,
             purposes: popularSearchPurposes,
             selectedPurpose: selectedPopularPurpose,
-            recentSearches: recentSearches
+            recentSearches: recentSearchesState,
+            showTruBrokerBanner: showTruBrokerBanner,
+            showSellerLeadsBanner: showSellerLeadsBanner
         )
-        presenter?.presentData(data: response)
+        presenter?.presentData(data: response, animated: animated)
     }
     
     func requestLocationAuthorization() {
@@ -134,16 +312,18 @@ final class HomeInteractor: HomeBusinessLogic {
         guard selectedNewProjectsLocationID != id else { return }
         selectedNewProjectsLocationID = id
         
+        projectsState = .loading
+        await MainActor.run { presentData() }
+        
         let cplIDs = adapter.utilities.supportedLocIDsCPL[id]
         let projects = await worker.fetchNewProjects(locationID: id, cplIDs: cplIDs)
+        projectsState = projects.isEmpty ? .empty : .data(projects)
         
-        await MainActor.run {
-            presenter?.presentNewProjects(projects: projects, selectedLocationID: id)
-        }
+        await MainActor.run { presentData() }
     }
     
     func didSelectSavedSearch(at index: Int) {
-        guard let savedSearches = savedSearches else { return }
+        guard case .data(let savedSearches) = savedSearchesState else { return }
         
         let search = savedSearches.searches[index]
         
@@ -155,8 +335,17 @@ final class HomeInteractor: HomeBusinessLogic {
     }
     
     func didSelectRecentSearch(at index: Int) {
-        guard index < recentSearches.count else { return }
+        guard case .data(let recentSearches) = recentSearchesState,
+              index < recentSearches.count else { return }
         let search = recentSearches[index]
         presenter?.presentRecentSearchRouting(search: search)
+    }
+    
+    func didSelectPopularSearch(at index: Int) {
+        guard case .data(let config) = popularSearchState else { return }
+        let purposeConfig = config.purposeConfigs.first { $0.purpose == selectedPopularPurpose }
+        guard let categories = purposeConfig?.categories, index < categories.count else { return }
+        let category = categories[index]
+        presenter?.presentPopularSearchRouting(category: category, purpose: selectedPopularPurpose)
     }
 }

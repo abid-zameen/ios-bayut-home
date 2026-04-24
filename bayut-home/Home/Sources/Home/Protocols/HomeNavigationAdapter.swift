@@ -20,4 +20,5 @@ public protocol HomeNavigationAdapter {
     func navigateToTruEstimate(from viewController: UIViewController?)
     func navigateToGPT(from viewController: UIViewController?)
     func navigateToSellerLeadsForm(with purpose: HomePurpose?, from viewController: UIViewController?)
+    func navigateToPopularSearch(category: PopularSearchCategory, purpose: PopularSearchPurpose, from viewController: UIViewController?)
 }

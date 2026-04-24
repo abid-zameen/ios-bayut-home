@@ -1,3 +1,10 @@
+//
+//  HighlightableCollectionViewCell.swift
+//  Home
+//
+//  Created by Hammad Shahid on 10/04/2026.
+//
+
 import UIKit
 
 protocol HomeRoutingLogic: AnyObject {
@@ -21,6 +28,7 @@ protocol HomeRoutingLogic: AnyObject {
     func routeToTruEstimate()
     func routeToGPT()
     func routeToSellerLeadsForm(purpose: HomePurpose?)
+    func routeToPopularSearch(category: PopularSearchCategory, purpose: PopularSearchPurpose)
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -126,5 +134,9 @@ final class HomeRouter: HomeRoutingLogic {
     
     func routeToSellerLeadsForm(purpose: HomePurpose?) {
         navigation.navigateToSellerLeadsForm(with: purpose, from: viewController)
+    }
+    
+    func routeToPopularSearch(category: PopularSearchCategory, purpose: PopularSearchPurpose) {
+        navigation.navigateToPopularSearch(category: category, purpose: purpose, from: viewController)
     }
 }

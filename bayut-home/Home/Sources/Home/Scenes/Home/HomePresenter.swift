@@ -8,10 +8,10 @@
 import Foundation
 
 protocol HomePresentationLogic: AnyObject {
-    func presentData(data: Home.Response?)
-    func presentNewProjects(projects: [ProjectHit], selectedLocationID: String)
+    func presentData(data: Home.Response?, animated: Bool)
     func presentSavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
     func presentRecentSearchRouting(search: HomeScreenRecentSearch)
+    func presentPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose)
 }
 
 final class HomePresenter: HomePresentationLogic {
@@ -25,23 +25,39 @@ final class HomePresenter: HomePresentationLogic {
     
     // MARK: - HomePresentationLogic
     @MainActor
-    func presentData(data: Home.Response?) {
+    func presentData(data: Home.Response?, animated: Bool) {
         guard let viewController = viewController as? HomeViewController else { return }
         self.lastResponse = data
         
-        let locations = mapLocationChips(selectedID: Emirates.dubai.rawValue)
-        let projects = data?.projects ?? []
-        let favourites = data?.favourites ?? []
-        let savedSearches = mapSavedSearches(data: data?.savedSearches)
-        let blogs = data?.blogs ?? []
-        let nearbyLocations = data?.nearbyLocations ?? []
-        let recentSearches = data?.recentSearches ?? []
+        let selectedLocID = data?.selectedNewProjectsLocationID ?? Emirates.dubai.rawValue
+        let locations = mapLocationChips(selectedID: selectedLocID)
+        
+        let projects = data?.projects ?? .loading
+        let favourites = data?.favourites ?? .loading
+        let savedSearches = mapSavedSearches(state: data?.savedSearches ?? .loading)
+        let blogs = data?.blogs ?? .loading
+        let nearbyLocations = data?.nearbyLocations ?? .loading
+        let recentSearches = data?.recentSearches ?? .loading
         
         // Map Popular Searches
-        let popularSearches = mapPopularSearches(
-            config: data?.popularSearchConfig,
-            selectedPurpose: data?.selectedPurpose ?? .rent
-        )
+        let popularSearchesState: Home.DataState<[PopularSearch]>
+        let popularSearchConfig: PopularSearchConfig?
+        
+        switch data?.popularSearchState ?? .loading {
+        case .loading:
+            popularSearchesState = .loading
+            popularSearchConfig = nil
+        case .data(let config):
+            let mappedDefault = mapPopularSearches(
+                config: config,
+                selectedPurpose: data?.selectedPurpose ?? .rent
+            )
+            popularSearchesState = .data(mappedDefault)
+            popularSearchConfig = config
+        case .empty:
+            popularSearchesState = .empty
+            popularSearchConfig = nil
+        }
         
         let purposes: [PopularSearchPurpose] = data?.purposes ?? [.buy, .rent]
         
@@ -54,45 +70,22 @@ final class HomePresenter: HomePresentationLogic {
             blogs: blogs,
             nearbyLocations: nearbyLocations,
             isLocationEnabled: data?.isLocationEnabled ?? false,
-            popularSearches: popularSearches,
-            popularSearchConfig: data?.popularSearchConfig,
+            popularSearches: popularSearchesState,
+            popularSearchConfig: popularSearchConfig,
+            selectedLocation: adapter.utilities.lastSearchedLocations ?? adapter.utilities.defaultCityName,
             purposes: purposes,
             selectedPurpose: data?.selectedPurpose ?? .rent,
             recentSearches: recentSearches,
+            showTruBrokerBanner: data?.showTruBrokerBanner ?? true,
+            showSellerLeadsBanner: data?.showSellerLeadsBanner ?? false,
+            marketingBannerConfig: adapter.environment.marketingBannerConfig,
             viewController: viewController)
         )
         
-        let viewModel = Home.HomeViewModel(sections: sections, animated: false)
+        let viewModel = Home.HomeViewModel(sections: sections, animated: animated)
         viewController.displaySections(viewModel: viewModel)
     }
     
-    @MainActor
-    func presentNewProjects(projects: [ProjectHit], selectedLocationID: String) {
-        guard let viewController = viewController as? HomeViewController,
-              let lastResponse = self.lastResponse else { return }
-        
-        let locations = mapLocationChips(selectedID: selectedLocationID)
-        
-        let sectionsBuilder = HomeSectionBuilder()
-        let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
-            projects: projects,
-            locations: locations,
-            favourites: lastResponse.favourites,
-            savedSearches: mapSavedSearches(data: lastResponse.savedSearches),
-            blogs: lastResponse.blogs,
-            nearbyLocations: lastResponse.nearbyLocations,
-            isLocationEnabled: lastResponse.isLocationEnabled,
-            popularSearches: mapPopularSearches(config: lastResponse.popularSearchConfig, selectedPurpose: lastResponse.selectedPurpose),
-            popularSearchConfig: lastResponse.popularSearchConfig,
-            purposes: lastResponse.purposes,
-            selectedPurpose: lastResponse.selectedPurpose,
-            recentSearches: lastResponse.recentSearches,
-            viewController: viewController)
-        )
-        
-        let viewModel = Home.HomeViewModel(sections: sections, animated: true)
-        viewController.displaySections(viewModel: viewModel)
-    }
     
     @MainActor
     func presentSavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit]) {
@@ -104,6 +97,11 @@ final class HomePresenter: HomePresentationLogic {
         viewController?.displayRecentSearchRouting(search: search)
     }
     
+    @MainActor
+    func presentPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose) {
+        viewController?.displayPopularSearchRouting(category: category, purpose: purpose)
+    }
+    
     // MARK: - Helpers
     private func mapPopularSearches(config: PopularSearchConfig?, selectedPurpose: PopularSearchPurpose) -> [PopularSearch] {
         guard let config = config else { return [] }
@@ -112,14 +110,11 @@ final class HomePresenter: HomePresentationLogic {
         let categories = purposeConfig?.categories ?? []
         let locations = adapter.utilities.lastSearchedLocations ?? adapter.utilities.defaultCityName
         
-        return categories.map { slug in
-            let info = adapter.utilities.getPropertyTypeInfo(category: slug)
-            let title = info?.titlePlural ?? slug.capitalized
-            
+        return categories.map { category in
             return PopularSearch(
-                title: title,
+                title: category.title,
                 location: "in \(locations)",
-                iconName: advanceImagesMap[slug] ?? "adv-res-apartments"
+                iconName: category.iconName
             )
         }
     }
@@ -135,62 +130,46 @@ final class HomePresenter: HomePresentationLogic {
         }
     }
     
-    private func mapSavedSearches(data: SavedSearchesData?) -> [SavedSearchesModel] {
-        guard let data = data else { return [] }
-        return data.searches.map { search in
-            let info = search.params
-            let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category ?? "")
-            
-            let displayTitle = propertyTypeInfo?.titlePlural ?? search.name
-            
-            var locationString = ""
-            if let slugs = info.locations, !slugs.isEmpty {
-                let matchedLocations = data.resolvedLocations.filter { location in
-                    guard let slug = location.slug else { return false }
-                    return slugs.contains(slug)
-                }
+    private func mapSavedSearches(state: Home.DataState<SavedSearchesData>) -> Home.DataState<[SavedSearchesModel]> {
+        switch state {
+        case .loading: return .loading
+        case .empty: return .empty
+        case .data(let data):
+            let mapped = data.searches.map { search in
+                let info = search.params
+                let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category ?? "")
                 
-                if !matchedLocations.isEmpty {
-                    locationString = matchedLocations.compactMap { $0.name }.joined(separator: ", ")
+                let displayTitle = propertyTypeInfo?.titlePlural ?? search.name
+                
+                var locationString = ""
+                if let slugs = info.locations, !slugs.isEmpty {
+                    let matchedLocations = data.resolvedLocations.filter { location in
+                        guard let slug = location.slug else { return false }
+                        return slugs.contains(slug)
+                    }
+                    
+                    if !matchedLocations.isEmpty {
+                        locationString = matchedLocations.map { $0.localizedName }.joined(separator: ", ")
+                    } else {
+                        locationString = adapter.utilities.defaultCityName
+                    }
                 } else {
                     locationString = adapter.utilities.defaultCityName
                 }
-            } else {
-                locationString = adapter.utilities.defaultCityName
+                
+                let isParent = propertyTypeInfo?.isParent ?? true
+                let showIcon = !isParent
+                let imageName = showIcon ? adapter.utilities.getIconName(for: info.category ?? "") : nil
+                
+                return SavedSearchesModel(
+                    name: search.name,
+                    displayTitle: displayTitle,
+                    location: locationString,
+                    showIcon: showIcon,
+                    imageName: imageName
+                )
             }
-            
-            let isParent = propertyTypeInfo?.isParent ?? true
-            let showIcon = !isParent
-            let imageName = showIcon ? advanceImagesMap[info.category ?? ""] : nil
-            
-            return SavedSearchesModel(
-                name: search.name,
-                displayTitle: displayTitle,
-                location: locationString,
-                showIcon: showIcon,
-                imageName: imageName
-            )
+            return mapped.isEmpty ? .empty : .data(mapped)
         }
-    }
-    
-    private var advanceImagesMap: [String: String] {
-        return [
-            "hotel-apartments" : "adv-res-hotel-apartments",
-            "apartments" : "adv-res-apartments",
-            "residential-buildings" : "adv-res-buildings",
-            "villas" : "sel-res-villas",
-            "residential-lands" : "adv-res-land",
-            "chalets" : "sel-res-chalets",
-            "rooms" : "sel-res-rooms",
-            "offices" : "adv-com-offices",
-            "warehouses" : "adv-com-warehouses",
-            "shops" : "adv-com-shops",
-            "commercial-properties" : "adv-com-properties",
-            "agriculture-plots" : "sel-com-agriculture-plots",
-            "duplexes" : "sel-res-duplexes",
-            "townhouses" : "sel-res-townhouses",
-            "residential-land" : "adv-res-land",
-            "residential-plots" : "adv-res-land"
-        ]
     }
 }

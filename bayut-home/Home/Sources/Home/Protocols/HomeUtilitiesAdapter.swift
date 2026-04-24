@@ -8,4 +8,8 @@ public protocol HomeUtilitiesAdapter {
     var popularSearchConfig: PopularSearchConfig { get }
     var lastSearchedLocations: String? { get }
     var supportedLocIDsCPL: [String: [String]] { get }
+    var popularSectionLocationQuery: String? { get }
+    var popularSectionParentLocationQuery: String? { get }
+    func getPopularSearchCategory(for id: Int) -> PopularSearchCategory?
+    func getIconName(for category: String) -> String
 }

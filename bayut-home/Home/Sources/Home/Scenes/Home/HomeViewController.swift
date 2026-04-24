@@ -1,13 +1,21 @@
+//
+//  HighlightableCollectionViewCell.swift
+//  Home
+//
+//  Created by Hammad Shahid on 10/04/2026.
+//
+
 import UIKit
 
 protocol HomeDisplayLogic: AnyObject {
     func displaySections(viewModel: Home.HomeViewModel)
     func displaySavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
     func displayRecentSearchRouting(search: HomeScreenRecentSearch)
+    func displayPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose)
 }
 
 final class HomeViewController: UIViewController, HomeDisplayLogic {
-    var interactor: HomeBusinessLogic?
+    var interactor: (HomeBusinessLogic & HomeTrackingLogic)?
     var router: HomeRoutingLogic?
     
     // MARK: - UI Components
@@ -48,7 +56,7 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
         configureDataSource()
         CellRegistry.registerCells(in: collectionView)
         setupHeaderCallbacks()
-        self.loadData()
+        interactor?.onViewLoad()
     }
     
     private func setupHeaderCallbacks() {
@@ -72,15 +80,10 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
         }
     }
     
-    func loadData() {
-        Task {
-            await interactor?.loadData()
-        }
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        interactor?.trackPageView()
     }
     
     override func viewDidLayoutSubviews() {
@@ -155,8 +158,9 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     
     // MARK: - Display Logic
     func displaySections(viewModel: Home.HomeViewModel) {
-        applySnapshot(sections: viewModel.sections, animated: viewModel.animated)
-        setupAutoscrolling(for: viewModel.sections)
+        applySnapshot(sections: viewModel.sections, animated: viewModel.animated) { [weak self] in
+            self?.setupAutoscrolling(for: viewModel.sections)
+        }
     }
     
     func displaySavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit]) {
@@ -165,6 +169,10 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     
     func displayRecentSearchRouting(search: HomeScreenRecentSearch) {
         router?.routeToRecentSearch(recentSearch: search)
+    }
+    
+    func displayPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose) {
+        router?.routeToPopularSearch(category: category, purpose: purpose)
     }
 
     private func setupAutoscrolling(for sections: [AnySection]) {
@@ -288,6 +296,45 @@ extension HomeViewController: UICollectionViewDelegate {
         guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
         section.didSelectItem(at: indexPath, with: item)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let snapshot = dataSource.snapshot()
+        guard indexPath.section < snapshot.sectionIdentifiers.count else { return }
+        let section = snapshot.sectionIdentifiers[indexPath.section]
+        
+        // Track section impression only once per load or based on logic
+        // For simplicity, we can track based on identifier
+        trackSectionImpression(for: section)
+    }
+    
+    private func trackSectionImpression(for section: AnySection) {
+        let identifier = section.identifierString
+        var trackingName = ""
+        
+        if identifier.contains("blogs") {
+            trackingName = "blogs"
+        } else if identifier.contains("projects") {
+            trackingName = "new_projects"
+        } else if identifier.contains("favourites") {
+            trackingName = "favourites"
+        } else if identifier.contains("saved") {
+            trackingName = "saved_searches"
+        } else if identifier.contains("recent") {
+            trackingName = "recent_searches"
+        } else if identifier.contains("nearby") {
+            trackingName = "nearby_locations"
+        } else if identifier.contains("popular") {
+            trackingName = "popular_searches"
+        } else if identifier.contains("trubroker") {
+            trackingName = "trubroker_banner"
+        } else if identifier.contains("sellerleads") {
+            trackingName = "seller_leads_banner"
+        }
+        
+        if !trackingName.isEmpty {
+            interactor?.trackSectionImpression(pageSection: trackingName)
+        }
+    }
 }
 
 // MARK: - Section Handlers
@@ -327,16 +374,19 @@ extension HomeViewController: RailingActionsDelegate {
 
 extension HomeViewController: FavouritesActionsDelegate {
     func favouritesDidTapCard(at index: Int, with externalId: String) {
+        interactor?.trackFavouriteClick(at: index)
         router?.routeToPropertyDetail(with: externalId)
     }
     
     func favouritesDidTapViewAll() {
+        // Track view all if needed, using custom tracker event if added later
         router?.routeToAllFavorites()
     }
 }
 
 extension HomeViewController: SavedSearchesActionsDelegate {
     func savedSearchesDidTapCard(at index: Int) {
+        interactor?.trackSavedSearchClick(at: index)
         interactor?.didSelectSavedSearch(at: index)
     }
     
@@ -347,23 +397,27 @@ extension HomeViewController: SavedSearchesActionsDelegate {
 
 extension HomeViewController: RecentSearchesActionsDelegate {
     func recentSearchesDidTapCard(at index: Int) {
+        interactor?.trackRecentSearchClick(at: index)
         interactor?.didSelectRecentSearch(at: index)
     }
 }
 
 extension HomeViewController: BlogsActionsDelegate {
-    func blogsDidTapCard(with url: String?, title: String?) {
+    func blogsDidTapCard(at index: Int, with url: String?, title: String?) {
+        interactor?.trackBlogClick(at: index)
         guard let url = url else { return }
         router?.routeToBlogs(url: url, title: title)
     }
     
     func blogsDidTapViewAll() {
+        interactor?.trackBlogViewAll()
         router?.routeToAllBlogs()
     }
 }
 
 extension HomeViewController: NearbyLocationsActionsDelegate {
-    func nearbyLocationsDidTapCard(with location: LocationHit) {
+    func nearbyLocationsDidTapCard(at index: Int, with location: LocationHit) {
+        interactor?.trackNearbyLocationClick(at: index)
         router?.routeToNearbySearch(location: location)
     }
     func nearbyLocationsDidTapAllowLocation() {
@@ -372,12 +426,14 @@ extension HomeViewController: NearbyLocationsActionsDelegate {
 }
 
 extension HomeViewController: PopularSearchActionsDelegate {
-    func popularSearchDidSelectPurpose(_ purpose: PopularSearchPurpose) {
+    func popularSearchDidSelectPurpose(at index: Int, purpose: PopularSearchPurpose) {
+        interactor?.trackPopularSearchClick(at: index)
         interactor?.updatePopularSearchPurpose(purpose: purpose)
     }
     
     func popularSearchDidSelectSearchItem(at index: Int) {
-        
+        interactor?.trackPopularSearchClick(at: index)
+        interactor?.didSelectPopularSearch(at: index)
     }
 }
 
@@ -424,7 +480,7 @@ private extension HomeViewController {
         }
     }
     
-    func applySnapshot(sections: [AnySection], animated: Bool) {
+    func applySnapshot(sections: [AnySection], animated: Bool, completion: (() -> Void)? = nil) {
         var newSnapshot = NSDiffableDataSourceSnapshot<AnySection, AnyHashable>()
         newSnapshot.appendSections(sections)
         for section in sections {
@@ -433,7 +489,7 @@ private extension HomeViewController {
                 newSnapshot.appendItems(items, toSection: section)
             }
         }
-        dataSource.apply(newSnapshot, animatingDifferences: animated)
+        dataSource.apply(newSnapshot, animatingDifferences: animated, completion: completion)
     }
 }
 

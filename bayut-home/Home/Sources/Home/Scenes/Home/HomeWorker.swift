@@ -7,6 +7,7 @@
 
 import NetworkLayer
 import SearchService
+import UIKit
 
 protocol HomeWorkerLogic: AnyObject {
     func fetchNewProjects(locationID: String, cplIDs: [String]?) async -> [ProjectHit]
@@ -17,6 +18,7 @@ protocol HomeWorkerLogic: AnyObject {
     func fetchLocations(slugs: [String]) async throws -> [LocationHit]
     func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [LocationHit]
     func fetchRecentSearches() async -> [HomeScreenRecentSearch]
+    func fetchPopularSectionMetadata(locationQuery: String) async throws -> PopularSectionResponse
 }
 
 final class HomeWorker: HomeWorkerLogic {
@@ -159,5 +161,37 @@ final class HomeWorker: HomeWorkerLogic {
     
     func fetchRecentSearches() async -> [HomeScreenRecentSearch] {
         return await HomeModule.shared.environment.recentSearchesProvider.fetchRecentSearches(limit: 5)
+    }
+    
+    func fetchPopularSectionMetadata(locationQuery: String) async throws -> PopularSectionResponse {
+        let requestBody = """
+{}
+{"size": 0,"query": {"query_string": { "query": "purpose_id:1 AND \(locationQuery) AND property_type_category_id:(1 OR 2) AND num_bedrooms:total AND num_bathrooms:total AND furnishing_status_id:total AND advanced_filter_id:total AND rent_is_paid_frequency_id:total AND property_completion_status_id:total" }},"aggs": {"group": {"terms": { "field": "property_type_id", "size": 30},"aggs": {"sum": { "sum": { "field": "count_live_listings_last_1_day"}},"sort_by_count": {"bucket_sort": { "sort": [ { "sum": { "order": "desc" }}], "size": 4}}}}}, "_source": false, "track_total_hits": false}
+{}
+{"size": 0,"query": {"query_string": { "query": "purpose_id:2 AND \(locationQuery) AND property_type_category_id:(1 OR 2) AND num_bedrooms:total AND num_bathrooms:total AND furnishing_status_id:total AND advanced_filter_id:total AND rent_is_paid_frequency_id:total AND property_completion_status_id:total" }},"aggs": {"group": {"terms": { "field": "property_type_id", "size": 30},"aggs": {"sum": { "sum": { "field": "count_live_listings_last_1_day"}},"sort_by_count": {"bucket_sort": { "sort": [ { "sum": { "order": "desc" }}], "size": 4}}}}}, "_source": false, "track_total_hits": false}
+{}
+{"size": 0,"query": {"query_string": { "query": "purpose_id:1 AND \(locationQuery) AND property_type_category_id:(1 OR 2) AND num_bedrooms:total AND num_bathrooms:total AND furnishing_status_id:total AND advanced_filter_id:total AND rent_is_paid_frequency_id:total AND property_completion_status_id:off_plan" }},"aggs": {"group": {"terms": { "field": "property_type_id", "size": 30},"aggs": {"sum": { "sum": { "field": "count_live_listings_last_1_day"}},"sort_by_count": {"bucket_sort": { "sort": [ { "sum": { "order": "desc" }}], "size": 4}}}}}, "_source": false, "track_total_hits": false}
+
+"""
+        //let url = HomeModule.shared.environment.dldPopularSectionMetadataURL.absoluteString
+        let url = "https://fenix-data-es2.stage.bayut.sector.run/property_filters_metadata_prod_alias/_msearch"
+        
+        let request = APIRequestBuilder.create(
+            path: "",
+            type: .post,
+            encoding: .raw,
+            headers: [
+                "Content-Type": "application/x-ndjson",
+                "Accept": "application/json",
+                "Authorization": "Basic YmF5dXRfcmVhZF9hcHBfZXMyOjEjLjVjLTFcditKWlFFeiw="
+            ],
+            cache: .none,
+            shouldHandleCookies: true,
+            fullURL: url,
+            requestBody: requestBody
+        )
+        
+        return try await networking.networkingService.execute(request: request)
+        
     }
 }
