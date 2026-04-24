@@ -34,9 +34,13 @@ struct Home {
         let isLocationEnabled: Bool
         let popularSearches: DataState<[PopularSearch]>
         let popularSearchConfig: PopularSearchConfig?
+        let selectedLocation: String
         let purposes: [PopularSearchPurpose]
         let selectedPurpose: PopularSearchPurpose
         let recentSearches: DataState<[HomeScreenRecentSearch]>
+        let showTruBrokerBanner: Bool
+        let showSellerLeadsBanner: Bool
+        let marketingBannerConfig: MarketingBannerConfig?
         let viewController: HomeViewController
     }
     
@@ -49,11 +53,13 @@ struct Home {
         var blogs: DataState<[Blog]> = .loading
         var nearbyLocations: DataState<[LocationHit]> = .loading
         var isLocationEnabled: Bool = false
-        var popularSearches: [PopularSearch] = []
-        var popularSearchConfig: PopularSearchConfig? = nil
+        var popularSearchState: DataState<PopularSearchConfig> = .loading
         var purposes: [PopularSearchPurpose] = []
         var selectedPurpose: PopularSearchPurpose = .rent
         var recentSearches: DataState<[HomeScreenRecentSearch]> = .loading
+        var showTruBrokerBanner: Bool = true
+        var showSellerLeadsBanner: Bool = false
+        var marketingBannerConfig: MarketingBannerConfig? = nil
     }
 }
 
@@ -160,6 +166,9 @@ enum Purpose: String, Codable {
 public struct LocationHit: Codable {
     public let id: Int?
     public let name: String?
+    public let name_l1: String?
+    public let name_l2: String?
+    public let name_l3: String?
     public let slug: String?
     public let level: Int?
     public let cityName: String?
@@ -167,6 +176,16 @@ public struct LocationHit: Codable {
     public let adCount: Int?
     public let externalID: String?
     public let hierarchy: [LocationHierarchy]?
+
+    public var localizedName: String {
+        let lang = HomeModule.shared.environment.appLanguage
+        switch lang {
+        case "ar": return name_l1 ?? name ?? ""
+        case "zh": return name_l2 ?? name ?? ""
+        case "ru": return name_l3 ?? name ?? ""
+        default: return name ?? ""
+        }
+    }
 }
 
 public struct LocationHierarchy: Codable {
@@ -181,6 +200,16 @@ public struct LocationHierarchy: Codable {
     public let slug_l1: String?
     public let slug_l2: String?
     public let slug_l3: String?
+    
+    public var localizedName: String {
+        let lang = HomeModule.shared.environment.appLanguage
+        switch lang {
+        case "ar": return name_l1 ?? name ?? ""
+        case "zh": return name_l2 ?? name ?? ""
+        case "ru": return name_l3 ?? name ?? ""
+        default: return name ?? ""
+        }
+    }
 }
 
 public struct Geography: Codable {
@@ -200,7 +229,7 @@ struct SavedSearchInfo: Codable {
     let categories: [String]?
     let locations: [String]?
     let purpose: String?
-    let baths: [String]?
+    let baths: [Int]?
     let beds: [Int]?
     let price: SavedSearchRange?
     let area: SavedSearchRange?

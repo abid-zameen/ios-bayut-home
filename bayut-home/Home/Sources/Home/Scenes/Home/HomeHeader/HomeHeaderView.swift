@@ -114,9 +114,9 @@ class HomeHeaderView: UIView {
         backgroundColor = .clear
         clipsToBounds = false
         
-        addSubview(backgroundImageView)
         addSubview(topCurveImageView)
         addSubview(bottomCurveSolidImageView)
+        addSubview(backgroundImageView)
         addSubview(bottomCurveGradientImageView)
         addSubview(logoImageView)
         addSubview(contentStackView)
@@ -163,7 +163,7 @@ class HomeHeaderView: UIView {
             bottomCurveSolidImageView.trailingAnchor.constraint(equalTo: bottomCurveGradientImageView.trailingAnchor),
             bottomCurveSolidImageView.bottomAnchor.constraint(equalTo: bottomCurveGradientImageView.bottomAnchor),
             
-            logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            logoImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             logoImageView.widthAnchor.constraint(equalToConstant: 154),
             logoHeightConstraint,
             logoTopConstraint,

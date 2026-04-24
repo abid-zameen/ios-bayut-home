@@ -53,7 +53,7 @@ struct Property: Hashable {
         let locationNames = hit.location?
             .filter { ($0.level ?? 0) > 0 }
             .sorted(by: { ($0.level ?? 0) > ($1.level ?? 0) })
-            .compactMap { $0.name } ?? []
+            .compactMap { $0.localizedName } ?? []
         
         self.location = locationNames.joined(separator: ", ")
         

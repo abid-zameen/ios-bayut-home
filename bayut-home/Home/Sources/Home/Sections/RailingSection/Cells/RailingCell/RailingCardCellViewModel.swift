@@ -57,12 +57,12 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.ctaText = "start_search".localized()
             
         case .commuteSearch:
-            self.headingText = "Search 2.0"
-            self.descriptionText = "Find a homes by commute time"
+            self.headingText = "commuteSearchBannerTitle".localized()
+            self.descriptionText = "commuteSearchBannerDescription".localized()
             self.backgroundImage = nil
             self.itemImage = "commuteBannerImage"
             self.backgroundViewColor = .AppColors.turquoise1
-            self.ctaText = "Search Now"
+            self.ctaText = "start_search".localized()
             
         case .bayutGPT:
             self.headingText = "BayutGPT"

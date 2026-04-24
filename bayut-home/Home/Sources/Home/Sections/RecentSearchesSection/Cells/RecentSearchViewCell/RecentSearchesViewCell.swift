@@ -96,7 +96,7 @@ private extension RecentSearchesViewCell {
         
         var chipTexts: [String] = []
         if filters.isEmpty {
-            chipTexts.append("All Filters".localized())
+            chipTexts.append("allFilters".localized())
         } else {
             if let first = presentation.first { chipTexts.append(first) }
             if let second = presentation.second { chipTexts.append(second) }

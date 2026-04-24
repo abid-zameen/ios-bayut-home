@@ -23,8 +23,8 @@ final class NearbyLocationCellViewModel: NearbyLocationCellViewModelType {
     
     init(location: LocationHit) {
         self.location = location
-        self.locationName = location.name ?? ""
-        self.locationCity = location.hierarchy?.first(where: { $0.level == 1 })?.name ?? ""
+        self.locationName = location.localizedName
+        self.locationCity = location.hierarchy?.first(where: { $0.level == 1 })?.localizedName ?? ""
         self.locationDistance = Self.distanceString(for: location)
     }
     

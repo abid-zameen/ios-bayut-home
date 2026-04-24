@@ -39,13 +39,13 @@ final class WhatsappButton: UIButton {
     }
     
     private func updateInsets() {
-//        if "language"  != "arabic" {
+        if HomeModule.shared.environment.appLanguage  != "ar" {
             imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
             titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
-        //} else {
-//           imageEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
-//           titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 4)
-//        }
+        } else {
+           imageEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
+           titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 4)
+        }
     }
     
     func hideTitle(_ isHidden: Bool) {

@@ -88,7 +88,7 @@ final class HomeSectionBuilder {
         
         let popularSearchActions = PopularSearchActions(delegate: sectionsData.viewController)
         let popularSearchGroup = PopularSearchGroup(
-            title: "popularIn".localized(),
+            title: String(format: "popularIn".localized(), sectionsData.selectedLocation),
             purposes: sectionsData.purposes,
             selectedPurpose: sectionsData.selectedPurpose,
             searches: sectionsData.popularSearches,
@@ -114,6 +114,15 @@ final class HomeSectionBuilder {
             actions: blogsActions
         )
         sections.append(contentsOf: blogsGroup.buildSections())
+        
+        // MARK: - Marketing Banner Dynamic Injection
+        if let config = sectionsData.marketingBannerConfig, config.isEnabled {
+            let bannerSection = MarketingBannerSection(imageUrl: config.bannerImageUrl)
+            let anySection = AnySection(bannerSection, isCustomizable: false)
+            
+            let insertionIndex = min(max(0, config.index), sections.count)
+            sections.insert(anySection, at: insertionIndex)
+        }
         
         return sections
     }
