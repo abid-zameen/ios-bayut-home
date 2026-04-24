@@ -15,6 +15,10 @@ public protocol HomeEnvironmentAdapter {
     var shouldShowDOTWChip: Bool { get }
     var isProjectWhatsAppEnabledHome: Bool { get }
     var storiesViewHeight: CGFloat { get }
+    var shouldFetchPopularSectionViaElasticSearch: Bool { get }
+    var isSellerLeadsEnabled: Bool { get }
+    var dldPopularSectionMetadataURL: URL { get }
+    var appLanguage: String { get }
     
     // MARK: - Location
     var userCoordinates: (lat: Double, lon: Double)? { get }
@@ -23,4 +27,7 @@ public protocol HomeEnvironmentAdapter {
     
     // MARK: - Recent Searches
     var recentSearchesProvider: RecentSearchesProvider { get }
+    
+    // MARK: - Marketing Banner
+    var marketingBannerConfig: MarketingBannerConfig? { get }
 }

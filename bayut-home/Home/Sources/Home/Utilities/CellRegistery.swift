@@ -63,6 +63,8 @@ final class CellRegistry {
         // Stories Hosting Cell
         collectionView.register(StoriesHostingCell.self, forCellWithReuseIdentifier: StoriesHostingCell.reuseId)
         
+        collectionView.register(MarketingBannerCell.self, forCellWithReuseIdentifier: MarketingBannerCell.reuseId)
+        
         // Shimmers
         collectionView.register(UINib(nibName: "ProjectsShimmerCell", bundle: .module), forCellWithReuseIdentifier: "ProjectsShimmerCell")
         collectionView.register(UINib(nibName: "RecentSearchShimmerCell", bundle: .module), forCellWithReuseIdentifier: "RecentSearchShimmerCell")
