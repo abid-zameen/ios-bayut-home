@@ -9,8 +9,7 @@ import UIKit
 
 extension UIImage {
     func localized() -> UIImage {
-        let isArabic = Locale.current.languageCode == "ar" || Locale.current.identifier.hasPrefix("ar")
-        if isArabic {
+        if Utils.isCurrentLanguageArabic {
             return self.imageFlippedForRightToLeftLayoutDirection()
         }
         return self

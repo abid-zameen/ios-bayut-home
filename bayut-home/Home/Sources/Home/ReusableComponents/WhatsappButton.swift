@@ -39,7 +39,7 @@ final class WhatsappButton: UIButton {
     }
     
     private func updateInsets() {
-        if HomeModule.shared.environment.appLanguage  != "ar" {
+        if !Utils.isCurrentLanguageArabic {
             imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
             titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
         } else {
@@ -66,7 +66,7 @@ final class WhatsappButton: UIButton {
 
 private enum Constants {
     static let whatsappImage = "whatsapp"
-    static let whatsapp = "WhatsApp"
+    static let whatsapp = "WhatsApp".localized()
 }
 
 
