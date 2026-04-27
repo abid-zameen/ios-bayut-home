@@ -12,6 +12,8 @@ protocol HomeDisplayLogic: AnyObject {
     func displaySavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
     func displayRecentSearchRouting(search: HomeScreenRecentSearch)
     func displayPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose)
+    func displayOnboarding()
+    func displayOnboardingV2()
 }
 
 final class HomeViewController: UIViewController, HomeDisplayLogic {
@@ -84,6 +86,7 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         interactor?.trackPageView()
+        interactor?.onViewAppear()
     }
     
     override func viewDidLayoutSubviews() {
@@ -99,10 +102,21 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     }
     
     private func setupConstraints() {
+        let leadingTarget: NSLayoutXAxisAnchor
+        let trailingTarget: NSLayoutXAxisAnchor
+        
+        if DeviceType.isIpad {
+            leadingTarget = view.readableContentGuide.leadingAnchor
+            trailingTarget = view.readableContentGuide.trailingAnchor
+        } else {
+            leadingTarget = view.leadingAnchor
+            trailingTarget = view.trailingAnchor
+        }
+        
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingTarget),
+            collectionView.trailingAnchor.constraint(equalTo: trailingTarget),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
         
@@ -173,6 +187,14 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     
     func displayPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose) {
         router?.routeToPopularSearch(category: category, purpose: purpose)
+    }
+    
+    func displayOnboarding() {
+        router?.navigateToOnboarding(from: self)
+    }
+    
+    func displayOnboardingV2() {
+        router?.navigateToOnboardingV2(from: self)
     }
 
     private func setupAutoscrolling(for sections: [AnySection]) {
@@ -376,6 +398,26 @@ extension HomeViewController: FavouritesActionsDelegate {
     func favouritesDidTapCard(at index: Int, with externalId: String) {
         interactor?.trackFavouriteClick(at: index)
         router?.routeToPropertyDetail(with: externalId)
+    }
+    
+    func favouritesDidToggleFavorite(at index: Int, with externalId: String) {
+        let alert = UIAlertController(
+            title: nil,
+            message: "removeFavoriteQuestion".localized(),
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "yes".localized(), style: .destructive, handler: { [weak self] _ in
+            self?.interactor?.didToggleFavorite(externalId: externalId)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "no".localized(), style: .cancel, handler: nil))
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    func favouritesDidTapAction(_ action: FavouriteCellAction, property: Property) {
+        router?.routeToFavoriteAction(action: action, property: property)
     }
     
     func favouritesDidTapViewAll() {

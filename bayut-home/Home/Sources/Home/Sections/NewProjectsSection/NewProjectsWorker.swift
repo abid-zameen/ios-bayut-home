@@ -16,10 +16,12 @@ protocol NewProjectsWorkerLogic {
 final class NewProjectsWorker: NewProjectsWorkerLogic {
     private let searchService: SearchService
     private let networkingService: Networking
+    private let projectsIndexName: String
     
-    init(searchService: SearchService, networkingService: Networking) {
+    init(searchService: SearchService, networkingService: Networking, projectsIndexName: String) {
         self.searchService = searchService
         self.networkingService = networkingService
+        self.projectsIndexName = projectsIndexName
     }
     
     func fetchProjects(locationID: String, cplIDs: [String]? = nil) async -> [ProjectHit] {
@@ -94,8 +96,7 @@ final class NewProjectsWorker: NewProjectsWorkerLogic {
         )
         
         do {
-            let indexName = "bayut-development-ads-project-property-ad-count-desc-en"
-            let result: SearchResult<ProjectHit> = try await searchService.search(query: request, in: indexName)
+            let result: SearchResult<ProjectHit> = try await searchService.search(query: request, in: self.projectsIndexName)
             return result.hits ?? []
         } catch {
             print("NewProjectsWorker: Search failed with error: \(error)")

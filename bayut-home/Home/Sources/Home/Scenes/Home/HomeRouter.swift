@@ -29,6 +29,9 @@ protocol HomeRoutingLogic: AnyObject {
     func routeToGPT()
     func routeToSellerLeadsForm(purpose: HomePurpose?)
     func routeToPopularSearch(category: PopularSearchCategory, purpose: PopularSearchPurpose)
+    func routeToFavoriteAction(action: FavouriteCellAction, property: Property)
+    func navigateToOnboarding(from viewController: UIViewController?)
+    func navigateToOnboardingV2(from viewController: UIViewController?)
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -138,5 +141,17 @@ final class HomeRouter: HomeRoutingLogic {
     
     func routeToPopularSearch(category: PopularSearchCategory, purpose: PopularSearchPurpose) {
         navigation.navigateToPopularSearch(category: category, purpose: purpose, from: viewController)
+    }
+    
+    func routeToFavoriteAction(action: FavouriteCellAction, property: Property) {
+        navigation.navigateToFavoriteAction(action: action, from: viewController)
+    }
+    
+    func navigateToOnboarding(from viewController: UIViewController?) {
+        navigation.navigateToOnboarding(from: viewController)
+    }
+    
+    func navigateToOnboardingV2(from viewController: UIViewController?) {
+        navigation.navigateToOnboardingV2(from: viewController)
     }
 }

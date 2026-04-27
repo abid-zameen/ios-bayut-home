@@ -15,6 +15,9 @@ protocol HomeBusinessLogic: AnyObject {
     func didSelectSavedSearch(at index: Int)
     func didSelectRecentSearch(at index: Int)
     func didSelectPopularSearch(at index: Int)
+    func onViewAppear()
+    func didToggleFavorite(externalId: String)
+    func checkOnboarding()
 }
 
 final class HomeInteractor: HomeBusinessLogic {
@@ -31,15 +34,18 @@ final class HomeInteractor: HomeBusinessLogic {
     var savedSearchesState: Home.DataState<SavedSearchesData> = .loading
     var recentSearchesState: Home.DataState<[HomeScreenRecentSearch]> = .loading
     var nearbyLocationsState: Home.DataState<[LocationHit]> = .loading
-    
     var isLocationAuthorized = false
-    
-    private var showTruBrokerBanner = true
-    private var showSellerLeadsBanner = false
-    
     var popularSearchPurposes: [PopularSearchPurpose] = []
     var selectedPopularPurpose: PopularSearchPurpose = .buy
+    private var showTruBrokerBanner = true
+    private var showSellerLeadsBanner = false
     private var popularSearchState: Home.DataState<PopularSearchConfig> = .loading
+    private var lastRecentSearchesSignature: String?
+    private var lastLanguage: String?
+    private var isDataLoaded: Bool = false
+    
+    private var shouldRefreshUserSpecificData: Bool = false
+    private var lastPopularSearchLocationQuery: String?
     
     // MARK: - Initialization
     init(adapter: HomeModuleAdapter, worker: HomeWorkerLogic, tracker: HomeTrackerType) {
@@ -57,6 +63,20 @@ final class HomeInteractor: HomeBusinessLogic {
             popularSearchPurposes = initialConfig.purposeConfigs.map { $0.purpose }
             selectedPopularPurpose = popularSearchPurposes.first ?? .rent
         }
+        setupNotificationObservers()
+    }
+    
+    private func setupNotificationObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .homeRefreshUserSpecificData, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .loggedIn, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .loggedOut, object: nil)
+        
+    }
+    
+    @objc private func handleRefreshUserSpecificData() {
+        shouldRefreshUserSpecificData = true
     }
     
     private func setupStoriesListener() {
@@ -78,14 +98,57 @@ final class HomeInteractor: HomeBusinessLogic {
     }
     
     func onViewLoad() {
-        self.presentData()
+        lastLanguage = Locale.current.languageCode ?? "en"
+        lastPopularSearchLocationQuery = adapter.utilities.popularSectionLocationQuery
+        isDataLoaded = true
+        self.presentData(animated: true)
+        
+        checkOnboarding()
         
         Task {
             await self.loadData()
         }
     }
     
-    // MARK: - HomeBusinessLogic
+    func onViewAppear() {
+        guard isDataLoaded else { return }
+        adapter.storiesProvider?.updateStoriesOnAppear()
+        if let storiesProvider = adapter.storiesProvider, storiesProvider.refreshStoriesIfNeeded() {
+            presentData(animated: true)
+        }
+        
+        let currentLanguage = Locale.current.languageCode ?? "en"
+        let langChanged = lastLanguage != currentLanguage
+        lastLanguage = currentLanguage
+        
+        let currentPopularLocationQuery = adapter.utilities.popularSectionLocationQuery
+        let popularLocationChanged = lastPopularSearchLocationQuery != currentPopularLocationQuery
+        
+        Task {
+            if shouldRefreshUserSpecificData {
+                await fetchUserSpecificData()
+                shouldRefreshUserSpecificData = false
+            }
+            
+            await fetchPopularSearchConfig()
+            let recentSearches = await worker.fetchRecentSearches()
+            let newSignature = computeRecentSearchesSignature(recentSearches)
+            
+            if langChanged || newSignature != lastRecentSearchesSignature {
+                recentSearchesState = .loading
+                await MainActor.run { presentData(animated: true) }
+                
+                recentSearchesState = recentSearches.isEmpty ? .empty : .data(recentSearches)
+                lastRecentSearchesSignature = newSignature
+                await MainActor.run { presentData(animated: true) }
+            }
+        }
+    }
+    
+    private func computeRecentSearchesSignature(_ searches: [HomeScreenRecentSearch]) -> String {
+        return searches.map { "\($0.id)" }.joined(separator: "-")
+    }
+    
     func loadData() async {
         resetStates()
         calculateBannerVisibility()
@@ -100,7 +163,7 @@ final class HomeInteractor: HomeBusinessLogic {
             group.addTask { await self.fetchRecentSearches() }
             group.addTask { await self.fetchNewProjects() }
             group.addTask { await self.fetchNearbyLocations() }
-            group.addTask { await self.fetchPopularSearchConfig() }
+            group.addTask { await self.fetchPopularSearchConfig(shouldUpdate: true) }
         }
     }
     
@@ -113,44 +176,34 @@ final class HomeInteractor: HomeBusinessLogic {
         }
         
         await withTaskGroup(of: Void.self) { group in
-            group.addTask {
-                do {
-                    let favIds = try await self.worker.fetchFavoritesIDs(userID: userID)
-                    let slicedFavIds = Array(favIds.prefix(5))
-                    if !slicedFavIds.isEmpty {
-                        let properties = try await self.worker.fetchFavoritesProperties(ids: slicedFavIds)
-                        let resolved = slicedFavIds.compactMap { id in
-                            properties.first(where: { $0.id == id })
-                        }
-                        self.favouritesState = resolved.isEmpty ? .empty : .data(resolved)
-                    } else {
-                        self.favouritesState = .empty
-                    }
-                } catch {
-                    self.favouritesState = .empty
-                }
-                await MainActor.run { self.presentData() }
-            }
-            
-            group.addTask {
-                do {
-                    let rawSearches = try await self.worker.fetchSavedSearches(userID: userID)
-                    let slicedSearches = Array(rawSearches.prefix(5))
-                    
-                    if !slicedSearches.isEmpty {
-                        let allSlugs = slicedSearches.compactMap { $0.params.locations }.flatMap { $0 }
-                        let uniqueSlugs = Array(Set(allSlugs))
-                        let resolvedLocations = try await self.worker.fetchLocations(slugs: uniqueSlugs)
-                        self.savedSearchesState = .data(SavedSearchesData(searches: slicedSearches, resolvedLocations: resolvedLocations))
-                    } else {
-                        self.savedSearchesState = .empty
-                    }
-                } catch {
-                    self.savedSearchesState = .empty
-                }
-                await MainActor.run { self.presentData() }
-            }
+            group.addTask { await self.refreshFavorites() }
+            group.addTask { await self.refreshSavedSearches() }
         }
+    }
+    
+    private func refreshSavedSearches() async {
+        guard let userID = adapter.environment.userID else {
+            savedSearchesState = .empty
+            await MainActor.run { presentData() }
+            return
+        }
+        
+        do {
+            let rawSearches = try await self.worker.fetchSavedSearches(userID: userID)
+            let slicedSearches = Array(rawSearches.prefix(5))
+            
+            if !slicedSearches.isEmpty {
+                let allSlugs = slicedSearches.compactMap { $0.params.locations }.flatMap { $0 }
+                let uniqueSlugs = Array(Set(allSlugs))
+                let resolvedLocations = try await self.worker.fetchLocations(slugs: uniqueSlugs)
+                self.savedSearchesState = .data(SavedSearchesData(searches: slicedSearches, resolvedLocations: resolvedLocations))
+            } else {
+                self.savedSearchesState = .empty
+            }
+        } catch {
+            self.savedSearchesState = .empty
+        }
+        await MainActor.run { self.presentData() }
     }
 
     private func fetchBlogs() async {
@@ -178,6 +231,10 @@ final class HomeInteractor: HomeBusinessLogic {
     }
     
     private func fetchNearbyLocations() async {
+        guard !adapter.environment.isOnboardingInProgress else {
+            return
+        }
+        
         guard isLocationAuthorized, let coords = adapter.environment.userCoordinates else {
             nearbyLocationsState = .empty
             await MainActor.run { presentData() }
@@ -193,10 +250,16 @@ final class HomeInteractor: HomeBusinessLogic {
         await MainActor.run { presentData() }
     }
     
-    private func fetchPopularSearchConfig() async {
+    private func fetchPopularSearchConfig(shouldUpdate: Bool = false) async {
         guard adapter.environment.shouldFetchPopularSectionViaElasticSearch else { return }
         
         var locationQuery = adapter.utilities.popularSectionLocationQuery ?? "location_id:total"
+        
+        guard shouldUpdate || locationQuery != lastPopularSearchLocationQuery else { return }
+        lastPopularSearchLocationQuery = locationQuery
+        
+        popularSearchState = .loading
+        await MainActor.run { presentData() }
         
         do {
                         
@@ -347,5 +410,59 @@ final class HomeInteractor: HomeBusinessLogic {
         guard let categories = purposeConfig?.categories, index < categories.count else { return }
         let category = categories[index]
         presenter?.presentPopularSearchRouting(category: category, purpose: selectedPopularPurpose)
+    }
+    
+    func didToggleFavorite(externalId: String) {
+        guard let userID = adapter.environment.userID else { return }
+        
+        favouritesState = .loading
+        presentData()
+        
+        Task {
+            do {
+                try await worker.toggleFavorite(userID: userID, externalID: externalId)
+                await refreshFavorites()
+            } catch {
+                await refreshFavorites()
+            }
+        }
+    }
+    
+    private func refreshFavorites() async {
+        guard let userID = adapter.environment.userID else {
+            favouritesState = .empty
+            await MainActor.run { presentData() }
+            return
+        }
+        
+        do {
+            let favIds = try await self.worker.fetchFavoritesIDs(userID: userID)
+            let slicedFavIds = Array(favIds.prefix(5))
+            if !slicedFavIds.isEmpty {
+                let properties = try await self.worker.fetchFavoritesProperties(ids: slicedFavIds)
+                let resolved = slicedFavIds.compactMap { id in
+                    properties.first(where: { $0.id == id })
+                }
+                self.favouritesState = resolved.isEmpty ? .empty : .data(resolved)
+            } else {
+                self.favouritesState = .empty
+            }
+        } catch {
+            self.favouritesState = .empty
+        }
+        await MainActor.run { self.presentData() }
+    }
+    
+    func checkOnboarding() {
+        let env = adapter.environment
+        guard env.isAppOnboardingEnabled, !env.wasDeepLinkInitiated, !env.hasDisplayedOnboarding else {
+            return
+        }
+        
+        if env.isOnboardingV2Enabled {
+            presenter?.presentOnboardingV2()
+        } else {
+            presenter?.presentOnboarding()
+        }
     }
 }

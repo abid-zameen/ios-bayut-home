@@ -4,9 +4,11 @@ import Foundation
 /// Protocol defining the environment constants required by the Home module
 public protocol HomeEnvironmentAdapter {
     var baseURL: String { get }
+    var algoliaProjectIndex: String { get }
+    var algoliaLocationIndex: String { get }
+    var algoliaListingIndex: String { get }
+    var dldBaseUrl: String { get }
     var imageBaseUrl: String { get }
-    var algoliaAppID: String { get }
-    var algoliaAPIKey: String { get }
     var userID: String? { get }
     var blogAuthorization: String { get }
     var blogAuthorizationHeaderKey: String { get }
@@ -18,16 +20,15 @@ public protocol HomeEnvironmentAdapter {
     var shouldFetchPopularSectionViaElasticSearch: Bool { get }
     var isSellerLeadsEnabled: Bool { get }
     var dldPopularSectionMetadataURL: URL { get }
-    var appLanguage: String { get }
-    
-    // MARK: - Location
     var userCoordinates: (lat: Double, lon: Double)? { get }
     var isLocationAuthorized: Bool { get }
     func requestLocationAuthorization()
-    
-    // MARK: - Recent Searches
     var recentSearchesProvider: RecentSearchesProvider { get }
-    
-    // MARK: - Marketing Banner
     var marketingBannerConfig: MarketingBannerConfig? { get }
+    var isAppOnboardingEnabled: Bool { get }
+    var isOnboardingV2Enabled: Bool { get }
+    var wasDeepLinkInitiated: Bool { get }
+    var hasDisplayedOnboarding: Bool { get }
+    var isOnboardingInProgress: Bool { get set }
+    func setOnboardingDisplayed()
 }

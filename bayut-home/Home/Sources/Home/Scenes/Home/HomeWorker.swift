@@ -19,27 +19,24 @@ protocol HomeWorkerLogic: AnyObject {
     func fetchNearbyLocations(latitude: Double, longitude: Double) async throws -> [LocationHit]
     func fetchRecentSearches() async -> [HomeScreenRecentSearch]
     func fetchPopularSectionMetadata(locationQuery: String) async throws -> PopularSectionResponse
+    func toggleFavorite(userID: String, externalID: String) async throws
 }
 
 final class HomeWorker: HomeWorkerLogic {
     
     private var networking: HomeNetworkingAdapter
-    
-    private enum Constants {
-        static let listingsIndexName = "bayut-development-ads-en"
-        static let projectIndexName = "bayut-development-ads-project-en"
-        static let locationsIndexName = "bayut-development-locations-en"
-    }
-    
+    private var environment: HomeEnvironmentAdapter
     private lazy var newProjectsWorker: NewProjectsWorkerLogic = {
         return NewProjectsWorker(
             searchService: networking.searchService,
-            networkingService: networking.networkingService
+            networkingService: networking.networkingService,
+            projectsIndexName: environment.algoliaProjectIndex
         )
     }()
     
-    init(networking: HomeNetworkingAdapter) {
+    init(networking: HomeNetworkingAdapter, environment: HomeEnvironmentAdapter) {
         self.networking = networking
+        self.environment = environment
     }
     
     func fetchNewProjects(locationID: String, cplIDs: [String]?) async -> [ProjectHit] {
@@ -78,7 +75,7 @@ final class HomeWorker: HomeWorkerLogic {
             attributesToRetrieve: ["*"]
         )
         
-        let result: SearchResult<AlgoliaPropertyHit> = try await networking.searchService.search(query: request, in: Constants.listingsIndexName)
+        let result: SearchResult<AlgoliaPropertyHit> = try await networking.searchService.search(query: request, in: "\(environment.algoliaListingIndex)en")
         return result.hits?.map { Property(hit: $0) } ?? []
     }
     
@@ -137,7 +134,7 @@ final class HomeWorker: HomeWorkerLogic {
             attributesToRetrieve: ["*"]
         )
         
-        let result: SearchResult<LocationHit> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
+        let result: SearchResult<LocationHit> = try await networking.searchService.search(query: request, in: "\(environment.algoliaLocationIndex)en")
         return result.hits ?? []
     }
     
@@ -155,7 +152,7 @@ final class HomeWorker: HomeWorkerLogic {
             ranking: ["geo"]
         )
         
-        let result: SearchResult<LocationHit> = try await networking.searchService.search(query: request, in: Constants.locationsIndexName)
+        let result: SearchResult<LocationHit> = try await networking.searchService.search(query: request, in: "\(environment.algoliaLocationIndex)en")
         return result.hits ?? []
     }
     
@@ -174,7 +171,7 @@ final class HomeWorker: HomeWorkerLogic {
 
 """
         //let url = HomeModule.shared.environment.dldPopularSectionMetadataURL.absoluteString
-        let url = "https://fenix-data-es2.stage.bayut.sector.run/property_filters_metadata_prod_alias/_msearch"
+        let url = "\(environment.dldBaseUrl)property_filters_metadata_prod_alias/_msearch"
         
         let request = APIRequestBuilder.create(
             path: "",
@@ -193,5 +190,20 @@ final class HomeWorker: HomeWorkerLogic {
         
         return try await networking.networkingService.execute(request: request)
         
+    }
+    
+    func toggleFavorite(userID: String, externalID: String) async throws {
+        let request = APIRequestBuilder.create(
+            path: "/api/user/\(userID)/favorites/\(externalID)/toggle/",
+            type: .post,
+            headers: [
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            ],
+            cache: .none,
+            shouldHandleCookies: true
+        )
+        
+        try await networking.networkingService.executeWithoutResponse(request: request)
     }
 }

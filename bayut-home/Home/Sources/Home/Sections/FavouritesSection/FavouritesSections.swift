@@ -118,6 +118,12 @@ final class FavouritesCarouselSection: SectionDescriptor {
         if let property = item.property {
             let vm = FavouriteCellViewModel(property: property)
             cell.configure(with: vm)
+            cell.onFavoriteToggle = { [weak self] in
+                self?.actions.delegate?.favouritesDidToggleFavorite(at: indexPath.row, with: property.id)
+            }
+            cell.onAction = { [weak self] action in
+                self?.actions.delegate?.favouritesDidTapAction(action, property: property)
+            }
         }
         return cell
     }

@@ -12,6 +12,8 @@ protocol HomePresentationLogic: AnyObject {
     func presentSavedSearchRouting(savedSearchData: [String: Any], resolvedLocations: [LocationHit])
     func presentRecentSearchRouting(search: HomeScreenRecentSearch)
     func presentPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose)
+    func presentOnboarding()
+    func presentOnboardingV2()
 }
 
 final class HomePresenter: HomePresentationLogic {
@@ -100,6 +102,16 @@ final class HomePresenter: HomePresentationLogic {
     @MainActor
     func presentPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose) {
         viewController?.displayPopularSearchRouting(category: category, purpose: purpose)
+    }
+    
+    @MainActor
+    func presentOnboarding() {
+        viewController?.displayOnboarding()
+    }
+    
+    @MainActor
+    func presentOnboardingV2() {
+        viewController?.displayOnboardingV2()
     }
     
     // MARK: - Helpers

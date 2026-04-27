@@ -29,6 +29,11 @@ final class PopularSearchCell: HighlightableCollectionViewCell {
         self.viewModel = viewModel
         setupWithViewModel()
     }
+    
+    override func prepareForReuse() {
+        self.viewModel = nil
+        self.locationLabel?.text = ""
+    }
 
 }
 

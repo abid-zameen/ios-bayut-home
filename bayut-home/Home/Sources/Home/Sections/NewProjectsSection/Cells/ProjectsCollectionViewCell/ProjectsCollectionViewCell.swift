@@ -34,11 +34,14 @@ final class ProjectsCollectionViewCell: HighlightableCollectionViewCell {
         setupViews()
     }
     
-    // MARK: - Configuration
     override func configure(with viewModel: Any) {
         guard let viewModel = viewModel as? NewProjectCellViewModelType else { return }
         self.viewModel = viewModel
         setupWithViewModel()
+    }
+    
+    @IBAction private func whatsappAction(_ sender: Any) {
+        
     }
 }
 

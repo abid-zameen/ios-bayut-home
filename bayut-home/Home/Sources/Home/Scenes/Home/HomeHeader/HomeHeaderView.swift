@@ -134,6 +134,18 @@ class HomeHeaderView: UIView {
         dividerLabel.translatesAutoresizingMaskIntoConstraints = false
         searchView.translatesAutoresizingMaskIntoConstraints = false
         
+        let leadingTarget: NSLayoutXAxisAnchor
+        let trailingTarget: NSLayoutXAxisAnchor
+        
+        if DeviceType.isIpad {
+            leadingTarget = self.readableContentGuide.leadingAnchor
+            trailingTarget = self.readableContentGuide.trailingAnchor
+        } else {
+            leadingTarget = self.leadingAnchor
+            trailingTarget = self.trailingAnchor
+        }
+        
+        
         logoHeightConstraint = logoImageView.heightAnchor.constraint(equalToConstant: HomeHeaderLayout.ViewHeight.logo)
         
         let initialLayout = HomeHeaderLayout.make(in: self)
@@ -183,16 +195,16 @@ class HomeHeaderView: UIView {
         bottomPin.isActive = true
         
         NSLayoutConstraint.activate([
-            contentStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentStackView.leadingAnchor.constraint(equalTo: leadingTarget),
+            contentStackView.trailingAnchor.constraint(equalTo: trailingTarget),
             
             aiSearchView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             aiSearchView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             
             dividerLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             
-            searchView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            searchView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16)
+            searchView.leadingAnchor.constraint(equalTo: leadingTarget, constant: 16),
+            searchView.trailingAnchor.constraint(equalTo: trailingTarget, constant: -16)
         ])
         
         contentTopConstraint?.isActive = true

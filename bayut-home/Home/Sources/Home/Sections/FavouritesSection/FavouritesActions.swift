@@ -7,9 +7,22 @@
 
 import Foundation
 
-// MARK: - Delegate Protocol
+// MARK: - Favourite Actions
+public enum FavouriteCellAction: Equatable {
+    case verification
+    case viewed
+    case potw
+    case offplan
+    case offplanResale
+    case history
+    case truBroker(url: URL?)
+    case paymentPlan
+}
+
 protocol FavouritesActionsDelegate: AnyObject {
     func favouritesDidTapCard(at index: Int, with externalId: String)
+    func favouritesDidToggleFavorite(at index: Int, with externalId: String)
+    func favouritesDidTapAction(_ action: FavouriteCellAction, property: Property)
     func favouritesDidTapViewAll()
 }
 

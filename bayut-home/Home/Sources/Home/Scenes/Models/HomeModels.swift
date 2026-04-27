@@ -4,6 +4,7 @@
 //
 //  Created by Hammad Shahid on 01/04/2026.
 //
+import Foundation
 
 struct Home {
     enum DataState<T> {
@@ -178,11 +179,11 @@ public struct LocationHit: Codable {
     public let hierarchy: [LocationHierarchy]?
 
     public var localizedName: String {
-        let lang = HomeModule.shared.environment.appLanguage
+        let lang = Locale.current.languageCode ?? "en"
         switch lang {
-        case "ar": return name_l1 ?? name ?? ""
-        case "zh": return name_l2 ?? name ?? ""
-        case "ru": return name_l3 ?? name ?? ""
+        case "ar": return name_l1 ?? name ?? .empty
+        case "zh": return name_l2 ?? name ?? .empty
+        case "ru": return name_l3 ?? name ?? .empty
         default: return name ?? ""
         }
     }
@@ -202,12 +203,12 @@ public struct LocationHierarchy: Codable {
     public let slug_l3: String?
     
     public var localizedName: String {
-        let lang = HomeModule.shared.environment.appLanguage
+        let lang = Locale.current.languageCode ?? "en"
         switch lang {
-        case "ar": return name_l1 ?? name ?? ""
-        case "zh": return name_l2 ?? name ?? ""
-        case "ru": return name_l3 ?? name ?? ""
-        default: return name ?? ""
+        case "ar": return name_l1 ?? name ?? .empty
+        case "zh": return name_l2 ?? name ?? .empty
+        case "ru": return name_l3 ?? name ?? .empty
+        default: return name ?? .empty
         }
     }
 }

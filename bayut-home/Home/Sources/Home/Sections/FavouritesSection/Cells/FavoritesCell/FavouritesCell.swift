@@ -50,6 +50,9 @@ final class FavouritesCell: HighlightableCollectionViewCell {
 
     // MARK: - Properties
     private var viewModel: FavoritesCellViewModelType?
+    var onFavoriteToggle: (() -> Void)?
+    var onAction: ((FavouriteCellAction) -> Void)?
+    
     
     // MARK: - Lifecycle
     override func awakeFromNib() {
@@ -65,27 +68,27 @@ final class FavouritesCell: HighlightableCollectionViewCell {
     
     // MARK: - IBActions
     @IBAction private func offplanResalePressedAction(_ sender: UIButton) {
-        // TODO: Handle offplan resale action
+        onAction?(.offplanResale)
     }
     
     @IBAction private func offplanPressedAction(_ sender: UIButton) {
-        // TODO: Handle offplan action
+        onAction?(.offplan)
     }
     
     @IBAction private func favoriteAction() {
-        // TODO: Handle favorite action using viewModel?.id
+        onFavoriteToggle?()
     }
     
     @IBAction private func viewedAction(_ sender: UIButton) {
-        // TODO: Handle viewed action
+        onAction?(.viewed)
     }
     
     @IBAction private func verificationAction() {
-        // TODO: Handle verification action
+        onAction?(.verification)
     }
     
     @IBAction private func potwAction(_ sender: UIButton) {
-        // TODO: Handle POTW action
+        onAction?(.potw)
     }
 
 }
@@ -174,6 +177,9 @@ private extension FavouritesCell {
         if viewModel.showOffPlanInfo {
             offPlanResaleBadgeView?.isHidden = false
             offPlanDetailView?.property = viewModel.property
+            offPlanDetailView?.paymentPlanInfoClick = { [weak self] _ in
+                self?.onAction?(.paymentPlan)
+            }
             resaleLabel?.text = viewModel.resaleLabelText
             resaleLabelStackView?.isHidden = !viewModel.showResaleInfo
             let hasOffPlanInfo = viewModel.property.handoverDate != nil || viewModel.property.paymentPlanPercentage != nil
@@ -213,7 +219,9 @@ private extension FavouritesCell {
         let agentImageUrl = URL(string: ownerAgent.userImage ?? "")
         truBrokerBadge?.set(imageUrl: agentImageUrl, 
                            hasStories: false, 
-                           action: nil, 
+                           action: { [weak self] in
+                               self?.onAction?(.truBroker(url: agentImageUrl))
+                           },
                            currentThumbnailIndex: 0)
     }
 }
