@@ -17,7 +17,6 @@ struct AnySection: SectionIdentifier, Hashable {
     var autoscrollable: SectionAutoscrollable? { _autoscrollable?() }
     
     private let identifier: AnyHashable
-    private let descriptorIdentity: ObjectIdentifier?
     private let _autoscrollable: (() -> SectionAutoscrollable?)?
     private let _layoutSection: (NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection
     private let _buildItems: () -> [AnyHashable]
@@ -27,7 +26,6 @@ struct AnySection: SectionIdentifier, Hashable {
     
     init<S: SectionDescriptor>(_ descriptor: S, isCustomizable: Bool = true) {
         self.identifier = AnyHashable(descriptor.identifier)
-        self.descriptorIdentity = (S.self as? AnyClass) != nil ? ObjectIdentifier(descriptor as AnyObject) : nil
         self.identifierString = descriptor.identifier.rawValue
         self.displayName = descriptor.identifier.displayName
         self.section = descriptor.identifier.section
@@ -69,10 +67,9 @@ struct AnySection: SectionIdentifier, Hashable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(identifier)
-        hasher.combine(descriptorIdentity)
     }
     
     static func == (lhs: AnySection, rhs: AnySection) -> Bool {
-        lhs.identifier == rhs.identifier && lhs.descriptorIdentity == rhs.descriptorIdentity
+        lhs.identifier == rhs.identifier
     }
 }

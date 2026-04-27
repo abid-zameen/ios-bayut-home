@@ -36,9 +36,11 @@ final class TabCell: UICollectionViewCell {
         if isSelected {
             backgroundColor = .AppColors.green5
             titleLabel.textColor = .white
+            titleLabel.font = .headingL4
         } else {
             backgroundColor = .clear
             titleLabel.textColor = .AppColors.grey5
+            titleLabel.font = .body
         }
     }
 }

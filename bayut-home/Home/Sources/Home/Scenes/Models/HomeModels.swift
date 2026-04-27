@@ -47,8 +47,7 @@ struct Home {
     
     struct Response {
         var projects: DataState<[ProjectHit]> = .loading
-        var locations: [LocationChipViewModel] = []
-        var selectedNewProjectsLocationID: String = ""
+        var selectedNewProjectsLocationID: String = .empty
         var favourites: DataState<[Property]> = .loading
         var savedSearches: DataState<SavedSearchesData> = .loading
         var blogs: DataState<[Blog]> = .loading
@@ -61,6 +60,48 @@ struct Home {
         var showTruBrokerBanner: Bool = true
         var showSellerLeadsBanner: Bool = false
         var marketingBannerConfig: MarketingBannerConfig? = nil
+    }
+
+    struct SectionsDataState {
+        var projects = ProjectsState()
+        var favourites: DataState<[Property]> = .loading
+        var blogs: DataState<[Blog]> = .loading
+        var savedSearches: DataState<SavedSearchesData> = .loading
+        var recentSearches = RecentSearchesState()
+        var nearbyLocations = NearbyLocationsState()
+        var popularSearch = PopularSearchState()
+        var banners = BannerState()
+        
+        var isDataLoaded = false
+        var lastLanguage: String?
+        var shouldRefreshUserSpecificData = false
+    }
+
+    struct ProjectsState {
+        var state: Home.DataState<[ProjectHit]> = .loading
+        var selectedLocationID: String = Emirates.dubai.rawValue
+    }
+
+    struct RecentSearchesState {
+        var state: Home.DataState<[HomeScreenRecentSearch]> = .loading
+        var lastSignature: String?
+    }
+
+    struct NearbyLocationsState {
+        var state: Home.DataState<[LocationHit]> = .loading
+        var isAuthorized: Bool = false
+    }
+
+    struct PopularSearchState {
+        var state: Home.DataState<PopularSearchConfig> = .loading
+        var purposes: [PopularSearchPurpose] = []
+        var selectedPurpose: PopularSearchPurpose = .buy
+        var lastLocationQuery: String?
+    }
+
+    struct BannerState {
+        var showTruBroker: Bool = true
+        var showSellerLeads: Bool = false
     }
 }
 

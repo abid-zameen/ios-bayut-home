@@ -33,15 +33,12 @@ final class HomePresenter: HomePresentationLogic {
         
         let selectedLocID = data?.selectedNewProjectsLocationID ?? Emirates.dubai.rawValue
         let locations = mapLocationChips(selectedID: selectedLocID)
-        
         let projects = data?.projects ?? .loading
         let favourites = data?.favourites ?? .loading
         let savedSearches = mapSavedSearches(state: data?.savedSearches ?? .loading)
         let blogs = data?.blogs ?? .loading
         let nearbyLocations = data?.nearbyLocations ?? .loading
         let recentSearches = data?.recentSearches ?? .loading
-        
-        // Map Popular Searches
         let popularSearchesState: Home.DataState<[PopularSearch]>
         let popularSearchConfig: PopularSearchConfig?
         
@@ -149,11 +146,11 @@ final class HomePresenter: HomePresentationLogic {
         case .data(let data):
             let mapped = data.searches.map { search in
                 let info = search.params
-                let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category ?? "")
+                let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category ?? .empty)
                 
                 let displayTitle = propertyTypeInfo?.titlePlural ?? search.name
                 
-                var locationString = ""
+                var locationString: String = .empty
                 if let slugs = info.locations, !slugs.isEmpty {
                     let matchedLocations = data.resolvedLocations.filter { location in
                         guard let slug = location.slug else { return false }
@@ -171,7 +168,7 @@ final class HomePresenter: HomePresentationLogic {
                 
                 let isParent = propertyTypeInfo?.isParent ?? true
                 let showIcon = !isParent
-                let imageName = showIcon ? adapter.utilities.getIconName(for: info.category ?? "") : nil
+                let imageName = showIcon ? adapter.utilities.getIconName(for: info.category ?? .empty) : nil
                 
                 return SavedSearchesModel(
                     name: search.name,

@@ -10,7 +10,7 @@ import NetworkLayer
 import SearchService
 
 protocol NewProjectsWorkerLogic {
-    func fetchProjects(locationID: String, cplIDs: [String]?) async -> [ProjectHit]
+    func fetchNewProjects(locationID: String, cplIDs: [String]?) async -> [ProjectHit]
 }
 
 final class NewProjectsWorker: NewProjectsWorkerLogic {
@@ -24,35 +24,29 @@ final class NewProjectsWorker: NewProjectsWorkerLogic {
         self.projectsIndexName = projectsIndexName
     }
     
-    func fetchProjects(locationID: String, cplIDs: [String]? = nil) async -> [ProjectHit] {
+    func fetchNewProjects(locationID: String, cplIDs: [String]? = nil) async -> [ProjectHit] {
         if let cplIDs = cplIDs, !cplIDs.isEmpty {
             return await fetchProjectsCPL(ids: cplIDs)
         }
         
-        // Fallback to Algolia shuffles
-        // 1. Construct Filters
         let baseFilter = "purpose:for-sale AND completionStatus:under-construction AND location.externalID:\(locationID)"
         let apartmentFilter = "\(baseFilter) AND unitCategories.externalID:4"
         let villaFilter = "\(baseFilter) AND unitCategories.externalID:3"
         
-        // 2. Perform Searches in Parallel
         async let apartmentTask = fetchFromAlgolia(filter: apartmentFilter, hitsPerPage: 20)
         async let villaTask = fetchFromAlgolia(filter: villaFilter, hitsPerPage: 20)
         
         var (apartmentHits, villaHits) = await (apartmentTask, villaTask)
         
-        // 3. Combine and Shuffle (8 Apartments + 4 Villas)
         var combinedHits: [ProjectHit] = Array(apartmentHits.prefix(8))
         let remainingVillas = villaHits.prefix(4)
         combinedHits.append(contentsOf: remainingVillas)
         
-        // If we don't have enough villas, fill with more apartments up to 12
         if combinedHits.count < 12 && apartmentHits.count > 8 {
             let extraApartments = apartmentHits.dropFirst(8).prefix(12 - combinedHits.count)
             combinedHits.append(contentsOf: extraApartments)
         }
         
-        // 4. Ensure Uniqueness and Shuffle before returning raw hits
         return combinedHits.uniqueByID().shuffled()
     }
 
@@ -73,23 +67,21 @@ final class NewProjectsWorker: NewProjectsWorkerLogic {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             ],
-            cache: .none,
+            cache: .appSession,
             shouldHandleCookies: true
         )
         
         do {
             let response: [ProjectHit] = try await networkingService.execute(request: request)
-            // Filter duplicates from CPL response
             return response.uniqueByID()
         } catch {
-            print("NewProjectsWorker: CPL Fetch failed with error: \(error)")
             return []
         }
     }
     
     private func fetchFromAlgolia(filter: String, hitsPerPage: Int) async -> [ProjectHit] {
         let request = SearchRequest(
-            query: "",
+            query: .empty,
             filters: filter,
             hitsPerPage: hitsPerPage,
             attributesToRetrieve: ["*"]
@@ -99,7 +91,6 @@ final class NewProjectsWorker: NewProjectsWorkerLogic {
             let result: SearchResult<ProjectHit> = try await searchService.search(query: request, in: self.projectsIndexName)
             return result.hits ?? []
         } catch {
-            print("NewProjectsWorker: Search failed with error: \(error)")
             return []
         }
     }
