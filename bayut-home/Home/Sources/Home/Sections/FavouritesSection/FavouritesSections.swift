@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 // MARK: - Shared Identifier
 enum FavouritesSectionId: String, SectionIdentifier {
@@ -19,8 +20,7 @@ enum FavouritesSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum FavouritesLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
-    static let spacing: CGFloat = 16
+    static let sectionInsets = NSDirectionalEdgeInsets(top: .sectionTopSpace, leading: .standard, bottom: .zero, trailing: .standard)
     static let cardWidth: CGFloat = 280
     static let cardHeight: CGFloat = 340
 }
@@ -99,12 +99,12 @@ final class FavouritesCarouselSection: SectionDescriptor {
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPaging
-        section.interGroupSpacing = 0
+        section.interGroupSpacing = .zero
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: FavouritesLayout.spacing,
-            leading: 0,
-            bottom: 0,
-            trailing: 0
+            top: .standard,
+            leading: .zero,
+            bottom: .zero,
+            trailing: .zero
         )
         return section
     }
@@ -153,10 +153,10 @@ final class FavouritesViewAllSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
-                top: 0,
-                leading: 0,
-                bottom: 0,
-                trailing: 0
+                top: .zero,
+                leading: .zero,
+                bottom: .zero,
+                trailing: .zero
             )
         )
     }

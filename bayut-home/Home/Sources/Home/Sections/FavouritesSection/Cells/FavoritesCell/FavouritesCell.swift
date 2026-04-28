@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class FavouritesCell: HighlightableCollectionViewCell {
     
@@ -104,41 +105,41 @@ private extension FavouritesCell {
         bgView?.setRoundedCorner(radius: cardCornerRadius)
         bgView?.setBorder(.clear, width: 1)
         
-        propertyImageBgView?.backgroundColor = .yellow
+        propertyImageBgView?.backgroundColor = .white
         propertyImageBgView?.setRoundedCorner(radius: cardCornerRadius)
         propertyImageView?.setRoundedCorner(radius: cardCornerRadius)
         
         
-        offPlanResaleBadgeView?.backgroundColor = UIColor.AppColors.blue1
+        offPlanResaleBadgeView?.backgroundColor = UIColor.blue1
         offPlanResaleBadgeView?.layer.cornerRadius = 12
         offPlanResaleBadgeView?.addBadgeShadow()
         
         potwView?.layer.cornerRadius = 12.0
         potwView?.addBadgeShadow()
         potwView?.layer.borderWidth = 1.0
-        potwView?.layer.borderColor = UIColor.AppColors.purpleOutlineColor.cgColor
+        potwView?.layer.borderColor = UIColor.purpleOutlineColor.cgColor
         potwView?.isHidden = !HomeModule.shared.environment.shouldShowDOTWChip
         potwLabel?.text = "potw".localized()
         potwLabel?.font = UIFont.headingL6
-        potwLabel?.textColor = UIColor.AppColors.purpleTitleColor
+        potwLabel?.textColor = UIColor.purpleTitleColor
         
         offPlanResaleLabel?.text = "offplan".localized()
         resaleLabel?.text = "resale".localized()
         resaleLabel?.font = UIFont.appRegularFont(ofSize: 12.0)
         
-        bedsLabel?.textColor = UIColor.AppColors.grey7
+        bedsLabel?.textColor = UIColor.grey7
         bedsLabel?.font = UIFont.body
-        bathsLabel?.textColor = UIColor.AppColors.grey7
+        bathsLabel?.textColor = UIColor.grey7
         bathsLabel?.font = UIFont.body
-        areaLabel?.textColor = UIColor.AppColors.grey7
+        areaLabel?.textColor = UIColor.grey7
         areaLabel?.font = UIFont.body
-        propertyTitleLabel?.textColor = UIColor.AppColors.grey7
+        propertyTitleLabel?.textColor = UIColor.grey7
         propertyTitleLabel?.font = UIFont.semiBoldBody
-        propertyAddressLabel?.textColor = UIColor.AppColors.grey7
+        propertyAddressLabel?.textColor = UIColor.grey7
         propertyAddressLabel?.font = UIFont.body
         
         // 5. Icons Tinting
-        let iconTint = UIColor.AppColors.grey6
+        let iconTint = UIColor.grey6
         bedsImageView?.tintColor = iconTint
         bathsImageView?.tintColor = iconTint
         areaImageView?.tintColor = iconTint
@@ -193,9 +194,9 @@ private extension FavouritesCell {
     }
     
     func setupViewedButtonAttributes() {
-        contactedView?.backgroundColor = UIColor.AppColors.grey1
+        contactedView?.backgroundColor = UIColor.grey1
         contactedView?.setRoundedWithRespectToHeight(shouldClipToBounds: true)
-        contactedLabel?.textColor = UIColor.AppColors.grey6
+        contactedLabel?.textColor = UIColor.grey6
         contactedLabel?.font = UIFont.headingL6
         viewedButtonTransparent?.setBackgroundColor(color: .clear, forState: .normal)
         viewedButtonTransparent?.setTitle("" ,for: .normal)

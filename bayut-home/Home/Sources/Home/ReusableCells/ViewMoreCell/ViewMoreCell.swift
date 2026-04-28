@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class ViewMoreCell: UICollectionViewCell {
     
@@ -48,8 +49,8 @@ final class ViewMoreCell: UICollectionViewCell {
             title: buttonTitle,
             iconName: Constants.chevronRight,
             font: .boldBody,
-            titleColor: .AppColors.teal5,
-            iconColor: .AppColors.teal5,
+            titleColor: .teal5,
+            iconColor: .teal5,
             imagePlacement: .trailing,
             imagePadding: Constants.iconPadding,
             cornerRadius: 8

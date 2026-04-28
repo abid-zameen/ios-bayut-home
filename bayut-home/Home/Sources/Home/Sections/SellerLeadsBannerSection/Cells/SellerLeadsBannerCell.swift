@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class SellerLeadsBannerCell: HighlightableCollectionViewCell {
     
@@ -28,8 +29,8 @@ final class SellerLeadsBannerCell: HighlightableCollectionViewCell {
         static let new = "new".localized()
         static let triangleImage = "triangle-vector"
 
-        static let gradientColor1: UIColor = .AppColors.forestGreenTeal
-        static let gradientColor2: UIColor = .AppColors.mediumForestTeal
+        static let gradientColor1: UIColor = .forestGreenTeal
+        static let gradientColor2: UIColor = .mediumForestTeal
     }
 
 
@@ -64,7 +65,7 @@ private extension SellerLeadsBannerCell {
         )
         
         readyToSellHomeTitle?.text = Constants.readyToSellHomeTitle
-        readyToSellHomeTitle?.textColor = UIColor.AppColors.limeGreenColor
+        readyToSellHomeTitle?.textColor = UIColor.limeGreenColor
         readyToSellHomeTitle?.font = .heading
         readyToSellHomeTitle?.setContentCompressionResistancePriority(.required, for: .vertical)
         
@@ -76,7 +77,7 @@ private extension SellerLeadsBannerCell {
         
         let bottomEdgeMask: CACornerMask = (Locale.current.languageCode == "ar" || Locale.current.identifier.hasPrefix("ar")) ? .layerMaxXMaxYCorner : .layerMinXMaxYCorner
         newBadgeView?.setRoundedCorner(radius: (newBadgeView?.frame.height ?? 1) / 2, maskedCorners: [.layerMinXMinYCorner, .layerMaxXMinYCorner, bottomEdgeMask])
-        newBadgeView?.backgroundColor = .AppColors.secondaryRedColor
+        newBadgeView?.backgroundColor = .secondaryRedColor
         newLabel?.textColor = .white
         newLabel?.font = .headingS1
         newLabel?.text = Constants.new

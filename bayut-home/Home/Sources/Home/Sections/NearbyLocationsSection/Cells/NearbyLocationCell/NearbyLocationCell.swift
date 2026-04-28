@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class NearbyLocationCell: HighlightableCollectionViewCell {
     
@@ -34,16 +35,16 @@ final class NearbyLocationCell: HighlightableCollectionViewCell {
 // MARK: - Setup
 private extension NearbyLocationCell {
     func setupViews() {
-        nameLabel?.textColor = UIColor.AppColors.teal5
+        nameLabel?.textColor = UIColor.teal5
         nameLabel?.font = UIFont.boldBody
         
-        cityLabel?.textColor = UIColor.AppColors.grey5
+        cityLabel?.textColor = UIColor.grey5
         cityLabel?.font = UIFont.body
         
-        distanceLabel?.textColor = UIColor.AppColors.grey7
+        distanceLabel?.textColor = UIColor.grey7
         distanceLabel?.font = UIFont.body
         
-        contentView.setBorder(UIColor.AppColors.grey2, width: 1)
+        contentView.setBorder(UIColor.grey2, width: 1)
         contentView.setRoundedCorner(radius: 8)
     }
     

@@ -187,9 +187,9 @@ extension UIView {
         }
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [
-            UIColor.AppColors.deepTealColor.cgColor,
-            UIColor.AppColors.emeraldTideColor.cgColor,
-            UIColor.AppColors.midnightAquaColor.cgColor
+            UIColor.deepTealColor.cgColor,
+            UIColor.emeraldTideColor.cgColor,
+            UIColor.midnightAquaColor.cgColor
         ]
         gradientLayer.locations = [0.2, 0.49, 0.72]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
@@ -242,8 +242,8 @@ extension UIView {
     }
     
     func showShimmer(
-        baseColor: UIColor = UIColor.AppColors.grey1,
-        secondaryColor: UIColor = UIColor.AppColors.grey1.withAlphaComponent(0.2),
+        baseColor: UIColor = UIColor.grey1,
+        secondaryColor: UIColor = UIColor.grey1.withAlphaComponent(0.2),
         cornerRadius: CGFloat = 4.0,
            direction: GradientDirection = .leftRight,
            duration: CFTimeInterval = 1.5,

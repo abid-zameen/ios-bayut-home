@@ -31,7 +31,7 @@ final class PopularSearchPurposeCell: UICollectionViewCell {
 private extension PopularSearchPurposeCell {
     func setupViews() {
         titleLabel?.font = .bodyL0
-        titleLabel?.textColor = .AppColors.grey5
+        titleLabel?.textColor = .grey5
         contentView.setRoundedCorner(radius: 4)
     }
     
@@ -39,8 +39,8 @@ private extension PopularSearchPurposeCell {
         guard let viewModel else { return }
         titleLabel?.text = viewModel.title
         titleLabel?.font = viewModel.isSelected ? .headingL4 : .bodyL0
-        titleLabel?.textColor = viewModel.isSelected ? .AppColors.green5 : .AppColors.grey5
-        contentView.backgroundColor = viewModel.isSelected ? .AppColors.green1 : .clear
-        contentView.setBorder(viewModel.isSelected ? .AppColors.green1 : .AppColors.grey2, width: 1)
+        titleLabel?.textColor = viewModel.isSelected ? .green5 : .grey5
+        contentView.backgroundColor = viewModel.isSelected ? .green1 : .clear
+        contentView.setBorder(viewModel.isSelected ? .green1 : .grey2, width: 1)
     }
 }

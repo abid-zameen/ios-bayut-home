@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class TruBrokerBannerCell: HighlightableCollectionViewCell {
     
@@ -60,7 +61,7 @@ private extension TruBrokerBannerCell {
         
         arrowImage?.image = UIImage(named: Constants.arrowImage, in: .module, compatibleWith: nil)?.localized()
         
-        newView?.backgroundColor = UIColor.AppColors.secondaryRedColor
+        newView?.backgroundColor = UIColor.secondaryRedColor
         newView?.setRoundedWithRespectToHeight()
         
         newLabel?.textColor = UIColor.white

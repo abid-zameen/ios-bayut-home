@@ -13,8 +13,8 @@ final class PageControlCell: UICollectionViewCell {
     private lazy var pageControl: UIPageControl = {
         let pc = UIPageControl()
         pc.translatesAutoresizingMaskIntoConstraints = false
-        pc.pageIndicatorTintColor = UIColor.AppColors.DTGraphVerticalLine
-        pc.currentPageIndicatorTintColor = UIColor.AppColors.teal5
+        pc.pageIndicatorTintColor = UIColor.DTGraphVerticalLine
+        pc.currentPageIndicatorTintColor = UIColor.teal5
         pc.addTarget(self, action: #selector(pageChanged), for: .valueChanged)
         return pc
     }()

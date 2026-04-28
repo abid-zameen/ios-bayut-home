@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class BlogCell: HighlightableCollectionViewCell {
     
@@ -32,13 +33,13 @@ final class BlogCell: HighlightableCollectionViewCell {
 
 private extension BlogCell {
     func setupViews() {
-        blogTitleLabel?.textColor = UIColor.AppColors.blackTextColor
+        blogTitleLabel?.textColor = UIColor.blackTextColor
         blogTitleLabel?.font = UIFont.bodyL1
         
-        categoryLabel?.textColor = UIColor.AppColors.teal5
+        categoryLabel?.textColor = UIColor.teal5
         categoryLabel?.font = UIFont.boldBody
         
-        contentView.setBorder(UIColor.AppColors.grey2, width: 1)
+        contentView.setBorder(UIColor.grey2, width: 1)
         contentView.setRoundedCorner(radius: 8)
     }
     

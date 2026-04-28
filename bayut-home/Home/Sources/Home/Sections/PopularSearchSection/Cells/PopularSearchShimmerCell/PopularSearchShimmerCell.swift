@@ -22,7 +22,7 @@ final class PopularSearchShimmerCell: UICollectionViewCell {
 // MARK: - Setup
 private extension PopularSearchShimmerCell {
     func setupViews() {
-        contentView.setBorder(UIColor.AppColors.grey2, width: 1)
+        contentView.setBorder(UIColor.grey2, width: 1)
         contentView.setRoundedCorner(radius: 8)
         
         shimmerViews?.forEach( {

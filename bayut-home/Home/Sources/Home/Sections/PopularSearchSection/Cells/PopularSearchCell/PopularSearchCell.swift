@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class PopularSearchCell: HighlightableCollectionViewCell {
     
@@ -40,13 +41,13 @@ final class PopularSearchCell: HighlightableCollectionViewCell {
 private extension PopularSearchCell {
     func setupViews() {
         titleLabel?.font = .headingL4
-        titleLabel?.textColor = .AppColors.teal5
+        titleLabel?.textColor = .teal5
         
         locationLabel?.font = .bodyL0
-        locationLabel?.textColor = .AppColors.grey7
+        locationLabel?.textColor = .grey7
         
         contentView.setRoundedCorner(radius: 8)
-        contentView.setBorder(.AppColors.grey2, width: 1)
+        contentView.setBorder(.grey2, width: 1)
         contentView.backgroundColor = .white
     }
     

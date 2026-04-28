@@ -31,8 +31,8 @@ struct Property: Hashable {
         self.title = hit.title ?? ""
         
         // Handover
-        if let completionDate = hit.completionDetails?.completionDateInt?.convertToDate() {
-            let handoverText = "Handover" 
+        if let completionDate = hit.completionDetails?.completionDateInt?.toDate() {
+            let handoverText = "Handover"
             let dateString = "Q\(completionDate.quarter) \(completionDate.yearInt)"
             self.handoverDate = "\(handoverText): \(dateString)".makeBold(text: dateString, font: .boldBodyS1)
         } else {

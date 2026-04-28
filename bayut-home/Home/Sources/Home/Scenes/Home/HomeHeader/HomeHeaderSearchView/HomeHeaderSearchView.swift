@@ -24,7 +24,7 @@ class HomeHeaderSearchView: UIView {
     // Separator
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .AppColors.grey1
+        view.backgroundColor = .grey1
         return view
     }()
     
@@ -41,8 +41,8 @@ class HomeHeaderSearchView: UIView {
         let btn = UIButton(type: .system)
         btn.setTitle(HomePurpose.buy.title, for: .normal)
         btn.titleLabel?.font = .headingL4
-        btn.backgroundColor = .AppColors.green1
-        btn.setTitleColor(.AppColors.green5 ,for: .normal)
+        btn.backgroundColor = .green1
+        btn.setTitleColor(.green5 ,for: .normal)
         btn.layer.cornerRadius = 4
         btn.heightAnchor.constraint(equalToConstant: 32).isActive = true
         return btn
@@ -53,9 +53,9 @@ class HomeHeaderSearchView: UIView {
         btn.setTitle(HomePurpose.rent.title, for: .normal)
         btn.titleLabel?.font = .bodyL0
         btn.backgroundColor = .white
-        btn.setTitleColor(.AppColors.grey5, for: .normal)
+        btn.setTitleColor(.grey5, for: .normal)
         btn.layer.cornerRadius = 4
-        btn.setBorder(.AppColors.grey1, width: 1)
+        btn.setBorder(.grey1, width: 1)
         btn.heightAnchor.constraint(equalToConstant: 32).isActive = true
         return btn
     }()
@@ -82,7 +82,7 @@ class HomeHeaderSearchView: UIView {
     private let searchLabel: UILabel = {
         let lbl = UILabel()
         lbl.text = "searchLocation".localized()
-        lbl.textColor = .AppColors.grey4
+        lbl.textColor = .grey4
         lbl.font = .bodyL1
         return lbl
     }()
@@ -198,15 +198,15 @@ class HomeHeaderSearchView: UIView {
     private func updatePurposeSelection(isBuy: Bool) {
         let (activeButton, inactiveButton) = isBuy ? (buyButton, rentButton) : (rentButton, buyButton)
         
-        activeButton.backgroundColor = .AppColors.green1
-        activeButton.setTitleColor(.AppColors.green5, for: .normal)
+        activeButton.backgroundColor = .green1
+        activeButton.setTitleColor(.green5, for: .normal)
         activeButton.titleLabel?.font = .headingL4
         activeButton.layer.borderWidth = 0
         
         inactiveButton.backgroundColor = .white
-        inactiveButton.setTitleColor(.AppColors.grey5, for: .normal)
+        inactiveButton.setTitleColor(.grey5, for: .normal)
         inactiveButton.titleLabel?.font = .bodyL0
-        inactiveButton.setBorder(.AppColors.grey1, width: 1)
+        inactiveButton.setBorder(.grey1, width: 1)
     }
     
     struct AnimationConfig {

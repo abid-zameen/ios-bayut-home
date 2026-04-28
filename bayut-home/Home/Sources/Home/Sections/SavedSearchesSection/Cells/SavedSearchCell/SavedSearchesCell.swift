@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class SavedSearchesCell: HighlightableCollectionViewCell {
 
@@ -35,16 +36,16 @@ final class SavedSearchesCell: HighlightableCollectionViewCell {
 // MARK: - Setup
 private extension SavedSearchesCell {
     func setupViews() {
-        titleLabel?.textColor = UIColor.AppColors.teal5
+        titleLabel?.textColor = UIColor.teal5
         titleLabel?.font = UIFont.boldBody
         
-        searchNameLabel?.textColor = UIColor.AppColors.blackTextColor
+        searchNameLabel?.textColor = UIColor.blackTextColor
         searchNameLabel?.font = UIFont.appBoldFont(ofSize: 16)
         
-        locationsLabel?.textColor = UIColor.AppColors.grey5
+        locationsLabel?.textColor = UIColor.grey5
         locationsLabel?.font = UIFont.body
         
-        cellBackgroundView?.setBorder(UIColor.AppColors.grey2, width: 1)
+        cellBackgroundView?.setBorder(UIColor.grey2, width: 1)
         cellBackgroundView?.setRoundedCorner(radius: 8)
     }
     

@@ -12,7 +12,7 @@ class DownPaymentView: UIView {
     // MARK: - UI Components
     private let mainView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.AppColors.lilac1
+        view.backgroundColor = UIColor.lilac1
         view.layer.cornerRadius = 6.0
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -39,7 +39,7 @@ class DownPaymentView: UIView {
     private let downPaymentLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.appRegularFont(ofSize: 12.0)
-        label.textColor = UIColor.AppColors.lilac5
+        label.textColor = UIColor.lilac5
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     } ()

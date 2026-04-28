@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class MapCell: UICollectionViewCell {
     
@@ -39,7 +40,7 @@ private extension MapCell {
         titleTextLabel?.font = .bodyL0
         allowLocationCTA?.setTitle("Allow Location Access", for: .normal)
         allowLocationCTA?.setupTealColors()
-        contentView.setBorder(.AppColors.grey1, width: 1)
+        contentView.setBorder(.grey1, width: 1)
         contentView.setRoundedCorner(radius: 8)
     }
 }

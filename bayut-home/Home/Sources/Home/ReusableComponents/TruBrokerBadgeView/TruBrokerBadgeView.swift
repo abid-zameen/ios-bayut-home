@@ -72,7 +72,7 @@ final class TruBrokerBadgeView: UIView {
         transparentButton?.setTitle("", for: .normal)
         
         displayImageView?.setRoundedWithRespectToHeight(shouldClipToBounds: true)
-        displayImageView?.backgroundColor = UIColor.AppColors.grey1
+        displayImageView?.backgroundColor = UIColor.grey1
         
         backgroundView?.addBadgeShadow(opacity: 0.2)
         backgroundView?.backgroundColor = UIColor.clear
@@ -90,7 +90,7 @@ final class TruBrokerBadgeView: UIView {
         avatar?.setGradient(
             colors: [
                 UIColor.white.cgColor,
-                UIColor.AppColors.lightGreenChipColor.cgColor
+                UIColor.lightGreenChipColor.cgColor
             ],
             startPoint: CGPoint(x: 0.0, y: 0.5),
             endPoint: CGPoint(x: 1.0, y: 0.5)

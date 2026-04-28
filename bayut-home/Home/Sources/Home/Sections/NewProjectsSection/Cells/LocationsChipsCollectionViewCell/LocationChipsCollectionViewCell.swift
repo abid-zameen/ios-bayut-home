@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class LocationChipsCollectionViewCell: HighlightableCollectionViewCell {
 
@@ -40,23 +41,23 @@ private extension LocationChipsCollectionViewCell {
     func setupViews() {
         chipsBackgroundView?.clipsToBounds = true
         chipsBackgroundView?.layer.borderWidth = 1.0
-        chipsBackgroundView?.layer.borderColor = UIColor.AppColors.green2.cgColor
-        chipsBackgroundView?.backgroundColor = UIColor.AppColors.green1
+        chipsBackgroundView?.layer.borderColor = UIColor.green2.cgColor
+        chipsBackgroundView?.backgroundColor = UIColor.green1
         locName?.font = UIFont.appBoldFont(ofSize: 14.0)
     }
     
     func setupWithViewModel() {
         guard let chip = chip else { return }
         if chip.isSelected {
-            chipsBackgroundView?.layer.borderColor = UIColor.AppColors.green2.cgColor
-            chipsBackgroundView?.backgroundColor = UIColor.AppColors.green1
+            chipsBackgroundView?.layer.borderColor = UIColor.green2.cgColor
+            chipsBackgroundView?.backgroundColor = UIColor.green1
             locName?.font = UIFont.appBoldFont(ofSize: 14)
-            locName?.textColor = UIColor.AppColors.green7
+            locName?.textColor = UIColor.green7
         } else {
-            chipsBackgroundView?.layer.borderColor = UIColor.AppColors.grey2.cgColor
+            chipsBackgroundView?.layer.borderColor = UIColor.grey2.cgColor
             chipsBackgroundView?.backgroundColor = .clear
             locName?.font = UIFont.appRegularFont(ofSize: 14)
-            locName?.textColor = UIColor.AppColors.grey5
+            locName?.textColor = UIColor.grey5
         }
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class RecentSearchesViewCell: HighlightableCollectionViewCell {
         
@@ -81,10 +82,10 @@ private extension RecentSearchesViewCell {
         )
         
         titleLabel?.font = UIFont.semiBoldBody
-        titleLabel?.textColor = UIColor.AppColors.grey7
+        titleLabel?.textColor = UIColor.grey7
         
         subtitleLabel?.font = UIFont.body
-        subtitleLabel?.textColor = UIColor.AppColors.grey7
+        subtitleLabel?.textColor = UIColor.grey7
     }
     
     func setupFilterChips(filters: [HomeScreenRecentSearchFilter]) {
@@ -117,8 +118,8 @@ private extension RecentSearchesViewCell {
         let label = UILabel()
         label.text = text
         label.font = UIFont.body0
-        label.textColor = UIColor.AppColors.grey7
-        label.backgroundColor = UIColor.AppColors.grey1
+        label.textColor = UIColor.grey7
+        label.backgroundColor = UIColor.grey1
         label.layer.cornerRadius = 6
         label.clipsToBounds = true
         
@@ -132,7 +133,7 @@ private extension RecentSearchesViewCell {
             label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8)
         ])
         
-        container.backgroundColor = UIColor.AppColors.grey1
+        container.backgroundColor = UIColor.grey1
         container.layer.cornerRadius = 6
         
         return container

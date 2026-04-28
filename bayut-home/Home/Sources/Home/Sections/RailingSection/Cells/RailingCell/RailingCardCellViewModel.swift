@@ -37,7 +37,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.descriptionText = "FindOutYourPropertyWorth".localized()
             self.backgroundImage = "truEstimate_entryPoint_background"
             self.itemImage = "truEstimate_entryPoint_backgroundImage"
-            self.backgroundViewColor = .AppColors.lightGreenBackgroundColor
+            self.backgroundViewColor = .lightGreenBackgroundColor
             self.ctaText = "getStarted".localized()
             
         case .truBroker:
@@ -53,7 +53,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.descriptionText = "entryPointHomeDescription".localized()
             self.backgroundImage = nil
             self.itemImage = "Transactions-Card-Icon"
-            self.backgroundViewColor = .AppColors.green1
+            self.backgroundViewColor = .green1
             self.ctaText = "start_search".localized()
             
         case .commuteSearch:
@@ -61,7 +61,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.descriptionText = "commuteSearchBannerDescription".localized()
             self.backgroundImage = nil
             self.itemImage = "commuteBannerImage"
-            self.backgroundViewColor = .AppColors.turquoise1
+            self.backgroundViewColor = .turquoise1
             self.ctaText = "start_search".localized()
             
         case .bayutGPT:
@@ -69,7 +69,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.descriptionText = "Your trusted AI Assitant for UAE Property"
             self.itemImage = "bayutGPTBannerImage"
             self.backgroundImage = nil
-            self.backgroundViewColor = .AppColors.teal1
+            self.backgroundViewColor = .teal1
             self.ctaText = "Start Chatting"
             
         case .findAnAgency:

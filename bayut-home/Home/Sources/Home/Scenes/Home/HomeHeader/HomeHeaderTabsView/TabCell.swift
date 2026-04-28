@@ -34,12 +34,12 @@ final class TabCell: UICollectionViewCell {
     func configure(title: String, isSelected: Bool) {
         titleLabel.text = title
         if isSelected {
-            backgroundColor = .AppColors.green5
+            backgroundColor = .green5
             titleLabel.textColor = .white
             titleLabel.font = .headingL4
         } else {
             backgroundColor = .clear
-            titleLabel.textColor = .AppColors.grey5
+            titleLabel.textColor = .grey5
             titleLabel.font = .body
         }
     }

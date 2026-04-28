@@ -18,6 +18,7 @@ extension CGFloat {
     static let little: CGFloat = 6
     static let tiny: CGFloat = 4
     static let standardBorderWidth : CGFloat = 1
+    static let sectionTopSpace: CGFloat = 20
     static var ipadLandscapeMarginPadding: CGFloat { 0.16 * UIScreen.main.bounds.size.width }
     static var ipadPortraitMarginPadding: CGFloat { 0.11 * UIScreen.main.bounds.size.width }
     static var ipadMarginPadding: CGFloat {

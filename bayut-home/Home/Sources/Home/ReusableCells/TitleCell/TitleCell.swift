@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 // MARK: - Title Cell
 final class TitleCell: UICollectionViewCell {
@@ -15,14 +16,14 @@ final class TitleCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .headingL1
         label.numberOfLines = .zero
-        label.textColor = .AppColors.grey7
+        label.textColor = .grey7
         return label
     }()
     
     private lazy var subTitleLabel: UILabel = {
         let label = UILabel()
         label.font = .body
-        label.textColor = .AppColors.grey7
+        label.textColor = .grey7
         label.numberOfLines = 0
         return label
     }()

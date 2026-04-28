@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class RailingCardCell: HighlightableCollectionViewCell {
     
@@ -53,13 +54,13 @@ private extension RailingCardCell {
         mainContentView?.clipsToBounds = true
         
         headingLabel?.font = UIFont.headingL1
-        headingLabel?.textColor = UIColor.AppColors.blackTextColor
+        headingLabel?.textColor = UIColor.blackTextColor
         
-        descriptionLabel?.textColor = UIColor.AppColors.blackTextColor
+        descriptionLabel?.textColor = UIColor.blackTextColor
         descriptionLabel?.font = UIFont.body
         
         ctalabel?.font = .heading
-        ctalabel?.textColor = .AppColors.turquoiseColor
+        ctalabel?.textColor = .turquoiseColor
         ctaView?.backgroundColor = .white
         ctaView?.setRoundedCorner(radius: 8)
         ctaButton?.setTitle("", for: .normal)

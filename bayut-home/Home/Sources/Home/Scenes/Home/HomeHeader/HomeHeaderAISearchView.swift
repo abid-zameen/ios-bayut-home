@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class HomeHeaderAISearchView: UIView {
     
@@ -40,7 +41,7 @@ final class HomeHeaderAISearchView: UIView {
     private let aiBadge: UILabel = {
         let lbl = UILabel()
         lbl.text = "AI"
-        lbl.textColor = .AppColors.blackTextColor
+        lbl.textColor = .blackTextColor
         lbl.font = .boldBody
         return lbl
     }()
@@ -109,7 +110,7 @@ final class HomeHeaderAISearchView: UIView {
         containerView.backgroundColor = .white
         
         // Text and Badge colors
-        aiLabel.textColor = progress > 0.5 ? .black : .darkGray
+        aiLabel.textColor = progress > 0.5 ? .black : .darkGrayColor
     }
     
     func reApplyAnimatedGradient() {
@@ -126,11 +127,11 @@ final class HomeHeaderAISearchView: UIView {
     
     func applyGradientBorder() {
         applyAnimatedGradientBorder(colors: [
-            UIColor.AppColors.blue5,
-            UIColor.AppColors.green2,
-            UIColor.AppColors.lightDividerColorSecondary,
-            UIColor.AppColors.lightDividerColorSecondary,
-            UIColor.AppColors.green5
+            UIColor.blue5,
+            UIColor.green2,
+            UIColor.lightDividerColorSecondary,
+            UIColor.lightDividerColorSecondary,
+            UIColor.green5
         ], lineWidth: 2, cornerRadius: 24)
     }
 }

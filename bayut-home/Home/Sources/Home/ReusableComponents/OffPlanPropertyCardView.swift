@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UIToolKit
 
 final class OffPlanPropertyCardView: UIView {
     
@@ -22,7 +23,7 @@ final class OffPlanPropertyCardView: UIView {
     
     private let handoverView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.AppColors.grey1
+        view.backgroundColor = UIColor.grey1
         view.layer.cornerRadius = 6.0
         view.clipsToBounds = true
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -32,14 +33,14 @@ final class OffPlanPropertyCardView: UIView {
     private let handoverLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.bodyS1
-        label.textColor = UIColor.AppColors.blackTextColor
+        label.textColor = UIColor.blackTextColor
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let paymentPlanView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.AppColors.grey1
+        view.backgroundColor = UIColor.grey1
         view.layer.cornerRadius = 6.0
         view.clipsToBounds = true
         view.isUserInteractionEnabled = true
@@ -59,7 +60,7 @@ final class OffPlanPropertyCardView: UIView {
     private let paymentPlanLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.bodyS1
-        label.textColor = UIColor.AppColors.blackTextColor
+        label.textColor = UIColor.blackTextColor
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
