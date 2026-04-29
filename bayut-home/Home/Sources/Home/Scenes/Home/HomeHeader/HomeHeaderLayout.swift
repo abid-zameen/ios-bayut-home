@@ -52,7 +52,7 @@ struct HomeHeaderLayout {
 
     var bottomCurveExpandedTop: CGFloat     { statusBarHeight + DesignOffset.bottomCurve }
     var bottomCurveCollapsedTop: CGFloat    { -20 }
-    var bottomCurveExpandedHeight: CGFloat  { 100.5 }
+    var bottomCurveExpandedHeight: CGFloat  { 97 }
     var bottomCurveCollapsedHeight: CGFloat { stickyHeight }
 
 

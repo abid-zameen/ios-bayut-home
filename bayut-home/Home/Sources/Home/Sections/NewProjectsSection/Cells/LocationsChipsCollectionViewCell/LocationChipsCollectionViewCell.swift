@@ -40,10 +40,10 @@ final class LocationChipsCollectionViewCell: HighlightableCollectionViewCell {
 private extension LocationChipsCollectionViewCell {
     func setupViews() {
         chipsBackgroundView?.clipsToBounds = true
-        chipsBackgroundView?.layer.borderWidth = 1.0
+        chipsBackgroundView?.layer.borderWidth = .standardBorderWidth
         chipsBackgroundView?.layer.borderColor = UIColor.green2.cgColor
         chipsBackgroundView?.backgroundColor = UIColor.green1
-        locName?.font = UIFont.appBoldFont(ofSize: 14.0)
+        locName?.font = .headingL4
     }
     
     func setupWithViewModel() {
@@ -51,12 +51,12 @@ private extension LocationChipsCollectionViewCell {
         if chip.isSelected {
             chipsBackgroundView?.layer.borderColor = UIColor.green2.cgColor
             chipsBackgroundView?.backgroundColor = UIColor.green1
-            locName?.font = UIFont.appBoldFont(ofSize: 14)
+            locName?.font = .headingL4
             locName?.textColor = UIColor.green7
         } else {
             chipsBackgroundView?.layer.borderColor = UIColor.grey2.cgColor
             chipsBackgroundView?.backgroundColor = .clear
-            locName?.font = UIFont.appRegularFont(ofSize: 14)
+            locName?.font = .body
             locName?.textColor = UIColor.grey5
         }
     }

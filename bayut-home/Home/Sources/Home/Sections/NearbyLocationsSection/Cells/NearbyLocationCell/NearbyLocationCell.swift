@@ -44,8 +44,8 @@ private extension NearbyLocationCell {
         distanceLabel?.textColor = UIColor.grey7
         distanceLabel?.font = UIFont.body
         
-        contentView.setBorder(UIColor.grey2, width: 1)
-        contentView.setRoundedCorner(radius: 8)
+        contentView.setBorder(UIColor.grey2, width: .standardBorderWidth)
+        contentView.setRoundedCorner(radius: .extraSmall)
     }
     
     func setupWithViewModel() {

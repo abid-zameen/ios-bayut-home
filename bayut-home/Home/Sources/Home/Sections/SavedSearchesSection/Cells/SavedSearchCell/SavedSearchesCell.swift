@@ -37,16 +37,16 @@ final class SavedSearchesCell: HighlightableCollectionViewCell {
 private extension SavedSearchesCell {
     func setupViews() {
         titleLabel?.textColor = UIColor.teal5
-        titleLabel?.font = UIFont.boldBody
+        titleLabel?.font = .headingL4
         
         searchNameLabel?.textColor = UIColor.blackTextColor
-        searchNameLabel?.font = UIFont.appBoldFont(ofSize: 16)
+        searchNameLabel?.font = .headingL4
         
         locationsLabel?.textColor = UIColor.grey5
         locationsLabel?.font = UIFont.body
         
-        cellBackgroundView?.setBorder(UIColor.grey2, width: 1)
-        cellBackgroundView?.setRoundedCorner(radius: 8)
+        cellBackgroundView?.setBorder(UIColor.grey2, width: .standardBorderWidth)
+        cellBackgroundView?.setRoundedCorner(radius: .extraSmall)
     }
     
     func setupWithViewModel() {

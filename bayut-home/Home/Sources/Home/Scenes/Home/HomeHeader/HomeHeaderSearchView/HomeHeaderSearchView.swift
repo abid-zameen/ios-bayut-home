@@ -126,9 +126,9 @@ class HomeHeaderSearchView: UIView {
         containerTop.isActive = true
         
         NSLayoutConstraint.activate([
-            toggleStackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
-            toggleStackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
-            toggleStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
+            toggleStackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
+            toggleStackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
+            toggleStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
             
             separatorView.topAnchor.constraint(equalTo: toggleStackView.bottomAnchor, constant: 8),
             separatorView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
@@ -137,7 +137,7 @@ class HomeHeaderSearchView: UIView {
             
         ])
         
-        let searchTop = searchContainer.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 60)
+        let searchTop = searchContainer.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 50)
         self.searchTopConstraint = searchTop
         
         NSLayoutConstraint.activate([
@@ -158,12 +158,12 @@ class HomeHeaderSearchView: UIView {
         searchLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            searchIcon.trailingAnchor.constraint(equalTo: searchContainer.trailingAnchor, constant: -12),
+            searchIcon.trailingAnchor.constraint(equalTo: searchContainer.trailingAnchor, constant: -16),
             searchIcon.centerYAnchor.constraint(equalTo: searchContainer.centerYAnchor),
-            searchIcon.widthAnchor.constraint(equalToConstant: 20),
-            searchIcon.heightAnchor.constraint(equalToConstant: 20),
+            searchIcon.widthAnchor.constraint(equalToConstant: 24),
+            searchIcon.heightAnchor.constraint(equalToConstant: 24),
             
-            searchLabel.leadingAnchor.constraint(equalTo: searchContainer.leadingAnchor, constant: 12),
+            searchLabel.leadingAnchor.constraint(equalTo: searchContainer.leadingAnchor, constant: 16),
             searchLabel.trailingAnchor.constraint(equalTo: searchIcon.leadingAnchor, constant: -8),
             searchLabel.centerYAnchor.constraint(equalTo: searchContainer.centerYAnchor)
         ])
@@ -212,7 +212,7 @@ class HomeHeaderSearchView: UIView {
     struct AnimationConfig {
         var initialContainerTop: CGFloat = 25
         var targetContainerTop: CGFloat = -40
-        var internalSearchTop: CGFloat = 60
+        var internalSearchTop: CGFloat = 50
     }
     
     var animationConfig = AnimationConfig()
@@ -244,7 +244,7 @@ class HomeHeaderSearchView: UIView {
             target = target + (animationConfig.internalSearchTop)
         }
         
-        containerTopConstraint?.constant = initial + (target - initial + 6) * progress
+        containerTopConstraint?.constant = initial + (target - initial + 12) * progress
         searchTopConstraint?.constant = isPurposeHidden ? 0 : animationConfig.internalSearchTop
     }
     

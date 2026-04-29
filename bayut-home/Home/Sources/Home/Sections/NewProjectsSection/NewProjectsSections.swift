@@ -22,14 +22,8 @@ enum NewProjectsSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum NewProjectsLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
-    static let spacing: CGFloat = 16
-    
-    // Location chips
+    static let sectionInsets = NSDirectionalEdgeInsets(top: .sectionTopSpace, leading: .standard, bottom: .zero, trailing: .standard)
     static let chipHeight: CGFloat = 36
-    static let chipSpacing: CGFloat = 8
-    
-    // Project cards
     static let cardWidth: CGFloat = 280
     static let cardHeight: CGFloat = 340
 }
@@ -116,12 +110,12 @@ final class NewProjectsLocationsSection: SectionDescriptor {
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
-        section.interGroupSpacing = NewProjectsLayout.chipSpacing
+        section.interGroupSpacing = .extraSmall
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: NewProjectsLayout.spacing,
-            leading: 16,
-            bottom: 0,
-            trailing: 16
+            top: .standard,
+            leading: .standard,
+            bottom: .zero,
+            trailing: .standard
         )
         return section
     }
@@ -206,12 +200,12 @@ final class NewProjectsCarouselSection: SectionDescriptor {
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
-        section.interGroupSpacing = NewProjectsLayout.spacing
+        section.interGroupSpacing = .standard
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: NewProjectsLayout.spacing,
-            leading: 16,
-            bottom: 0,
-            trailing: 16
+            top: .standard,
+            leading: .standard,
+            bottom: .zero,
+            trailing: .standard
         )
         return section
     }
@@ -268,10 +262,10 @@ final class NewProjectsViewAllSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
-                top: 0,
-                leading: 0,
-                bottom: 0,
-                trailing: 0
+                top: .zero,
+                leading: .zero,
+                bottom: .zero,
+                trailing: .zero
             )
         )
     }

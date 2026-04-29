@@ -19,11 +19,10 @@ enum PopularSearchSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum PopularSearchLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
-    static let spacing: CGFloat = 12
+    static let sectionInsets = NSDirectionalEdgeInsets(top: .sectionTopSpace, leading: .standard, bottom: .zero, trailing: .standard)
     static let purposeHeight: CGFloat = 40
     static let cardWidth: CGFloat = 217
-    static let cardHeight: CGFloat = 72
+    static let cardHeight: CGFloat = 64
 }
 
 final class PopularSearchTitleSection: SectionDescriptor {
@@ -80,7 +79,7 @@ final class PopularSearchPurposeSection: SectionDescriptor {
             heightDimension: .absolute(PopularSearchLayout.purposeHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
+        item.contentInsets = NSDirectionalEdgeInsets(top: .zero, leading: .tiny, bottom: .zero, trailing: .standard)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -89,7 +88,7 @@ final class PopularSearchPurposeSection: SectionDescriptor {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 12, bottom: 0, trailing: 12)
+        section.contentInsets = NSDirectionalEdgeInsets(top: .standard, leading: .small, bottom: .zero, trailing: .small)
         return section
     }
     
@@ -150,12 +149,12 @@ final class PopularSearchCarouselSection: SectionDescriptor {
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
-        section.interGroupSpacing = PopularSearchLayout.spacing
+        section.interGroupSpacing = .small
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: 16,
-            leading: 16,
-            bottom: 0,
-            trailing: 16
+            top: .standard,
+            leading: .standard,
+            bottom: .zero,
+            trailing: .standard
         )
         return section
     }

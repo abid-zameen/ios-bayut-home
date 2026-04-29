@@ -40,7 +40,7 @@ final class TruBrokerBannerSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         return .fullWidthList(
             estimatedHeight: 100,
-            sectionInsets: NSDirectionalEdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16)
+            sectionInsets: NSDirectionalEdgeInsets(top: .sectionTopSpace, leading: 16, bottom: 0, trailing: 16)
         )
     }
     

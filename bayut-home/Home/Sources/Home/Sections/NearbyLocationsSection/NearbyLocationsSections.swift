@@ -19,12 +19,9 @@ enum NearbyLocationsSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum NearbyLocationsLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
-    static let spacing: CGFloat = 16
-    
+    static let sectionInsets = NSDirectionalEdgeInsets(top: .sectionTopSpace, leading: .standard, bottom: .zero, trailing: .standard)
     static let cardWidth: CGFloat = 200
     static let cardHeight: CGFloat = 80
-    
     static let mapHeight: CGFloat = 240
 }
 
@@ -101,12 +98,12 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
-        section.interGroupSpacing = NearbyLocationsLayout.spacing
+        section.interGroupSpacing = .standard
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: NearbyLocationsLayout.spacing,
-            leading: 16,
-            bottom: 0,
-            trailing: 16
+            top: .standard,
+            leading: .standard,
+            bottom: .zero,
+            trailing: .standard
         )
         return section
     }
@@ -159,10 +156,10 @@ final class NearbyLocationMapSection: SectionDescriptor {
         
         let section = NSCollectionLayoutSection(group: group)
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: NearbyLocationsLayout.spacing,
-            leading: 16,
-            bottom: 0,
-            trailing: 16
+            top: .standard,
+            leading: .standard,
+            bottom: .zero,
+            trailing: .standard
         )
         return section
     }

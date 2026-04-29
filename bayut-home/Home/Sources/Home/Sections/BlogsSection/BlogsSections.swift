@@ -19,9 +19,7 @@ enum BlogsSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum BlogsLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 20, leading: 16, bottom: 0, trailing: 16)
-    static let spacing: CGFloat = 16
-    
+    static let sectionInsets = NSDirectionalEdgeInsets(top: .sectionTopSpace, leading: .standard, bottom: .zero, trailing: .standard)
     static let cardWidth: CGFloat = 10
     static let estimatedCardHeight: CGFloat = 260
 }
@@ -90,7 +88,7 @@ final class BlogsCarouselSection: SectionDescriptor {
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+        item.contentInsets = NSDirectionalEdgeInsets(top: .zero, leading: .standard, bottom: .zero, trailing: .standard)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.85),
@@ -100,12 +98,12 @@ final class BlogsCarouselSection: SectionDescriptor {
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPaging
-        section.interGroupSpacing = 0
+        section.interGroupSpacing = .zero
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: BlogsLayout.spacing,
-            leading: 0,
-            bottom: 0,
-            trailing: 0
+            top: .standard,
+            leading: .zero,
+            bottom: .zero,
+            trailing: .zero
         )
         return section
     }
@@ -148,10 +146,10 @@ final class BlogsViewAllSection: SectionDescriptor {
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         .fullWidthList(
             sectionInsets: NSDirectionalEdgeInsets(
-                top: 0,
-                leading: 0,
-                bottom: BlogsLayout.spacing,
-                trailing: 0
+                top: .zero,
+                leading: .zero,
+                bottom: .standard,
+                trailing: .zero
             )
         )
     }

@@ -26,6 +26,13 @@ final class ProjectsCollectionViewCell: HighlightableCollectionViewCell {
     @IBOutlet private weak var projectName: UILabel?
     @IBOutlet private weak var projectImage: UIImageView?
     
+    // MARK: - Constants
+    private enum Constants {
+        static let handover = "handover".localized()
+        static let startingFromTitle = "startingFromTitle".localized()
+        static let whatsApp = "whatsApp".localized()
+    }
+    
     // MARK: - Properties
     var viewModel: NewProjectCellViewModelType?
     
@@ -49,14 +56,14 @@ final class ProjectsCollectionViewCell: HighlightableCollectionViewCell {
 private extension ProjectsCollectionViewCell {
     func setupViews() {
         contentView.clipsToBounds = false
-        bottomView?.layer.cornerRadius = 8
-        projectImage?.layer.cornerRadius = 8
+        bottomView?.layer.cornerRadius = .extraSmall
+        projectImage?.layer.cornerRadius = .extraSmall
         projectImage?.clipsToBounds = true
         
-        handOverTitle?.text = "handover".localized()
-        launchPriceTitle?.text = "startingFromTitle".localized()
+        handOverTitle?.text = Constants.handover
+        launchPriceTitle?.text = Constants.startingFromTitle
         
-        whatsappButton?.setTitle("Whatsapp", for: .normal)
+        whatsappButton?.setTitle(Constants.whatsApp, for: .normal)
     }
     
     func setupWithViewModel() {

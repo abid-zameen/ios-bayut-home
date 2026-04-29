@@ -37,10 +37,10 @@ final class MapCell: UICollectionViewCell {
 private extension MapCell {
     func setupViews() {
         titleTextLabel?.text = "Enable your location to get tailored nearby locations"
-        titleTextLabel?.font = .bodyL0
+        titleTextLabel?.font = .body
         allowLocationCTA?.setTitle("Allow Location Access", for: .normal)
         allowLocationCTA?.setupTealColors()
-        contentView.setBorder(.grey1, width: 1)
-        contentView.setRoundedCorner(radius: 8)
+        contentView.setBorder(.grey1, width: .standardBorderWidth)
+        contentView.setRoundedCorner(radius: .extraSmall)
     }
 }

@@ -33,7 +33,7 @@ final class PopularSearchCell: HighlightableCollectionViewCell {
     
     override func prepareForReuse() {
         self.viewModel = nil
-        self.locationLabel?.text = ""
+        self.locationLabel?.text = .empty
     }
 
 }
@@ -46,8 +46,8 @@ private extension PopularSearchCell {
         locationLabel?.font = .bodyL0
         locationLabel?.textColor = .grey7
         
-        contentView.setRoundedCorner(radius: 8)
-        contentView.setBorder(.grey2, width: 1)
+        contentView.setRoundedCorner(radius: .extraSmall)
+        contentView.setBorder(.grey2, width: .standardBorderWidth)
         contentView.backgroundColor = .white
     }
     

@@ -93,8 +93,8 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         let isIpad = environment.traitCollection.horizontalSizeClass == .regular
-        let horizontalInset: CGFloat = 16
-        let interItemSpacing: CGFloat = 16
+        let horizontalInset: CGFloat = .standard
+        let interItemSpacing: CGFloat = .standard
         
         let visibleWidth = environment.container.contentSize.width - horizontalInset
         let cardWidth: CGFloat = isIpad ? visibleWidth * 0.58 : 340.0
@@ -115,10 +115,10 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
         section.orthogonalScrollingBehavior = .groupPaging
         section.interGroupSpacing = interItemSpacing
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: 12,
-            leading: 16,
-            bottom: 0,
-            trailing: 16
+            top: .sectionTopSpace,
+            leading: .standard,
+            bottom: .zero,
+            trailing: .standard
         )
         
         section.visibleItemsInvalidationHandler = { [weak syncState, cellCount = cellTypes.count] (visibleItems, offset, env) in
@@ -187,8 +187,8 @@ final class RailingPageControlSection: SectionDescriptor {
     
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
         return .fullWidthList(
-            estimatedHeight: 12,
-            sectionInsets: NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16)
+            estimatedHeight: .small,
+            sectionInsets: NSDirectionalEdgeInsets(top: .extraSmall, leading: .standard, bottom: .zero, trailing: .standard)
         )
     }
     

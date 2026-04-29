@@ -46,11 +46,11 @@ private extension RailingCardCell {
     func setupViews() {
         self.clipsToBounds = false
         contentView.backgroundColor = .white
-        contentView.setRoundedCorner(radius: 8)
+        contentView.setRoundedCorner(radius: .extraSmall)
         contentView.clipsToBounds = false
         contentView.sketchShadow()
         
-        mainContentView?.setRoundedCorner(radius: 8)
+        mainContentView?.setRoundedCorner(radius: .extraSmall)
         mainContentView?.clipsToBounds = true
         
         headingLabel?.font = UIFont.headingL1
@@ -62,8 +62,8 @@ private extension RailingCardCell {
         ctalabel?.font = .heading
         ctalabel?.textColor = .turquoiseColor
         ctaView?.backgroundColor = .white
-        ctaView?.setRoundedCorner(radius: 8)
-        ctaButton?.setTitle("", for: .normal)
+        ctaView?.setRoundedCorner(radius: .extraSmall)
+        ctaButton?.setTitle(.empty, for: .normal)
     }
     
     func setupWithViewModel() {

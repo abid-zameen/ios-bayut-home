@@ -40,13 +40,10 @@ final class NearbyLocationsGroup: SectionGroup {
             return []
         }
         
-        // 1. Title Header
         let titleSection = NearbyLocationsTitleSection(title: title, section: section)
         sections.append(AnySection(titleSection, isCustomizable: false))
         
-        // 2. Main Content
         if isLocationEnabled {
-            // Carousel (Handles loading/data internally)
             let carouselSection = NearbyLocationsCarouselSection(
                 state: locations,
                 section: section,
@@ -54,7 +51,6 @@ final class NearbyLocationsGroup: SectionGroup {
             )
             sections.append(AnySection(carouselSection, isCustomizable: false))
         } else {
-            // Map Cell (Static UI when location disabled)
             let mapSection = NearbyLocationMapSection(section: section, actions: actions)
             sections.append(AnySection(mapSection, isCustomizable: false))
         }
