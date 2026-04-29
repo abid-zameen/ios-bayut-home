@@ -82,7 +82,7 @@ class HomeHeaderView: UIView {
     // MARK: - Animation Engine
     private let animationEngine = HeaderAnimationEngine()
     
-    var variant: HeaderVariant = .uae {
+    var variant: HeaderVariant = .aiSearch {
         didSet {
             setupLayout()
         }
@@ -232,7 +232,7 @@ class HomeHeaderView: UIView {
     var expandedContentHeight: CGFloat {
         let layout = HomeHeaderLayout.make(in: self)
         
-        if variant == .gcc {
+        if variant == .standard {
             // In GCC, searchView top is relative to the header top
             return layout.gccSearchExpandedTop + searchView.contentHeight
         } else {
@@ -274,7 +274,7 @@ class HomeHeaderView: UIView {
     }
     
     private func updateConstraintsForVariant() {
-        let isGCC = variant == .gcc
+        let isGCC = variant == .standard
         
         aiSearchTopConstraint?.isActive = !isGCC
         dividerTopConstraint?.isActive = !isGCC
@@ -299,7 +299,7 @@ class HomeHeaderView: UIView {
         animationEngine.currentVariant = variant
         let layout = HomeHeaderLayout.make(in: self)
         
-        searchView.animationConfig.targetContainerTop = (variant == .uae) ? -70 : -50
+        searchView.animationConfig.targetContainerTop = (variant == .aiSearch) ? -70 : -50
         
         let logoElement = AnimatableElement(
             view: logoImageView,
@@ -334,7 +334,7 @@ class HomeHeaderView: UIView {
             expandedTop: layout.bottomCurveExpandedTop, collapsedTop: layout.bottomCurveCollapsedTop,
             secondaryConstraint: bottomCurveHeightConstraint,
             expandedSecondary: layout.bottomCurveExpandedHeight, collapsedSecondary: layout.bottomCurveCollapsedHeight,
-            expandedAlpha: (variant == .uae) ? 1 : 0,
+            expandedAlpha: (variant == .aiSearch) ? 1 : 0,
             collapsedAlpha: 0,
             alphaStartProgress: 0.8, alphaEndProgress: 1.0
         )
@@ -343,7 +343,7 @@ class HomeHeaderView: UIView {
             view: bottomCurveSolidImageView,
             topConstraint: nil,
             expandedTop: 0, collapsedTop: 0,
-            expandedAlpha: (variant == .uae) ? 0 : 1,
+            expandedAlpha: (variant == .aiSearch) ? 0 : 1,
             collapsedAlpha: 1,
             alphaStartProgress: 0.8, alphaEndProgress: 1.0
         )
@@ -352,7 +352,7 @@ class HomeHeaderView: UIView {
         var variantElements: [AnimatableElement]
         
         switch variant {
-        case .gcc:
+        case .standard:
             tabsElement = AnimatableElement(
                 view: tabsView,
                 topConstraint: contentTopConstraint,
@@ -370,7 +370,7 @@ class HomeHeaderView: UIView {
             
             variantElements = [gccSearchElement]
             
-        case .uae:
+        case .aiSearch:
             tabsElement = AnimatableElement(
                 view: tabsView,
                 topConstraint: contentTopConstraint,
@@ -421,7 +421,7 @@ class HomeHeaderView: UIView {
         animationEngine.apply(progress: p)
         
         searchView.setProgress(p)
-        if variant == .uae {
+        if variant == .aiSearch {
             aiSearchView.setProgress(p)
         }
     }

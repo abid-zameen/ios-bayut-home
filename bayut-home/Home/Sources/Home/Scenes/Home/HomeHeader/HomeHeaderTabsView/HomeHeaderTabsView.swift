@@ -21,7 +21,6 @@ final class HomeHeaderTabsView: UIView {
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = 14
         return view
     }()
     
@@ -60,6 +59,11 @@ final class HomeHeaderTabsView: UIView {
             collectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -4),
             collectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -4)
         ])
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        containerView.setRoundedWithRespectToHeight(shouldClipToBounds: true)
     }
     
     func setupTabs(tabs: [HomeHeaderTab]) {

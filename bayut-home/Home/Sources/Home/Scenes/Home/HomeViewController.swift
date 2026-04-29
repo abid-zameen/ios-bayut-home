@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import BayutUIKit
 
 protocol HomeDisplayLogic: AnyObject {
     func displaySections(viewModel: Home.HomeViewModel)
@@ -45,7 +46,7 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     private var headerHeightConstraint: NSLayoutConstraint?
     private var initialHeaderHeight: CGFloat = 350
     private var isInitialInsetSet = false
-    private var variant: HeaderVariant = .gcc
+    private var variant: HeaderVariant = .standard
     private var autoscrollTimers: [AnySection: Timer] = [:]
     private var resumeAutoscrollWorkItems: [AnySection: DispatchWorkItem] = [:]
     private let autoscrollResumeDelay: TimeInterval = 2.0
@@ -53,6 +54,7 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        interactor?.checkOnboarding()
         setupHierarchy()
         setupConstraints()
         configureDataSource()

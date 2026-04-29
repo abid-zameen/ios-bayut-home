@@ -36,7 +36,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ulX-IQ-SFM" customClass="PrimaryDarkButton" customModule="UIToolKit">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ulX-IQ-SFM" customClass="PrimaryDarkButton" customModule="BayutUIKit">
                                 <rect key="frame" x="16" y="160" width="324" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="orQ-x6-cwg"/>

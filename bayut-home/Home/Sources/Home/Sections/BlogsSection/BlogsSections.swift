@@ -19,7 +19,7 @@ enum BlogsSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum BlogsLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 38, leading: 16, bottom: 0, trailing: 16)
+    static let sectionInsets = NSDirectionalEdgeInsets(top: 20, leading: 16, bottom: 0, trailing: 16)
     static let spacing: CGFloat = 16
     
     static let cardWidth: CGFloat = 10

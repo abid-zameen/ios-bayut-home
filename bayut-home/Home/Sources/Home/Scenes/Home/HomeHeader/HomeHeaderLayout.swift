@@ -24,8 +24,8 @@ struct HomeHeaderLayout {
     // MARK: - View Heights (from Figma — screen-independent)
 
     enum ViewHeight {
-        static let logo:       CGFloat = 32
-        static let tabs:       CGFloat = 44
+        static let logo:       CGFloat = 33.24
+        static let tabs:       CGFloat = 36
         static let aiSearch:   CGFloat = 52
         static let gccSearch:  CGFloat = 48
         static let buildings:  CGFloat = 137
@@ -35,13 +35,13 @@ struct HomeHeaderLayout {
     // These encode the Figma spacing above each element in the expanded state.
 
     private enum DesignOffset {
-        static let logo:         CGFloat = 46   // 44 + 46 = 90
-        static let buildings:    CGFloat = 10   // 44 + 20 = 64
-        static let tabs:         CGFloat = 140  // 44 + 121 = 165
-        static let bottomCurve:  CGFloat = 134  // 44 + 134 = 178
+        static let logo:         CGFloat = 49   // 44 + 46 = 90
+        static let buildings:    CGFloat = 0   // 44 + 20 = 64
+        static let tabs:         CGFloat = 130  // 44 + 121 = 165
+        static let bottomCurve:  CGFloat = 130  // 44 + 130 = 178
         static let topCurve:     CGFloat = 57   // 44 + 57 = 101 (fixed, not animated)
         static let aiSearchGap:  CGFloat = 8
-        static let gccSearchGap: CGFloat = 8
+        static let gccSearchGap: CGFloat = 12
     }
 
     var logoExpandedTop: CGFloat    { statusBarHeight + DesignOffset.logo }
@@ -52,7 +52,7 @@ struct HomeHeaderLayout {
 
     var bottomCurveExpandedTop: CGFloat     { statusBarHeight + DesignOffset.bottomCurve }
     var bottomCurveCollapsedTop: CGFloat    { -20 }
-    var bottomCurveExpandedHeight: CGFloat  { 97 }
+    var bottomCurveExpandedHeight: CGFloat  { 100.5 }
     var bottomCurveCollapsedHeight: CGFloat { stickyHeight }
 
 

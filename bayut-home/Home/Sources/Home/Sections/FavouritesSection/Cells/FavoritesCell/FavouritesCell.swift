@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import UIToolKit
+import BayutUIKit
 
 final class FavouritesCell: HighlightableCollectionViewCell {
     

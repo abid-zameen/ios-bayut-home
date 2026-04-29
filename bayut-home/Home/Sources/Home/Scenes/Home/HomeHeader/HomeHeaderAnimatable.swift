@@ -8,8 +8,8 @@
 import UIKit
 
 enum HeaderVariant {
-    case uae
-    case gcc
+    case aiSearch
+    case standard
 }
 
 // MARK: - Animatable Element
@@ -43,7 +43,7 @@ extension HeaderVariant: Hashable {}
 final class HeaderAnimationEngine {
 
     var elements: [AnimatableElement] = []
-    var currentVariant: HeaderVariant = .uae
+    var currentVariant: HeaderVariant = .aiSearch
 
     /// Applies animation state to all registered elements for the given progress.
     /// - Parameter progress: A value in the range [0.0, 1.0] where 0 = expanded, 1 = collapsed.

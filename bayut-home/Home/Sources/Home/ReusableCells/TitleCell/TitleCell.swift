@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import UIToolKit
+import BayutUIKit
 
 // MARK: - Title Cell
 final class TitleCell: UICollectionViewCell {
