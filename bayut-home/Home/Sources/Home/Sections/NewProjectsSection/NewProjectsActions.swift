@@ -12,6 +12,7 @@ protocol NewProjectsActionsDelegate: AnyObject {
     func newProjectsDidTapCard(hit: ProjectHit)
     func newProjectsDidTapLocationChip(externalID: String)
     func newProjectsDidTapViewAll(externalID: String, displayName: String)
+    func newProjectsDidTapWhatsapp(hit: ProjectHit, index: Int)
 }
 
 // MARK: - Actions Container

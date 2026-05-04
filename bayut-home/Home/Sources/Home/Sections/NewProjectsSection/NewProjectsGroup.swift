@@ -42,10 +42,6 @@ final class NewProjectsGroup: SectionGroup {
     func buildSections() -> [AnySection] {
         var sections: [AnySection] = []
         
-        if case .empty = projects {
-            return []
-        }
-        
         // 1. Header Section
         let header = NewProjectsTitleSection(title: headerTitle, section: section)
         sections.append(AnySection(header, isCustomizable: false))

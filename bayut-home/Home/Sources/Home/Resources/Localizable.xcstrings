@@ -900,6 +900,35 @@
         }
       }
     },
+    "savedSearchChildTypeFormat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ "
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ "
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ "
+          }
+        }
+      }
+    },
     "savedSearches" : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -925,6 +954,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已保存搜索"
+          }
+        }
+      }
+    },
+    "savedSearchParentTypeTitleFormat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ %@"
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@ %@ %@ %@"
           }
         }
       }
@@ -1332,6 +1390,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "查看所有保存的搜索"
+          }
+        }
+      }
+    },
+    "whatsapp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whatsapp"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whatsapp"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whatsapp"
+          }
+        },
+        "zh" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whatsapp"
           }
         }
       }

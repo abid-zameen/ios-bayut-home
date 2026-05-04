@@ -18,6 +18,7 @@ protocol HomeBusinessLogic: AnyObject {
     func onViewAppear()
     func didToggleFavorite(externalId: String)
     func checkOnboarding()
+    func didTapWhatsapp(for hit: ProjectHit, index: Int)
 }
 
 final class HomeInteractor: HomeBusinessLogic {
@@ -50,10 +51,15 @@ final class HomeInteractor: HomeBusinessLogic {
         NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .homeRefreshUserSpecificData, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .loggedIn, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .loggedOut, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRecentSearchRefresh), name: .refreshRecentSeachesOnHome, object: nil)
     }
     
     @objc private func handleRefreshUserSpecificData() {
         sectionsData.shouldRefreshUserSpecificData = true
+    }
+    
+    @objc private func handleRecentSearchRefresh() {
+        sectionsData.shouldRefreshRecentSearches = true
     }
     
     private func setupStoriesListener() {
@@ -79,8 +85,10 @@ final class HomeInteractor: HomeBusinessLogic {
     func onViewAppear() {
         guard sectionsData.isDataLoaded else { return }
         adapter.storiesProvider?.updateStoriesOnAppear()
+        
+        var shouldPresentImmediately = false
         if let storiesProvider = adapter.storiesProvider, storiesProvider.refreshStoriesIfNeeded() {
-            presentData(animated: true)
+            shouldPresentImmediately = true
         }
         
         let currentLanguage = Locale.current.languageCode ?? "en"
@@ -90,6 +98,15 @@ final class HomeInteractor: HomeBusinessLogic {
         let currentPopularLocationQuery = adapter.utilities.popularSectionLocationQuery
         let popularLocationChanged = sectionsData.popularSearch.lastLocationQuery != currentPopularLocationQuery
         
+        if sectionsData.shouldRefreshRecentSearches || langChanged {
+            sectionsData.recentSearches.state = .loading
+            shouldPresentImmediately = true
+        }
+        
+        if shouldPresentImmediately {
+            presentData(animated: true)
+        }
+        
         Task {
             if sectionsData.shouldRefreshUserSpecificData {
                 await fetchUserSpecificData()
@@ -97,15 +114,11 @@ final class HomeInteractor: HomeBusinessLogic {
             }
             
             await fetchPopularSearchConfig()
-            let recentSearches = await worker.fetchRecentSearches()
-            let newSignature = computeRecentSearchesSignature(recentSearches)
             
-            if langChanged || newSignature != sectionsData.recentSearches.lastSignature {
-                sectionsData.recentSearches.state = .loading
-                await MainActor.run { presentData(animated: true) }
-                
+            if sectionsData.shouldRefreshRecentSearches || langChanged {
+                let recentSearches = await worker.fetchRecentSearches()
                 sectionsData.recentSearches.state = recentSearches.isEmpty ? .empty : .data(recentSearches)
-                sectionsData.recentSearches.lastSignature = newSignature
+                sectionsData.shouldRefreshRecentSearches = false
                 await MainActor.run { presentData(animated: true) }
             }
         }
@@ -172,6 +185,10 @@ final class HomeInteractor: HomeBusinessLogic {
         } else {
             presenter?.presentOnboarding()
         }
+    }
+    
+    func didTapWhatsapp(for hit: ProjectHit, index: Int) {
+        HomeModule.shared.ovation.sendProjectWhatsappLead(hit: hit, listingPosition: index)
     }
 }
 
@@ -295,10 +312,6 @@ extension HomeInteractor {
         let recent = await worker.fetchRecentSearches()
         sectionsData.recentSearches.state = recent.isEmpty ? .empty : .data(recent)
         await MainActor.run { presentData() }
-    }
-    
-    private func computeRecentSearchesSignature(_ searches: [HomeScreenRecentSearch]) -> String {
-        return searches.map { "\($0.id)" }.joined(separator: "-")
     }
     
     func didSelectRecentSearch(at index: Int) {

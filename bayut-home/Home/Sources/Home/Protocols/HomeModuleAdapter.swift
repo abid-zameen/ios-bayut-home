@@ -9,6 +9,7 @@ public protocol HomeModuleAdapter {
     var navigation: HomeNavigationAdapter { get }
     var storiesProvider: HomeStoriesProvider? { get }
     var homeTrackingAdapter: HomeTrackingAdapter { get }
+    var ovation: HomeOvationAdapter { get }
 }
 
 

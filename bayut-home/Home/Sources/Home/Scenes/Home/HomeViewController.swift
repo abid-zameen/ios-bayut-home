@@ -1,5 +1,5 @@
 //
-//  HighlightableCollectionViewCell.swift
+//  HomeViewController.swift
 //  Home
 //
 //  Created by Hammad Shahid on 10/04/2026.
@@ -375,6 +375,10 @@ extension HomeViewController: NewProjectsActionsDelegate {
     
     func newProjectsDidTapViewAll(externalID: String, displayName: String) {
         router?.routeToProjectsScreen(externalID: externalID, displayName: displayName)
+    }
+    
+    func newProjectsDidTapWhatsapp(hit: ProjectHit, index: Int) {
+        interactor?.didTapWhatsapp(for: hit, index: index)
     }
 }
     

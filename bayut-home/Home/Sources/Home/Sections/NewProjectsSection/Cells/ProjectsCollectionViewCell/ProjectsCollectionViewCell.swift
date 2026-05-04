@@ -30,11 +30,12 @@ final class ProjectsCollectionViewCell: HighlightableCollectionViewCell {
     private enum Constants {
         static let handover = "handover".localized()
         static let startingFromTitle = "startingFromTitle".localized()
-        static let whatsApp = "whatsApp".localized()
+        static let whatsApp = "whatsapp".localized()
     }
     
     // MARK: - Properties
     var viewModel: NewProjectCellViewModelType?
+    var whatsappCallback: (() -> Void)?
     
     // MARK: - Lifecycle
     override func awakeFromNib() {
@@ -49,7 +50,7 @@ final class ProjectsCollectionViewCell: HighlightableCollectionViewCell {
     }
     
     @IBAction private func whatsappAction(_ sender: Any) {
-        
+        whatsappCallback?()
     }
 }
 

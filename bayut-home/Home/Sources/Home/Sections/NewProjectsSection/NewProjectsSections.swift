@@ -223,6 +223,9 @@ final class NewProjectsCarouselSection: SectionDescriptor {
         if let data = item.data {
             let viewModel = NewProjectCellViewModel(hit: data, showWhatsappButton: showWhatsappButton)
             cell.configure(with: viewModel)
+            cell.whatsappCallback = { [weak self] in
+                self?.actions.delegate?.newProjectsDidTapWhatsapp(hit: data, index: indexPath.item)
+            }
         }
         return cell
     }
