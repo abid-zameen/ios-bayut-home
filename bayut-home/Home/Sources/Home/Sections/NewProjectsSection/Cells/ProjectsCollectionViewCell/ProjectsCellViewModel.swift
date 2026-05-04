@@ -41,13 +41,7 @@ final class NewProjectCellViewModel: NewProjectCellViewModelType {
         self.location = locationNames.joined(separator: ", ")
         
         if let price = hit.price, price > 0 {
-            if price >= 1_000_000 {
-                self.startingPrice = String(format: "AED %.1fM", price / 1_000_000)
-            } else if price >= 1_000 {
-                self.startingPrice = String(format: "AED %.0fK", price / 1_000)
-            } else {
-                self.startingPrice = String(format: "AED %.0f", price)
-            }
+            self.startingPrice = Utils.priceShortStringRepresentationWithoutDecimal(price: price)
         } else {
             self.startingPrice = nil
         }

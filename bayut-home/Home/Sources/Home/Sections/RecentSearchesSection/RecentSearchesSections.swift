@@ -18,8 +18,7 @@ enum RecentSearchesSectionId: String, SectionIdentifier {
 
 // MARK: - Constants
 private enum RecentSearchesLayout {
-    static let sectionInsets = NSDirectionalEdgeInsets(top: 4, leading: 16, bottom: 0, trailing: 16)
-    static let spacing: CGFloat = 16
+    static let sectionInsets = NSDirectionalEdgeInsets(top: .tiny, leading: .standard, bottom: .zero, trailing: .standard)
     static let cardWidth: CGFloat = 322
     static let cardHeight: CGFloat = 96
 }
@@ -96,13 +95,13 @@ final class RecentSearchesCarouselSection: SectionDescriptor {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
-        section.interGroupSpacing = 12
+        section.orthogonalScrollingBehavior = .groupPaging
+        section.interGroupSpacing = .small
         section.contentInsets = NSDirectionalEdgeInsets(
-            top: 12,
-            leading: 16,
-            bottom: 0,
-            trailing: 16
+            top: .small,
+            leading: .standard,
+            bottom: .zero,
+            trailing: .standard
         )
         return section
     }

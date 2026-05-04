@@ -10,4 +10,5 @@ public extension Notification.Name {
     static let homeRefreshUserSpecificData = Notification.Name("HomeRefreshUserSpecificData")
     static let loggedIn = Notification.Name("loggedIn")
     static let loggedOut = Notification.Name("loggedOut")
+    static let refreshRecentSeachesOnHome = Notification.Name("refreshRecentSeachesOnHome")
 }
