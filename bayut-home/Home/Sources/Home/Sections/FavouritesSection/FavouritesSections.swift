@@ -56,8 +56,16 @@ final class FavouritesCarouselSection: SectionDescriptor {
     struct Item: Hashable {
         let id: String
         let property: Property?
-        func hash(into hasher: inout Hasher) { hasher.combine(id) }
-        static func == (lhs: Item, rhs: Item) -> Bool { lhs.id == rhs.id }
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+            hasher.combine(property?.isViewed)
+            hasher.combine(property?.isContacted)
+        }
+        static func == (lhs: Item, rhs: Item) -> Bool {
+            lhs.id == rhs.id &&
+            lhs.property?.isViewed == rhs.property?.isViewed &&
+            lhs.property?.isContacted == rhs.property?.isContacted
+        }
     }
     
     private let state: Home.DataState<[Property]>

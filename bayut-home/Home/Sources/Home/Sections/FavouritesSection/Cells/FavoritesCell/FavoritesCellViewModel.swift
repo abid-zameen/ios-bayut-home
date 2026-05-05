@@ -35,7 +35,7 @@ struct FavouriteCellViewModel: FavoritesCellViewModelType {
     var imageUrl: URL?
     var isPropertyTruChecked: Bool
     var showOffPlanInfo: Bool
-    var resaleLabelText: String = ""
+    var resaleLabelText: String = .empty
     var showResaleInfo: Bool = false
     
     init(property: Property) {
@@ -43,14 +43,9 @@ struct FavouriteCellViewModel: FavoritesCellViewModelType {
         self.id = property.id
         self.title = property.title
         
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        let formattedPrice = formatter.string(from: NSNumber(value: property.rawPrice ?? 0)) ?? "0"
-        
         let attributedString = NSMutableAttributedString()
-        
         let priceAttr: [NSAttributedString.Key: Any] = [.font: UIFont.headingL20]
-        let priceString = "AED \(formattedPrice)"
+        let priceString = HomeModule.shared.utilities.priceStringRepresentation(price: property.price) ?? "0"
         attributedString.append(NSAttributedString(string: priceString, attributes: priceAttr))
         
         if property.purpose == .rent, let frequency = property.rentFrequency {
@@ -60,9 +55,9 @@ struct FavouriteCellViewModel: FavoritesCellViewModelType {
         
         self.price = attributedString
         
-        self.beds = property.beds ?? ""
-        self.baths = property.baths ?? ""
-        self.area = property.area ?? ""
+        self.beds = property.beds ?? .empty
+        self.baths = property.baths ?? .empty
+        self.area = Utils.getAreaFromSqft(area: property.area) ?? .empty
         self.location = property.location
         self.imageUrl = property.imageURL
         self.isPropertyTruChecked = property.isTruChecked

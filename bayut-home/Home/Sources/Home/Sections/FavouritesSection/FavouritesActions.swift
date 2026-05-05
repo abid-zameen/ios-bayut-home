@@ -9,16 +9,22 @@ import Foundation
 
 // MARK: - Favourite Actions
 public enum FavouriteCellAction: Equatable {
-    case verification
+    case verification(isTruCheck: Bool, verifiedAt: String?, completionStatus: String?)
     case viewed
     case potw
     case offplan
     case offplanResale
     case history
-    case truBroker(url: URL?)
-    case paymentPlan
+    case truBroker(name: String?, externalID: String?)
+    case paymentPlan(
+        externalID: String,
+        saleType: String?,
+        originalPrice: Double?,
+        paidPrice: Double?,
+        price: Double?,
+        paymentPlans: [PaymentPlanData]?
+    )
 }
-
 protocol FavouritesActionsDelegate: AnyObject {
     func favouritesDidTapCard(at index: Int, with externalId: String)
     func favouritesDidToggleFavorite(at index: Int, with externalId: String)

@@ -85,7 +85,12 @@ final class FavouritesCell: HighlightableCollectionViewCell {
     }
     
     @IBAction private func verificationAction() {
-        onAction?(.verification)
+        guard let property = viewModel?.property else { return }
+        onAction?(.verification(
+            isTruCheck: property.isTruChecked,
+            verifiedAt: property.verifiedAt,
+            completionStatus: property.completionStatus
+        ))
     }
     
     @IBAction private func potwAction(_ sender: UIButton) {
@@ -179,7 +184,23 @@ private extension FavouritesCell {
             offPlanResaleBadgeView?.isHidden = false
             offPlanDetailView?.property = viewModel.property
             offPlanDetailView?.paymentPlanInfoClick = { [weak self] _ in
-                self?.onAction?(.paymentPlan)
+                guard let property = self?.viewModel?.property else { return }
+                let paymentPlansData = property.paymentPlans?.map { plan in
+                    PaymentPlanData(
+                        downPaymentPercentage: plan.breakdown?.downPaymentPercentage,
+                        preHandoverPercentage: plan.breakdown?.preHandoverPercentage,
+                        handoverPercentage: plan.breakdown?.handoverPercentage,
+                        postHandoverPercentage: plan.breakdown?.postHandoverPercentage
+                    )
+                }
+                self?.onAction?(.paymentPlan(
+                    externalID: property.id,
+                    saleType: property.offPlanDetails?.saleType,
+                    originalPrice: property.offPlanDetails?.originalPrice,
+                    paidPrice: property.offPlanDetails?.paidPrice,
+                    price: property.price,
+                    paymentPlans: paymentPlansData
+                ))
             }
             resaleLabel?.text = viewModel.resaleLabelText
             resaleLabelStackView?.isHidden = !viewModel.showResaleInfo
@@ -203,9 +224,19 @@ private extension FavouritesCell {
     }
     
     func setupForViewedListing() {
-        // TODO: Add ViewedListing support to the viewModel/Property
-        contactedView?.isHidden = true
-        contactedViewWidth?.constant = 0
+        guard let property = viewModel?.property else { return }
+        
+        if property.isContacted || property.isViewed {
+            contactedView?.isHidden = false
+            let status = property.isContacted ? "Contacted" : "Viewed"
+            contactedLabel?.text = status.localized()
+            if let size = contactedLabel?.text?.size(withAttributes: [.font: UIFont.headingL6]) {
+                contactedViewWidth?.constant = size.width + 35
+            }
+        } else {
+            contactedView?.isHidden = true
+            contactedViewWidth?.constant = 0
+        }
         contactedView?.setRoundedWithRespectToHeight(shouldClipToBounds: true)
     }
     
@@ -221,7 +252,7 @@ private extension FavouritesCell {
         truBrokerBadge?.set(imageUrl: agentImageUrl, 
                            hasStories: false, 
                            action: { [weak self] in
-                               self?.onAction?(.truBroker(url: agentImageUrl))
+                               self?.onAction?(.truBroker(name: ownerAgent.name, externalID: ownerAgent.externalID))
                            },
                            currentThumbnailIndex: 0)
     }
