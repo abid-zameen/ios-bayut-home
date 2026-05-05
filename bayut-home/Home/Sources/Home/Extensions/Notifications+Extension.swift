@@ -11,4 +11,5 @@ public extension Notification.Name {
     static let loggedIn = Notification.Name("loggedIn")
     static let loggedOut = Notification.Name("loggedOut")
     static let refreshRecentSeachesOnHome = Notification.Name("refreshRecentSeachesOnHome")
+    static let refreshPopularSearchesOnHome = Notification.Name("refreshPopularSearchesOnHome")
 }
