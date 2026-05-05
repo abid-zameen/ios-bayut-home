@@ -24,4 +24,5 @@ public protocol HomeNavigationAdapter {
     func navigateToFavoriteAction(action: FavouriteCellAction, from viewController: UIViewController?)
     func navigateToOnboarding(from viewController: UIViewController?)
     func navigateToOnboardingV2(from viewController: UIViewController?)
+    func navigateToAppReviewFlow(from viewController: UIViewController?)
 }

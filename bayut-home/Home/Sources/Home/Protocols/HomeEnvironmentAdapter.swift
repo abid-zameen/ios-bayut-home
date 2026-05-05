@@ -7,6 +7,7 @@ public protocol HomeEnvironmentAdapter {
     var algoliaProjectIndex: String { get }
     var algoliaLocationIndex: String { get }
     var algoliaListingIndex: String { get }
+    var selectedCurrency: String { get }
     var dldBaseUrl: String { get }
     var imageBaseUrl: String { get }
     var userID: String? { get }
@@ -21,6 +22,7 @@ public protocol HomeEnvironmentAdapter {
     var isSellerLeadsEnabled: Bool { get }
     var dldPopularSectionMetadataURL: URL { get }
     var userCoordinates: (lat: Double, lon: Double)? { get }
+    var isRailingAutoScrollEnabled: Bool { get }
     var isLocationAuthorized: Bool { get }
     func requestLocationAuthorization()
     var recentSearchesProvider: RecentSearchesProvider { get }
@@ -31,4 +33,12 @@ public protocol HomeEnvironmentAdapter {
     var hasDisplayedOnboarding: Bool { get }
     var isOnboardingInProgress: Bool { get set }
     func setOnboardingDisplayed()
+    var truEstimateVariant: String { get }
+    var shouldShowAppReview: Bool { get }
+    var isFavouritesWithoutLoginEnabled: Bool { get }
+    var unsyncedFavouriteIDs: [String] { get }
+    func toggleLocalFavorite(externalID: String)
+    func syncFavourites() async
+    var viewedListingIDs: [String] { get }
+    var contactedListingIDs: [String] { get }
 }
