@@ -21,7 +21,9 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
     typealias Identifier = RailingSectionId
     let identifier: RailingSectionId = .carousel
     static let infiniteMultiplier = 1000
-    var autoscrollInterval: TimeInterval { 2.0 }
+    var autoscrollInterval: TimeInterval {
+        return HomeModule.shared.environment.isRailingAutoScrollEnabled ? 2.0 : 999999.0
+    }
     var onInteractionBegan: (() -> Void)?
     
     struct Item: Hashable {
@@ -44,6 +46,7 @@ final class RailingCarouselSection: SectionDescriptor, SectionAutoscrollable {
     }
     
     func scrollToNext(in collectionView: UICollectionView, at sectionIndex: Int) {
+        guard HomeModule.shared.environment.isRailingAutoScrollEnabled else { return }
         let nextItemIndex = syncState.currentVirtualIndex + 1
         let indexPath = IndexPath(item: nextItemIndex, section: sectionIndex)
         

@@ -19,6 +19,7 @@ protocol RailingCardCellViewModelType: AnyObject {
     var itemImage: String { get }
     var ctaText: String { get }
     var onCTATap: (() -> Void)? { get set }
+    var truEstimateConfig: TruEstimateCardConfig? { get }
 }
 
 final class RailingCardCellViewModel: RailingCardCellViewModelType {
@@ -29,12 +30,27 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
     let ctaText: String
     let backgroundViewColor: UIColor
     var onCTATap: (() -> Void)?
+    let truEstimateConfig: TruEstimateCardConfig?
     
     init(type: RailingCellType) {
         switch type {
         case .truEstimate:
-            self.headingText = "truEstimate".localized()
-            self.descriptionText = "FindOutYourPropertyWorth".localized()
+            let variantString = HomeModule.shared.environment.truEstimateVariant
+            let variant = TruEstimateABTestVariant(fromRemoteConfig: variantString)
+            let config = TruEstimateCardConfig(
+                labelText: variant.labelText,
+                partialHighlightText: variant.partialHighlightText,
+                shouldHighlightEntireText: variant.shouldHighlightEntireText,
+                descriptionText: variant.descriptionText,
+                shouldHighlightDescription: variant.shouldHighlightDescription,
+                descriptionHighlightText: variant.descriptionHighlightText,
+                ctaColor: variant.ctaColor,
+                ctaViewColor: variant.ctaViewColor
+            )
+            self.headingText = config.labelText
+            self.descriptionText = config.descriptionText
+            self.truEstimateConfig = config
+            
             self.backgroundImage = "truEstimate_entryPoint_background"
             self.itemImage = "truEstimate_entryPoint_backgroundImage"
             self.backgroundViewColor = .lightGreenBackgroundColor
@@ -47,6 +63,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.itemImage = "trubroker_icon"
             self.backgroundViewColor = .white
             self.ctaText = "findAgents".localized()
+            self.truEstimateConfig = nil
             
         case .dubaiTransactions:
             self.headingText = "dubaiTransaction".localized()
@@ -55,6 +72,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.itemImage = "Transactions-Card-Icon"
             self.backgroundViewColor = .green1
             self.ctaText = "start_search".localized()
+            self.truEstimateConfig = nil
             
         case .commuteSearch:
             self.headingText = "commuteSearchBannerTitle".localized()
@@ -63,6 +81,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.itemImage = "commuteBannerImage"
             self.backgroundViewColor = .turquoise1
             self.ctaText = "start_search".localized()
+            self.truEstimateConfig = nil
             
         case .bayutGPT:
             self.headingText = "BayutGPT"
@@ -71,6 +90,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.backgroundImage = nil
             self.backgroundViewColor = .teal1
             self.ctaText = "Start Chatting"
+            self.truEstimateConfig = nil
             
         case .findAnAgency:
             self.headingText = "Find an Agency"
@@ -79,6 +99,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.itemImage = "agency_icon"
             self.backgroundViewColor = .white
             self.ctaText = "Browse"
+            self.truEstimateConfig = nil
             
         case .mapView:
             self.headingText = "Map View"
@@ -87,6 +108,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.itemImage = "map_icon"
             self.backgroundViewColor = .white
             self.ctaText = "View Map"
+            self.truEstimateConfig = nil
             
         case .dailyRental:
             self.headingText = "Daily Rentals"
@@ -95,6 +117,7 @@ final class RailingCardCellViewModel: RailingCardCellViewModelType {
             self.itemImage = "rentals_icon"
             self.backgroundViewColor = .white
             self.ctaText = "Book Now"
+            self.truEstimateConfig = nil
         }
     }
 }

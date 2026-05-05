@@ -20,7 +20,6 @@ public protocol HomeEnvironmentAdapter {
     var storiesViewHeight: CGFloat { get }
     var shouldFetchPopularSectionViaElasticSearch: Bool { get }
     var isSellerLeadsEnabled: Bool { get }
-    var dldPopularSectionMetadataURL: URL { get }
     var userCoordinates: (lat: Double, lon: Double)? { get }
     var isRailingAutoScrollEnabled: Bool { get }
     var isLocationAuthorized: Bool { get }

@@ -53,7 +53,7 @@ private extension RailingCardCell {
         mainContentView?.setRoundedCorner(radius: .extraSmall)
         mainContentView?.clipsToBounds = true
         
-        headingLabel?.font = UIFont.headingL1
+        headingLabel?.font = .bodyL2
         headingLabel?.textColor = UIColor.blackTextColor
         
         descriptionLabel?.textColor = UIColor.blackTextColor
@@ -73,6 +73,23 @@ private extension RailingCardCell {
         descriptionLabel?.text = viewModel.descriptionText
         ctalabel?.text = viewModel.ctaText
         mainContentView?.backgroundColor = viewModel.backgroundViewColor
+        
+        if let config = viewModel.truEstimateConfig {
+            if config.shouldHighlightEntireText {
+                headingLabel?.highlight(text: config.labelText, font: UIFont.headingL1)
+            } else if let partialText = config.partialHighlightText {
+                headingLabel?.highlight(text: partialText, font: UIFont.headingL1)
+            }
+            
+            if config.shouldHighlightDescription, let highlightText = config.descriptionHighlightText {
+                descriptionLabel?.highlight(text: highlightText, font: UIFont.boldBody)
+            }
+            ctaView?.backgroundColor = config.ctaViewColor
+            ctalabel?.textColor = config.ctaColor
+        } else {
+            ctalabel?.textColor = .turquoiseColor
+            ctaView?.backgroundColor = .white
+        }
         
         if let bgImageName = viewModel.backgroundImage {
             backgroundImageView?.image = UIImage(named: bgImageName, in: .module, compatibleWith: nil)

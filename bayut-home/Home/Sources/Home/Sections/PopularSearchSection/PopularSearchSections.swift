@@ -79,7 +79,7 @@ final class PopularSearchPurposeSection: SectionDescriptor {
             heightDimension: .absolute(PopularSearchLayout.purposeHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: .zero, leading: .tiny, bottom: .zero, trailing: .standard)
+        item.contentInsets = NSDirectionalEdgeInsets(top: .zero, leading: .tiny, bottom: .zero, trailing: .tiny)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
