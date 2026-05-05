@@ -12,6 +12,7 @@ final class HomeHeaderTabsView: UIView {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .clear
         cv.showsHorizontalScrollIndicator = false
+        cv.contentInset = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         cv.delegate = self
         cv.dataSource = self
         cv.register(TabCell.self, forCellWithReuseIdentifier: TabCell.reuseId)
@@ -46,6 +47,7 @@ final class HomeHeaderTabsView: UIView {
         
         containerView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.bounces = false
         
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -55,8 +57,8 @@ final class HomeHeaderTabsView: UIView {
             containerView.heightAnchor.constraint(equalToConstant: 36),
             
             collectionView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 4),
-            collectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 4),
-            collectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -4),
+            collectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 0),
+            collectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: 0),
             collectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -4)
         ])
     }
@@ -97,6 +99,7 @@ extension HomeHeaderTabsView: UICollectionViewDataSource, UICollectionViewDelega
         
         let indexPaths = [IndexPath(item: oldIndex, section: 0), indexPath]
         collectionView.reconfigureItems(at: indexPaths)
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         
         onTabSelected?(tabs[selectedIndex])
     }
@@ -107,7 +110,8 @@ extension HomeHeaderTabsView: UICollectionViewDataSource, UICollectionViewDelega
         let width = title.size(withAttributes: [.font: font]).width + 32
 
         if tabs.count <= 2 {
-            let totalAvailableWidth = max(0.1, collectionView.bounds.width - 4)
+            let contentWidth = collectionView.bounds.width - collectionView.contentInset.left - collectionView.contentInset.right
+            let totalAvailableWidth = max(0.1, contentWidth - 4)
             return CGSize(width: totalAvailableWidth / CGFloat(tabs.count), height: 28)
         }
         

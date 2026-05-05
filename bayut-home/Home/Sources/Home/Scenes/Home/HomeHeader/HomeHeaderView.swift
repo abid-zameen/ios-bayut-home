@@ -214,6 +214,10 @@ class HomeHeaderView: UIView {
             self.onSearchTapped?(self.currentTab, self.searchView.selectedPurpose)
         }
         
+        searchView.onPurposeSelected = { [weak self] purpose in
+            self?.tabPurposes[self?.currentTab ?? .properties] = purpose
+        }
+        
         searchView.onHeightChanged = { [weak self] in
             self?.onHeaderHeightChanged?()
         }
@@ -264,6 +268,7 @@ class HomeHeaderView: UIView {
     }
     
     private var currentTab: HomeHeaderTab = .properties
+    private var tabPurposes: [HomeHeaderTab: HomePurpose] = [:]
     var onSearchTapped: ((HomeHeaderTab, HomePurpose) -> Void)?
     var onHeaderHeightChanged: (() -> Void)?
     
@@ -271,6 +276,9 @@ class HomeHeaderView: UIView {
         self.currentTab = tab
         let searchViewModel = HomeHeaderSearchViewModel(selectedTab: tab)
         searchView.configure(with: searchViewModel)
+        
+        let purpose = tabPurposes[tab] ?? .buy
+        searchView.setPurpose(purpose)
     }
     
     private func updateConstraintsForVariant() {

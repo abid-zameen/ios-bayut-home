@@ -67,7 +67,7 @@ class HomeHeaderSearchView: UIView {
     private let searchContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = 8
+        view.layer.cornerRadius = .extraSmall
         view.heightAnchor.constraint(equalToConstant: 48).isActive = true
         return view
     }()
@@ -103,7 +103,7 @@ class HomeHeaderSearchView: UIView {
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowOpacity = 0.1
-        layer.shadowRadius = 4
+        layer.shadowRadius = .extraSmall
         
         addSubview(containerView)
         containerView.addSubview(toggleStackView)
@@ -207,6 +207,11 @@ class HomeHeaderSearchView: UIView {
         inactiveButton.setTitleColor(.grey5, for: .normal)
         inactiveButton.titleLabel?.font = .bodyL0
         inactiveButton.setBorder(.grey1, width: 1)
+    }
+    
+    func setPurpose(_ purpose: HomePurpose) {
+        selectedPurpose = purpose
+        updatePurposeSelection(isBuy: purpose == .buy)
     }
     
     struct AnimationConfig {
