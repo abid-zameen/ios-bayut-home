@@ -11,20 +11,24 @@ struct Property: Hashable {
     let id: String
     let title: String
     let location: String
-    let price: String
     let beds: String?
     let baths: String?
-    let area: String?
+    let area: Double?
     let isTruChecked: Bool
+    let isChecked: Bool
+    let verifiedAt: String?
     let imageURL: URL?
     let completionStatus: String?
     let handoverDate: NSAttributedString?
     let paymentPlanPercentage: NSAttributedString?
     let offPlanDetails: OffplanDetails?
     let ownerAgent: OwnerAgent?
-    let rawPrice: Double?
+    let price: Double?
     let purpose: Purpose?
     let rentFrequency: String?
+    let paymentPlans: [PaymentPlan]?
+    var isViewed: Bool = false
+    var isContacted: Bool = false
     
     init(hit: AlgoliaPropertyHit) {
         self.id = hit.externalID ?? "\(hit.id ?? 0)"
@@ -57,16 +61,6 @@ struct Property: Hashable {
         
         self.location = locationNames.joined(separator: ", ")
         
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        let formattedPrice = formatter.string(from: NSNumber(value: hit.price ?? 0)) ?? "0"
-        
-        if hit.purpose == .rent, let frequency = hit.rentFrequency {
-            self.price = "\(formattedPrice) AED / \(frequency.capitalized)"
-        } else {
-            self.price = "\(formattedPrice) AED"
-        }
-        
         if let rooms = hit.rooms {
             if rooms == 0 {
                 self.beds = "Studio"
@@ -86,7 +80,7 @@ struct Property: Hashable {
         
         // 5. Area
         if let area = hit.area {
-            self.area = "\(Int(round(area))) sqft"
+            self.area = area * HomeConstants.SqmToSqftConversionRate
         } else {
             self.area = nil
         }
@@ -101,18 +95,30 @@ struct Property: Hashable {
         }
         
         if let photoId {
-            let urlString = HomeModule.shared.environment.imageBaseUrl + "\(photoId)-400x300.jpeg"
+            let urlString = HomeModule.shared.environment.imageBaseUrl + "\(photoId)" + HomeConstants.imageDimension
             self.imageURL = URL(string: urlString)
         } else {
             self.imageURL = nil
         }
         
         isTruChecked = hit.isVerified && (hit.verification?.eligible ?? false)
+        isChecked = hit.isVerified
+        
+        if let verifiedAt = hit.verification?.verifiedAt {
+            let date = Date(timeIntervalSince1970: verifiedAt)
+            let formatter = DateFormatter()
+            formatter.dateFormat = date.dateFormatWithSuffix()
+            self.verifiedAt = formatter.string(from: date)
+        } else {
+            self.verifiedAt = nil
+        }
+        
         completionStatus = hit.completionStatus
         offPlanDetails = hit.offplanDetails
         ownerAgent = hit.ownerAgent
-        rawPrice = hit.price
+        price = hit.price
         purpose = hit.purpose
         rentFrequency = hit.rentFrequency
+        paymentPlans = hit.paymentPlans
     }
 }
