@@ -32,6 +32,7 @@ protocol HomeRoutingLogic: AnyObject {
     func routeToFavoriteAction(action: FavouriteCellAction, property: Property)
     func navigateToOnboarding(from viewController: UIViewController?)
     func navigateToOnboardingV2(from viewController: UIViewController?)
+    func routeToAppReview()
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -153,5 +154,9 @@ final class HomeRouter: HomeRoutingLogic {
     
     func navigateToOnboardingV2(from viewController: UIViewController?) {
         navigation.navigateToOnboardingV2(from: viewController)
+    }
+    
+    func routeToAppReview() {
+        navigation.navigateToAppReviewFlow(from: viewController)
     }
 }

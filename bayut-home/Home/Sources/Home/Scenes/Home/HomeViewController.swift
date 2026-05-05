@@ -15,6 +15,7 @@ protocol HomeDisplayLogic: AnyObject {
     func displayPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose)
     func displayOnboarding()
     func displayOnboardingV2()
+    func displayAppReview()
 }
 
 final class HomeViewController: UIViewController, HomeDisplayLogic {
@@ -197,6 +198,10 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
     
     func displayOnboardingV2() {
         router?.navigateToOnboardingV2(from: self)
+    }
+
+    func displayAppReview() {
+        router?.routeToAppReview()
     }
 
     private func setupAutoscrolling(for sections: [AnySection]) {
@@ -409,7 +414,7 @@ extension HomeViewController: FavouritesActionsDelegate {
     func favouritesDidToggleFavorite(at index: Int, with externalId: String) {
         let alert = UIAlertController(
             title: nil,
-            message: "removeFavoriteQuestion".localized(),
+            message: "removeThisPropertyFromFavourites".localized(),
             preferredStyle: .alert
         )
         
@@ -427,7 +432,6 @@ extension HomeViewController: FavouritesActionsDelegate {
     }
     
     func favouritesDidTapViewAll() {
-        // Track view all if needed, using custom tracker event if added later
         router?.routeToAllFavorites()
     }
 }

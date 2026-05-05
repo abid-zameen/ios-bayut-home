@@ -14,6 +14,7 @@ protocol HomePresentationLogic: AnyObject {
     func presentPopularSearchRouting(category: PopularSearchCategory, purpose: PopularSearchPurpose)
     func presentOnboarding()
     func presentOnboardingV2()
+    func presentAppReview()
 }
 
 final class HomePresenter: HomePresentationLogic {
@@ -49,7 +50,8 @@ final class HomePresenter: HomePresentationLogic {
         case .data(let config):
             let mappedDefault = mapPopularSearches(
                 config: config,
-                selectedPurpose: data?.selectedPurpose ?? .rent
+                selectedPurpose: data?.selectedPurpose ?? .rent,
+                selectedLocation: data?.popularSearchDisplayedLocation ?? adapter.utilities.lastSearchedLocations ?? adapter.utilities.defaultCityName
             )
             popularSearchesState = .data(mappedDefault)
             popularSearchConfig = config
@@ -78,6 +80,7 @@ final class HomePresenter: HomePresentationLogic {
             showTruBrokerBanner: data?.showTruBrokerBanner ?? true,
             showSellerLeadsBanner: data?.showSellerLeadsBanner ?? false,
             marketingBannerConfig: adapter.environment.marketingBannerConfig,
+            popularSearchDisplayedLocation: data?.popularSearchDisplayedLocation ?? adapter.utilities.lastSearchedLocations ?? adapter.utilities.defaultCityName,
             viewController: viewController)
         )
         
@@ -111,18 +114,22 @@ final class HomePresenter: HomePresentationLogic {
         viewController?.displayOnboardingV2()
     }
     
+    @MainActor
+    func presentAppReview() {
+        viewController?.displayAppReview()
+    }
+    
     // MARK: - Helpers
-    private func mapPopularSearches(config: PopularSearchConfig?, selectedPurpose: PopularSearchPurpose) -> [PopularSearch] {
+    private func mapPopularSearches(config: PopularSearchConfig?, selectedPurpose: PopularSearchPurpose, selectedLocation: String) -> [PopularSearch] {
         guard let config = config else { return [] }
         
         let purposeConfig = config.purposeConfigs.first { $0.purpose == selectedPurpose }
         let categories = purposeConfig?.categories ?? []
-        let locations = adapter.utilities.lastSearchedLocations ?? adapter.utilities.defaultCityName
         
         return categories.map { category in
             return PopularSearch(
                 title: category.title,
-                location: "in \(locations)",
+                location: "in \(selectedLocation)",
                 iconName: category.iconName
             )
         }
@@ -147,8 +154,22 @@ final class HomePresenter: HomePresentationLogic {
             let mapped = data.searches.map { search in
                 let info = search.params
                 let propertyTypeInfo = adapter.utilities.getPropertyTypeInfo(category: info.category ?? .empty)
-                
+                let purpose = Purpose(rawValue: info.purpose ?? "for-sale")
                 let displayTitle = propertyTypeInfo?.titlePlural ?? search.name
+                var searchTitle: String = .empty
+                
+                if propertyTypeInfo?.isParent  ?? false {
+                    searchTitle = String(format: "savedSearchParentTypeTitleFormat".localized(),
+                                         displayTitle,
+                                         "properties".localized(),
+                                         "for".localized(),
+                                         (purpose?.displayName ?? .empty))
+                } else {
+                    searchTitle = String(format: "savedSearchChildTypeFormat".localized(),
+                                         displayTitle,
+                                         "for".localized(),
+                                         (purpose?.displayName ?? .empty))
+                }
                 
                 var locationString: String = .empty
                 if let slugs = info.locations, !slugs.isEmpty {
@@ -172,7 +193,7 @@ final class HomePresenter: HomePresentationLogic {
                 
                 return SavedSearchesModel(
                     name: search.name,
-                    displayTitle: displayTitle,
+                    displayTitle: searchTitle,
                     location: locationString,
                     showIcon: showIcon,
                     imageName: imageName

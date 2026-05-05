@@ -52,6 +52,7 @@ final class HomeInteractor: HomeBusinessLogic {
         NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .loggedIn, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRefreshUserSpecificData), name: .loggedOut, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRecentSearchRefresh), name: .refreshRecentSeachesOnHome, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePopularSearchesRefresh), name: .refreshPopularSearchesOnHome, object: nil)
     }
     
     @objc private func handleRefreshUserSpecificData() {
@@ -60,6 +61,10 @@ final class HomeInteractor: HomeBusinessLogic {
     
     @objc private func handleRecentSearchRefresh() {
         sectionsData.shouldRefreshRecentSearches = true
+    }
+    
+    @objc private func handlePopularSearchesRefresh() {
+        sectionsData.popularSearch.shouldRefresh = true
     }
     
     private func setupStoriesListener() {
@@ -71,7 +76,6 @@ final class HomeInteractor: HomeBusinessLogic {
     // MARK: - Lifecycle
     func onViewLoad() {
         sectionsData.lastLanguage = Locale.current.languageCode ?? "en"
-        sectionsData.popularSearch.lastLocationQuery = adapter.utilities.popularSectionLocationQuery
         sectionsData.isDataLoaded = true
         self.presentData(animated: true)
         
@@ -84,6 +88,11 @@ final class HomeInteractor: HomeBusinessLogic {
     
     func onViewAppear() {
         guard sectionsData.isDataLoaded else { return }
+        
+        if adapter.environment.shouldShowAppReview {
+            presenter?.presentAppReview()
+        }
+        
         adapter.storiesProvider?.updateStoriesOnAppear()
         
         var shouldPresentImmediately = false
@@ -95,11 +104,15 @@ final class HomeInteractor: HomeBusinessLogic {
         let langChanged = sectionsData.lastLanguage != currentLanguage
         sectionsData.lastLanguage = currentLanguage
         
-        let currentPopularLocationQuery = adapter.utilities.popularSectionLocationQuery
-        let popularLocationChanged = sectionsData.popularSearch.lastLocationQuery != currentPopularLocationQuery
-        
         if sectionsData.shouldRefreshRecentSearches || langChanged {
             sectionsData.recentSearches.state = .loading
+            shouldPresentImmediately = true
+        }
+        
+        fetchLocalListingStatus()
+        if case .data(let currentFavs) = sectionsData.favourites {
+            let updatedFavs = applyStatusToProperties(currentFavs)
+            sectionsData.favourites = .data(updatedFavs)
             shouldPresentImmediately = true
         }
         
@@ -113,7 +126,10 @@ final class HomeInteractor: HomeBusinessLogic {
                 sectionsData.shouldRefreshUserSpecificData = false
             }
             
-            await fetchPopularSearchConfig()
+            if sectionsData.popularSearch.shouldRefresh {
+                await fetchPopularSearchConfig()
+                sectionsData.popularSearch.shouldRefresh = false
+            }
             
             if sectionsData.shouldRefreshRecentSearches || langChanged {
                 let recentSearches = await worker.fetchRecentSearches()
@@ -138,7 +154,7 @@ final class HomeInteractor: HomeBusinessLogic {
             group.addTask { await self.fetchRecentSearches() }
             group.addTask { await self.fetchNewProjects() }
             group.addTask { await self.fetchNearbyLocations() }
-            group.addTask { await self.fetchPopularSearchConfig(shouldUpdate: true) }
+            group.addTask { await self.fetchPopularSearchConfig() }
         }
     }
     
@@ -156,7 +172,8 @@ final class HomeInteractor: HomeBusinessLogic {
             selectedPurpose: sectionsData.popularSearch.selectedPurpose,
             recentSearches: sectionsData.recentSearches.state,
             showTruBrokerBanner: sectionsData.banners.showTruBroker,
-            showSellerLeadsBanner: sectionsData.banners.showSellerLeads
+            showSellerLeadsBanner: sectionsData.banners.showSellerLeads,
+            popularSearchDisplayedLocation: sectionsData.popularSearch.displayedLocationName
         )
         presenter?.presentData(data: response, animated: animated)
     }
@@ -195,8 +212,11 @@ final class HomeInteractor: HomeBusinessLogic {
 // MARK: - User Specific Data Logic
 extension HomeInteractor {
     private func fetchUserSpecificData() async {
+        await adapter.environment.syncFavourites()
+        fetchLocalListingStatus()
+        
         guard let userID = adapter.environment.userID else {
-            sectionsData.favourites = .empty
+            await refreshFavorites()
             sectionsData.savedSearches = .empty
             await MainActor.run { presentData() }
             return
@@ -212,44 +232,76 @@ extension HomeInteractor {
 // MARK: - Favourites Section Logic
 extension HomeInteractor {
     func didToggleFavorite(externalId: String) {
-        guard let userID = adapter.environment.userID else { return }
-        
-        sectionsData.favourites = .loading
-        presentData()
-        
-        Task {
-            do {
-                try await worker.toggleFavorite(userID: userID, externalID: externalId)
-                await refreshFavorites()
-            } catch {
+        if let userID = adapter.environment.userID {
+            sectionsData.favourites = .loading
+            presentData()
+            
+            Task {
+                do {
+                    try await worker.toggleFavorite(userID: userID, externalID: externalId)
+                    await refreshFavorites()
+                } catch {
+                    await refreshFavorites()
+                }
+            }
+        } else if adapter.environment.isFavouritesWithoutLoginEnabled {
+            adapter.environment.toggleLocalFavorite(externalID: externalId)
+            Task {
                 await refreshFavorites()
             }
         }
     }
     
     private func refreshFavorites() async {
-        guard let userID = adapter.environment.userID else {
-            sectionsData.favourites = .empty
-            await MainActor.run { presentData() }
-            return
-        }
-        
-        do {
-            let favIds = try await self.worker.fetchFavoritesIDs(userID: userID)
-            let slicedFavIds = Array(favIds.prefix(5))
-            if !slicedFavIds.isEmpty {
+        let env = adapter.environment
+        if let userID = env.userID {
+            do {
+                let favIds = try await self.worker.fetchFavoritesIDs(userID: userID)
+                let slicedFavIds = Array(favIds.prefix(5))
+                if !slicedFavIds.isEmpty {
+                    let properties = try await self.worker.fetchFavoritesProperties(ids: slicedFavIds)
+                    let resolved = slicedFavIds.compactMap { id in
+                        properties.first(where: { $0.id == id })
+                    }
+                    let finalized = applyStatusToProperties(resolved)
+                    self.sectionsData.favourites = finalized.isEmpty ? .empty : .data(finalized)
+                } else {
+                    self.sectionsData.favourites = .empty
+                }
+            } catch {
+                self.sectionsData.favourites = .empty
+            }
+        } else if env.isFavouritesWithoutLoginEnabled && !env.unsyncedFavouriteIDs.isEmpty {
+            do {
+                let favIds = env.unsyncedFavouriteIDs
+                let slicedFavIds = Array(favIds.prefix(5).reversed())
                 let properties = try await self.worker.fetchFavoritesProperties(ids: slicedFavIds)
                 let resolved = slicedFavIds.compactMap { id in
                     properties.first(where: { $0.id == id })
                 }
-                self.sectionsData.favourites = resolved.isEmpty ? .empty : .data(resolved)
-            } else {
+                let finalized = applyStatusToProperties(resolved)
+                self.sectionsData.favourites = finalized.isEmpty ? .empty : .data(finalized)
+            } catch {
                 self.sectionsData.favourites = .empty
             }
-        } catch {
+        } else {
             self.sectionsData.favourites = .empty
         }
         await MainActor.run { self.presentData() }
+    }
+    
+    private func fetchLocalListingStatus() {
+        sectionsData.viewedListingIDs = Set(adapter.environment.viewedListingIDs)
+        sectionsData.contactedListingIDs = Set(adapter.environment.contactedListingIDs)
+    }
+    
+    private func applyStatusToProperties(_ properties: [Property]) -> [Property] {
+        return properties.map { property in
+            var p = property
+            p.isViewed = sectionsData.viewedListingIDs.contains(p.id)
+            p.isContacted = sectionsData.contactedListingIDs.contains(p.id)
+            return p
+        }
     }
 }
 
@@ -348,18 +400,17 @@ extension HomeInteractor {
 
 // MARK: - Popular Search Section Logic
  extension HomeInteractor {
-    private func fetchPopularSearchConfig(shouldUpdate: Bool = false) async {
+    private func fetchPopularSearchConfig() async {
         guard adapter.environment.shouldFetchPopularSectionViaElasticSearch else { return }
         
         var locationQuery = adapter.utilities.popularSectionLocationQuery ?? "location_id:total"
-        guard shouldUpdate || locationQuery != sectionsData.popularSearch.lastLocationQuery else { return }
-        sectionsData.popularSearch.lastLocationQuery = locationQuery
         
         sectionsData.popularSearch.state = .loading
         await MainActor.run { presentData() }
         
         do {
             var metadata = try await worker.fetchPopularSectionMetadata(locationQuery: locationQuery)
+            var displayedLocationName = adapter.utilities.popularSectionLocationName
             
             if (metadata.responses?.first?.aggregations?.group?.buckets?.isEmpty ?? true) &&
                 (metadata.responses?.count ?? 0 > 1 && metadata.responses?[1].aggregations?.group?.buckets?.isEmpty ?? true) {
@@ -373,8 +424,11 @@ extension HomeInteractor {
                 (metadata.responses?.count ?? 0 > 1 && metadata.responses?[1].aggregations?.group?.buckets?.isEmpty ?? true) &&
                 locationQuery != "location_id:total" {
                 locationQuery = "location_id:total"
+                displayedLocationName = nil
                 metadata = try await worker.fetchPopularSectionMetadata(locationQuery: locationQuery)
             }
+            
+            sectionsData.popularSearch.displayedLocationName = displayedLocationName
             
             var saleCategories: [PopularSearchCategory] = []
             var rentCategories: [PopularSearchCategory] = []

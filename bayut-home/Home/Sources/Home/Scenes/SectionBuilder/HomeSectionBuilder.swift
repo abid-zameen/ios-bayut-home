@@ -68,7 +68,7 @@ final class HomeSectionBuilder {
         let newProjectsActions = NewProjectsActions(delegate: sectionsData.viewController)
         let newProjectsGroup = NewProjectsGroup(
             headerTitle: "browseNewProjectsInUAE".localized(),
-            viewAllTitle: "",
+            viewAllTitle: .empty,
             projects: sectionsData.projects,
             locations: sectionsData.locations,
             actions: newProjectsActions
@@ -88,7 +88,7 @@ final class HomeSectionBuilder {
         
         let popularSearchActions = PopularSearchActions(delegate: sectionsData.viewController)
         let popularSearchGroup = PopularSearchGroup(
-            title: String(format: "popularIn".localized(), sectionsData.selectedLocation),
+            title: String(format: "popularIn".localized(), sectionsData.popularSearchDisplayedLocation ?? sectionsData.selectedLocation),
             purposes: sectionsData.purposes,
             selectedPurpose: sectionsData.selectedPurpose,
             searches: sectionsData.popularSearches,

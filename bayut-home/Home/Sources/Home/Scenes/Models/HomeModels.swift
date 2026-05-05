@@ -42,6 +42,7 @@ struct Home {
         let showTruBrokerBanner: Bool
         let showSellerLeadsBanner: Bool
         let marketingBannerConfig: MarketingBannerConfig?
+        let popularSearchDisplayedLocation: String?
         let viewController: HomeViewController
     }
     
@@ -60,6 +61,7 @@ struct Home {
         var showTruBrokerBanner: Bool = true
         var showSellerLeadsBanner: Bool = false
         var marketingBannerConfig: MarketingBannerConfig? = nil
+        var popularSearchDisplayedLocation: String? = nil
     }
 
     struct SectionsDataState {
@@ -75,6 +77,9 @@ struct Home {
         var isDataLoaded = false
         var lastLanguage: String?
         var shouldRefreshUserSpecificData = false
+        var shouldRefreshRecentSearches = false
+        var viewedListingIDs: Set<String> = []
+        var contactedListingIDs: Set<String> = []
     }
 
     struct ProjectsState {
@@ -84,7 +89,6 @@ struct Home {
 
     struct RecentSearchesState {
         var state: Home.DataState<[HomeScreenRecentSearch]> = .loading
-        var lastSignature: String?
     }
 
     struct NearbyLocationsState {
@@ -96,7 +100,8 @@ struct Home {
         var state: Home.DataState<PopularSearchConfig> = .loading
         var purposes: [PopularSearchPurpose] = []
         var selectedPurpose: PopularSearchPurpose = .buy
-        var lastLocationQuery: String?
+        var shouldRefresh: Bool = false
+        var displayedLocationName: String?
     }
 
     struct BannerState {
@@ -184,15 +189,40 @@ struct CompletionDetails: Codable {
 
 struct Verification: Codable {
     let eligible: Bool
+    let verifiedAt: Double?
 }
 
 struct OffplanDetails: Codable, Hashable {
-    let saleType: String
+    let saleType: String?
+    let originalPrice: Double?
+    let paidPrice: Double?
 }
 
-struct PaymentPlan: Codable {
+struct PaymentPlan: Codable, Hashable {
     let preHandoverPercentageSum: Double?
     let postHandoverPercentageSum: Double?
+    let breakdown: PaymentPlanBreakdown?
+}
+
+struct PaymentPlanBreakdown: Codable, Hashable {
+    let downPaymentPercentage: Double?
+    let preHandoverPercentage: Double?
+    let handoverPercentage: Double?
+    let postHandoverPercentage: Double?
+}
+
+public struct PaymentPlanData: Equatable {
+    public let downPaymentPercentage: Double?
+    public let preHandoverPercentage: Double?
+    public let handoverPercentage: Double?
+    public let postHandoverPercentage: Double?
+    
+    public init(downPaymentPercentage: Double?, preHandoverPercentage: Double?, handoverPercentage: Double?, postHandoverPercentage: Double?) {
+        self.downPaymentPercentage = downPaymentPercentage
+        self.preHandoverPercentage = preHandoverPercentage
+        self.handoverPercentage = handoverPercentage
+        self.postHandoverPercentage = postHandoverPercentage
+    }
 }
 
 struct CoverPhoto: Codable {
@@ -203,6 +233,13 @@ struct CoverPhoto: Codable {
 
 enum Purpose: String, Codable {
     case rent = "for-rent", buy = "for-sale"
+    
+    var displayName : String {
+        switch self {
+        case .buy: return "sale".localized()
+        case .rent: return "rent".localized()
+        }
+    }
 }
 
 public struct LocationHit: Codable {
