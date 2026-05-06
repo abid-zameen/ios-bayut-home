@@ -15,6 +15,7 @@ struct AnySection: SectionIdentifier, Hashable {
     let section: HomeSection?
     let isCustomizable: Bool
     var autoscrollable: SectionAutoscrollable? { _autoscrollable?() }
+    let isShimmering: Bool
     
     private let identifier: AnyHashable
     private let _autoscrollable: (() -> SectionAutoscrollable?)?
@@ -30,6 +31,7 @@ struct AnySection: SectionIdentifier, Hashable {
         self.displayName = descriptor.identifier.displayName
         self.section = descriptor.identifier.section
         self.isCustomizable = isCustomizable
+        self.isShimmering = descriptor.isShimmering
         self._autoscrollable = { descriptor as? SectionAutoscrollable }
         
         self._layoutSection = descriptor.layoutSection
@@ -67,9 +69,10 @@ struct AnySection: SectionIdentifier, Hashable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(identifier)
+        hasher.combine(isShimmering)
     }
     
     static func == (lhs: AnySection, rhs: AnySection) -> Bool {
-        lhs.identifier == rhs.identifier
+        lhs.identifier == rhs.identifier && lhs.isShimmering == rhs.isShimmering
     }
 }

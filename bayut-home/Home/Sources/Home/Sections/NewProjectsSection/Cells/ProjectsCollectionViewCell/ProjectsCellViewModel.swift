@@ -59,7 +59,7 @@ final class NewProjectCellViewModel: NewProjectCellViewModelType {
         
         if let photoID = hit.coverPhoto?.id {
             let imageBase = HomeModule.shared.environment.imageBaseUrl
-            let urlString = "\(imageBase)\(photoID)-240x180.jpeg"
+            let urlString = "\(imageBase)\(photoID)" + HomeConstants.imageDimension
             self.imageURL = URL(string: urlString)
         } else {
             self.imageURL = nil

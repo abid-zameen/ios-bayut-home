@@ -47,6 +47,7 @@ private extension SavedSearchesCell {
         
         cellBackgroundView?.setBorder(UIColor.grey2, width: .standardBorderWidth)
         cellBackgroundView?.setRoundedCorner(radius: .extraSmall)
+        imageView.isHidden = true
     }
     
     func setupWithViewModel() {

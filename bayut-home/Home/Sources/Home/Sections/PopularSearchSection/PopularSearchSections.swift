@@ -123,6 +123,11 @@ final class PopularSearchCarouselSection: SectionDescriptor {
         self.actions = actions
     }
     
+    var isShimmering: Bool {
+        if case .loading = state { return true }
+        return false
+    }
+    
     func buildItems() -> [Item] {
         switch state {
         case .loading:

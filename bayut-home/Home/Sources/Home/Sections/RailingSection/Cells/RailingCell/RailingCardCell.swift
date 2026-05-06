@@ -53,7 +53,7 @@ private extension RailingCardCell {
         mainContentView?.setRoundedCorner(radius: .extraSmall)
         mainContentView?.clipsToBounds = true
         
-        headingLabel?.font = .bodyL2
+        headingLabel?.font = .headingL1
         headingLabel?.textColor = UIColor.blackTextColor
         
         descriptionLabel?.textColor = UIColor.blackTextColor
@@ -75,6 +75,7 @@ private extension RailingCardCell {
         mainContentView?.backgroundColor = viewModel.backgroundViewColor
         
         if let config = viewModel.truEstimateConfig {
+            headingLabel?.font = .bodyL2
             if config.shouldHighlightEntireText {
                 headingLabel?.highlight(text: config.labelText, font: UIFont.headingL1)
             } else if let partialText = config.partialHighlightText {

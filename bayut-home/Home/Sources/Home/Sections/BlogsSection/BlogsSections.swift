@@ -67,6 +67,11 @@ final class BlogsCarouselSection: SectionDescriptor {
         self.actions = actions
     }
     
+    var isShimmering: Bool {
+        if case .loading = state { return true }
+        return false
+    }
+    
     func buildItems() -> [Item] {
         switch state {
         case .loading:
@@ -88,7 +93,7 @@ final class BlogsCarouselSection: SectionDescriptor {
             heightDimension: .absolute(BlogsLayout.estimatedCardHeight)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: .zero, leading: .standard, bottom: .zero, trailing: .standard)
+        item.contentInsets = NSDirectionalEdgeInsets(top: .zero, leading: .standard, bottom: .zero, trailing: .zero)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.85),

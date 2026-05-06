@@ -95,7 +95,7 @@ struct Property: Hashable {
         }
         
         if let photoId {
-            let urlString = HomeModule.shared.environment.imageBaseUrl + "\(photoId)" + HomeConstants.imageDimension
+            let urlString = HomeModule.shared.environment.imageBaseUrl + "\(photoId)" + HomeConstants.highResolutionImageDimension
             self.imageURL = URL(string: urlString)
         } else {
             self.imageURL = nil

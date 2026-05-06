@@ -8,4 +8,5 @@
 enum HomeConstants {
     static let SqmToSqftConversionRate: Double = 10.7639104167097223
     static let imageDimension = "-400x300.jpeg"
+    static let highResolutionImageDimension = "-800x600.jpeg"
 }
