@@ -71,10 +71,10 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
                 self?.router?.routeToLocationSearch(purpose: purpose)
             case .newProjects:
                 self?.router?.routeToLocationForProjects()
+            case .agents:
+                self?.router?.routeToLocationAndAgentPicker(purpose: purpose)
             case .transactions:
                 self?.router?.routeToLocationForTransactions(purpose: purpose)
-            case .agents:
-                self?.router?.routeToFindAgents()
             default:
                 break
             }

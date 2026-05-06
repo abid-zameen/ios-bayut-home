@@ -33,6 +33,7 @@ protocol HomeRoutingLogic: AnyObject {
     func navigateToOnboarding(from viewController: UIViewController?)
     func navigateToOnboardingV2(from viewController: UIViewController?)
     func routeToAppReview()
+    func routeToLocationAndAgentPicker(purpose: HomePurpose)
 }
 
 final class HomeRouter: HomeRoutingLogic {
@@ -158,5 +159,9 @@ final class HomeRouter: HomeRoutingLogic {
     
     func routeToAppReview() {
         navigation.navigateToAppReviewFlow(from: viewController)
+    }
+    
+    func routeToLocationAndAgentPicker(purpose: HomePurpose) {
+        navigation.navigateToLocationAndAgentPicker(from: viewController, purpose: purpose)
     }
 }

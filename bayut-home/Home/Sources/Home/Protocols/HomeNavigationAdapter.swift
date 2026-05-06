@@ -4,6 +4,7 @@ public protocol HomeNavigationAdapter {
     func navigateToLocationSearch(from viewController: UIViewController?, purpose: HomePurpose)
     func navigateToLocationForProjects(from viewController: UIViewController?)
     func navigateToDubaiTransaction(from viewController: UIViewController?)
+    func navigateToLocationAndAgentPicker(from viewController: UIViewController?, purpose: HomePurpose)
     func navigateToFindAgents(from viewController: UIViewController?)
     func navigateToBlogs(url: String, title: String?, from viewController: UIViewController?)
     func navigateToLocationForTransactions(from viewController: UIViewController?, purpose: HomePurpose)
