@@ -40,6 +40,7 @@ protocol SectionDescriptor {
     var identifier: Identifier { get }
     
     func buildItems() -> [Item]
+    var isShimmering: Bool { get }
     func layoutSection(environment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell
     func configureSupplementaryView(in collectionView: UICollectionView, kind: String, at indexPath: IndexPath) -> UICollectionReusableView?
@@ -50,6 +51,8 @@ extension SectionDescriptor {
     func configureSupplementaryView(in collectionView: UICollectionView, kind: String, at indexPath: IndexPath) -> UICollectionReusableView? {
         return nil
     }
+    
+    var isShimmering: Bool { false }
     
     func didSelectItem(at indexPath: IndexPath, with item: Item) {}
 }
