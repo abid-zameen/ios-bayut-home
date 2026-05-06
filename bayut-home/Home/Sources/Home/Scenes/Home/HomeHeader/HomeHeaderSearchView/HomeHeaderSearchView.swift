@@ -67,7 +67,7 @@ class HomeHeaderSearchView: UIView {
     private let searchContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = .extraSmall
+        view.layer.cornerRadius = .small
         view.heightAnchor.constraint(equalToConstant: 48).isActive = true
         return view
     }()
