@@ -161,8 +161,9 @@ final class SavedSearchesViewAllSection: SectionDescriptor {
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ViewMoreCell.reuseId, for: indexPath) as? ViewMoreCell else { return UICollectionViewCell() }
-        cell.configure(buttonTitle: item.buttonTitle) { [weak self] in
-            self?.actions.delegate?.savedSearchesDidTapViewAll()
+        let actions = actions
+        cell.configure(buttonTitle: item.buttonTitle) {
+            actions.delegate?.savedSearchesDidTapViewAll()
         }
         return cell
     }

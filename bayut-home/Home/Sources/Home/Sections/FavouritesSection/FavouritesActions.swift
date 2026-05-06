@@ -33,7 +33,7 @@ protocol FavouritesActionsDelegate: AnyObject {
 }
 
 // MARK: - Actions Container
-struct FavouritesActions {
+final class FavouritesActions {
     weak var delegate: FavouritesActionsDelegate?
     
     init(delegate: FavouritesActionsDelegate? = nil) {

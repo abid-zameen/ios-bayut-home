@@ -16,7 +16,7 @@ protocol NewProjectsActionsDelegate: AnyObject {
 }
 
 // MARK: - Actions Container
-struct NewProjectsActions {
+final class NewProjectsActions {
     weak var delegate: NewProjectsActionsDelegate?
     
     init(delegate: NewProjectsActionsDelegate? = nil) {

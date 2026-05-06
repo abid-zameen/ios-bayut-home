@@ -15,12 +15,14 @@ protocol HomePresentationLogic: AnyObject {
     func presentOnboarding()
     func presentOnboardingV2()
     func presentAppReview()
+    func presentOpenLocationSettings()
 }
 
 final class HomePresenter: HomePresentationLogic {
     weak var viewController: HomeDisplayLogic?
     private let adapter: HomeModuleAdapter
     private var lastResponse: Home.Response?
+    private let sectionBuilder = HomeSectionBuilder()
     
     init(adapter: HomeModuleAdapter) {
         self.adapter = adapter
@@ -62,7 +64,19 @@ final class HomePresenter: HomePresentationLogic {
         
         let purposes: [PopularSearchPurpose] = data?.purposes ?? [.buy, .rent]
         
-        let sectionsBuilder = HomeSectionBuilder()
+        let sectionsBuilder = sectionBuilder
+        sectionsBuilder.setDelegate(viewController as? (
+            RecentSearchesActionsDelegate &
+            TruBrokerBannerActionsDelegate &
+            SellerLeadsBannerActionsDelegate &
+            RailingActionsDelegate &
+            SavedSearchesActionsDelegate &
+            NewProjectsActionsDelegate &
+            FavouritesActionsDelegate &
+            PopularSearchActionsDelegate &
+            NearbyLocationsActionsDelegate &
+            BlogsActionsDelegate
+        ))
         let sections = sectionsBuilder.buildSections(sectionsData: Home.HomeSections(
             projects: projects,
             locations: locations,
@@ -81,6 +95,7 @@ final class HomePresenter: HomePresentationLogic {
             showSellerLeadsBanner: data?.showSellerLeadsBanner ?? false,
             marketingBannerConfig: adapter.environment.marketingBannerConfig,
             popularSearchDisplayedLocation: data?.popularSearchDisplayedLocation ?? adapter.utilities.lastSearchedLocations ?? adapter.utilities.defaultCityName,
+            userCoordinates: data?.userCoordinates,
             viewController: viewController)
         )
         
@@ -117,6 +132,12 @@ final class HomePresenter: HomePresentationLogic {
     @MainActor
     func presentAppReview() {
         viewController?.displayAppReview()
+    }
+    
+    func presentOpenLocationSettings() {
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.displayOpenLocationSettings()
+        }
     }
     
     // MARK: - Helpers

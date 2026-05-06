@@ -14,7 +14,7 @@ protocol RailingActionsDelegate: AnyObject {
 }
 
 // MARK: - Actions Container
-struct RailingActions {
+final class RailingActions {
     weak var delegate: RailingActionsDelegate?
     
     init(delegate: RailingActionsDelegate? = nil) {

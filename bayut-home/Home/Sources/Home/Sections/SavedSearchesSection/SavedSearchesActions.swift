@@ -12,6 +12,10 @@ protocol SavedSearchesActionsDelegate: AnyObject {
     func savedSearchesDidTapViewAll()
 }
 
-struct SavedSearchesActions {
+final class SavedSearchesActions {
     weak var delegate: SavedSearchesActionsDelegate?
+    
+    init(delegate: SavedSearchesActionsDelegate? = nil) {
+        self.delegate = delegate
+    }
 }

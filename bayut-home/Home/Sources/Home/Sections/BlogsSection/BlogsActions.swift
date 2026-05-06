@@ -12,6 +12,10 @@ protocol BlogsActionsDelegate: AnyObject {
     func blogsDidTapViewAll()
 }
 
-struct BlogsActions {
+final class BlogsActions {
     weak var delegate: BlogsActionsDelegate?
+    
+    init(delegate: BlogsActionsDelegate? = nil) {
+        self.delegate = delegate
+    }
 }

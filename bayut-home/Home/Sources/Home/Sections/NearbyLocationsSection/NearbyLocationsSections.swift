@@ -62,10 +62,12 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
     
     private let state: Home.DataState<[LocationHit]>
     private let actions: NearbyLocationsActions
+    private let userCoordinates: (lat: Double, lon: Double)?
     
-    init(state: Home.DataState<[LocationHit]>, section: HomeSection?, actions: NearbyLocationsActions) {
+    init(state: Home.DataState<[LocationHit]>, section: HomeSection?, actions: NearbyLocationsActions, userCoordinates: (lat: Double, lon: Double)?) {
         self.state = state
         self.actions = actions
+        self.userCoordinates = userCoordinates
     }
     
     var isShimmering: Bool {
@@ -120,7 +122,7 @@ final class NearbyLocationsCarouselSection: SectionDescriptor {
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NearbyLocationCell.reuseId, for: indexPath) as? NearbyLocationCell else { return UICollectionViewCell() }
         if let location = item.location {
-            let vm = NearbyLocationCellViewModel(location: location)
+            let vm = NearbyLocationCellViewModel(location: location, userCoordinates: userCoordinates)
             cell.configure(with: vm)
         }
         return cell
@@ -171,8 +173,9 @@ final class NearbyLocationMapSection: SectionDescriptor {
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MapCell.reuseId, for: indexPath) as? MapCell else { return UICollectionViewCell() }
-        let vm = MapCellViewModel { [weak self] in
-            self?.actions.delegate?.nearbyLocationsDidTapAllowLocation()
+        let actions = actions
+        let vm = MapCellViewModel {
+            actions.delegate?.nearbyLocationsDidTapAllowLocation()
         }
         cell.configure(with: vm)
         return cell

@@ -12,6 +12,10 @@ protocol PopularSearchActionsDelegate: AnyObject {
     func popularSearchDidSelectSearchItem(at index: Int)
 }
 
-struct PopularSearchActions {
+final class PopularSearchActions {
     weak var delegate: PopularSearchActionsDelegate?
+    
+    init(delegate: PopularSearchActionsDelegate? = nil) {
+        self.delegate = delegate
+    }
 }

@@ -30,7 +30,7 @@ final class ProjectsCollectionViewCell: HighlightableCollectionViewCell {
     private enum Constants {
         static let handover = "handover".localized()
         static let startingFromTitle = "startingFromTitle".localized()
-        static let whatsApp = "whatsapp".localized()
+        static let registerNow = "registerNow".localized()
     }
     
     // MARK: - Properties
@@ -64,7 +64,7 @@ private extension ProjectsCollectionViewCell {
         handOverTitle?.text = Constants.handover
         launchPriceTitle?.text = Constants.startingFromTitle
         
-        whatsappButton?.setTitle(Constants.whatsApp, for: .normal)
+        whatsappButton?.setTitle(Constants.registerNow, for: .normal)
     }
     
     func setupWithViewModel() {

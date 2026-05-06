@@ -12,6 +12,10 @@ protocol NearbyLocationsActionsDelegate: AnyObject {
     func nearbyLocationsDidTapAllowLocation()
 }
 
-struct NearbyLocationsActions {
+final class NearbyLocationsActions {
     weak var delegate: NearbyLocationsActionsDelegate?
+    
+    init(delegate: NearbyLocationsActionsDelegate? = nil) {
+        self.delegate = delegate
+    }
 }

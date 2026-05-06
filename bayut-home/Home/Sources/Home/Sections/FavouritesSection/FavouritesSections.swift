@@ -131,11 +131,12 @@ final class FavouritesCarouselSection: SectionDescriptor {
         if let property = item.property {
             let vm = FavouriteCellViewModel(property: property)
             cell.configure(with: vm)
-            cell.onFavoriteToggle = { [weak self] in
-                self?.actions.delegate?.favouritesDidToggleFavorite(at: indexPath.row, with: property.id)
+            let actions = actions
+            cell.onFavoriteToggle = {
+                actions.delegate?.favouritesDidToggleFavorite(at: indexPath.row, with: property.id)
             }
-            cell.onAction = { [weak self] action in
-                self?.actions.delegate?.favouritesDidTapAction(action, property: property)
+            cell.onAction = { action in
+                actions.delegate?.favouritesDidTapAction(action, property: property)
             }
         }
         return cell
@@ -176,8 +177,9 @@ final class FavouritesViewAllSection: SectionDescriptor {
     
     func configureCell(in collectionView: UICollectionView, at indexPath: IndexPath, with item: Item) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ViewMoreCell.reuseId, for: indexPath) as? ViewMoreCell else { return UICollectionViewCell() }
-        cell.configure(buttonTitle: item.buttonTitle) { [weak self] in
-            self?.actions.delegate?.favouritesDidTapViewAll()
+        let actions = actions
+        cell.configure(buttonTitle: item.buttonTitle) {
+            actions.delegate?.favouritesDidTapViewAll()
         }
         return cell
     }

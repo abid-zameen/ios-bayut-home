@@ -13,7 +13,7 @@ protocol RecentSearchesActionsDelegate: AnyObject {
 }
 
 // MARK: - Actions Container
-struct RecentSearchesActions {
+final class RecentSearchesActions {
     weak var delegate: RecentSearchesActionsDelegate?
     
     init(delegate: RecentSearchesActionsDelegate? = nil) {

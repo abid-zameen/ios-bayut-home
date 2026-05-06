@@ -16,17 +16,20 @@ final class NearbyLocationsGroup: SectionGroup {
     private let isLocationEnabled: Bool
     private let locations: Home.DataState<[LocationHit]>
     private let actions: NearbyLocationsActions
+    private let userCoordinates: (lat: Double, lon: Double)?
     
     init(
         title: String,
         isLocationEnabled: Bool,
         locations: Home.DataState<[LocationHit]>,
-        actions: NearbyLocationsActions
+        actions: NearbyLocationsActions,
+        userCoordinates: (lat: Double, lon: Double)?
     ) {
         self.title = title
         self.isLocationEnabled = isLocationEnabled
         self.locations = locations
         self.actions = actions
+        self.userCoordinates = userCoordinates
     }
     
     func buildSections() -> [AnySection] {
@@ -47,7 +50,8 @@ final class NearbyLocationsGroup: SectionGroup {
             let carouselSection = NearbyLocationsCarouselSection(
                 state: locations,
                 section: section,
-                actions: actions
+                actions: actions,
+                userCoordinates: userCoordinates
             )
             sections.append(AnySection(carouselSection, isCustomizable: false))
         } else {

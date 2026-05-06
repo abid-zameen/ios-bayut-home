@@ -228,8 +228,9 @@ final class NewProjectsCarouselSection: SectionDescriptor {
         if let data = item.data {
             let viewModel = NewProjectCellViewModel(hit: data, showWhatsappButton: showWhatsappButton)
             cell.configure(with: viewModel)
-            cell.whatsappCallback = { [weak self] in
-                self?.actions.delegate?.newProjectsDidTapWhatsapp(hit: data, index: indexPath.item)
+            let actions = actions
+            cell.whatsappCallback = {
+                actions.delegate?.newProjectsDidTapWhatsapp(hit: data, index: indexPath.item)
             }
         }
         return cell
@@ -284,9 +285,8 @@ final class NewProjectsViewAllSection: SectionDescriptor {
         ) as? ViewMoreCell else {
             return UICollectionViewCell()
         }
-        cell.configure(buttonTitle: item.buttonTitle) { [weak self] in
-            guard let self = self else { return }
-            self.actions.delegate?.newProjectsDidTapViewAll(externalID: self.externalID, displayName: self.displayName)
+        cell.configure(buttonTitle: item.buttonTitle) { [actions, externalID, displayName] in
+            actions.delegate?.newProjectsDidTapViewAll(externalID: externalID, displayName: displayName)
         }
         return cell
     }

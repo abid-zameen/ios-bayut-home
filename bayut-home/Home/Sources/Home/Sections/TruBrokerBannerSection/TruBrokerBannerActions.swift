@@ -4,7 +4,7 @@ public protocol TruBrokerBannerActionsDelegate: AnyObject {
     func truBrokerBannerDidTap()
 }
 
-public struct TruBrokerBannerActions {
+public final class TruBrokerBannerActions {
     public weak var delegate: TruBrokerBannerActionsDelegate?
     
     public init(delegate: TruBrokerBannerActionsDelegate?) {
