@@ -34,7 +34,6 @@ let package = Package(
             path: "Sources/Home",
             resources: [
                 .process("Resources/Assets.xcassets"),
-                .process("Resources/Lato"),
                 .process("Resources/Localizable.xcstrings")
             ]
         ),
