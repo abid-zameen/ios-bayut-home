@@ -17,6 +17,7 @@ protocol HomeTrackingLogic {
     func trackSavedSearchClick(at index: Int)
     func trackFavouriteClick(at index: Int)
     func trackNearbyLocationClick(at index: Int)
+    func trackLocationAccess(authorization: String)
 }
 
 extension HomeInteractor: HomeTrackingLogic {
@@ -63,10 +64,13 @@ extension HomeInteractor: HomeTrackingLogic {
         let property = favourites[index]
         tracker?.track(.favouriteClick(position: index + 1, externalID: property.id))
     }
-    
     func trackNearbyLocationClick(at index: Int) {
         guard case .data(let locations) = sectionsData.nearbyLocations.state, index < locations.count else { return }
         let location = locations[index]
         tracker?.track(.nearbyLocationClick(position: index + 1, locationName: location.name ?? ""))
+    }
+    
+    func trackLocationAccess(authorization: String) {
+        tracker?.track(.locationAccess(authorization: authorization))
     }
 }
