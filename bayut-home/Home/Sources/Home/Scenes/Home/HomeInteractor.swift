@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol HomeBusinessLogic: AnyObject {
     func onViewLoad()
@@ -21,20 +22,24 @@ protocol HomeBusinessLogic: AnyObject {
     func didTapWhatsapp(for hit: ProjectHit, index: Int)
 }
 
-final class HomeInteractor: HomeBusinessLogic {
+final class HomeInteractor: NSObject, HomeBusinessLogic {
     let adapter: HomeModuleAdapter
     var presenter: HomePresentationLogic?
     var worker: HomeWorkerLogic
     let tracker: HomeTrackerType?
     var sectionsData = Home.SectionsDataState()
+    private let locationManager: CLLocationManager
     
     // MARK: - Initialization
     init(adapter: HomeModuleAdapter, worker: HomeWorkerLogic, tracker: HomeTrackerType) {
         self.adapter = adapter
         self.worker = worker
         self.tracker = tracker
+        self.locationManager = CLLocationManager()
+        super.init()
         setupStoriesListener()
-        sectionsData.nearbyLocations.isAuthorized = adapter.environment.isLocationAuthorized
+        locationManager.delegate = self
+        updateLocationStatus()
         
         if adapter.environment.shouldFetchPopularSectionViaElasticSearch {
             sectionsData.popularSearch.state = .loading
@@ -173,7 +178,8 @@ final class HomeInteractor: HomeBusinessLogic {
             recentSearches: sectionsData.recentSearches.state,
             showTruBrokerBanner: sectionsData.banners.showTruBroker,
             showSellerLeadsBanner: sectionsData.banners.showSellerLeads,
-            popularSearchDisplayedLocation: sectionsData.popularSearch.displayedLocationName
+            popularSearchDisplayedLocation: sectionsData.popularSearch.displayedLocationName,
+            userCoordinates: sectionsData.nearbyLocations.userCoordinates
         )
         presenter?.presentData(data: response, animated: animated)
     }
@@ -498,23 +504,100 @@ extension HomeInteractor {
     private func fetchNearbyLocations() async {
         guard !adapter.environment.isOnboardingInProgress else { return }
         
-        guard sectionsData.nearbyLocations.isAuthorized, let coords = adapter.environment.userCoordinates else {
+        guard sectionsData.nearbyLocations.isAuthorized else {
             sectionsData.nearbyLocations.state = .empty
             await MainActor.run { presentData() }
             return
         }
         
-        do {
-            let locations = try await worker.fetchNearbyLocations(latitude: coords.lat, longitude: coords.lon)
-            sectionsData.nearbyLocations.state = locations.isEmpty ? .empty : .data(locations)
-        } catch {
-            sectionsData.nearbyLocations.state = .empty
-        }
+        sectionsData.nearbyLocations.state = .loading
         await MainActor.run { presentData() }
+        return
     }
     
     func requestLocationAuthorization() {
-        adapter.environment.requestLocationAuthorization()
+        let status = locationManager.authorizationStatus
+        
+        if status == .notDetermined {
+            sectionsData.nearbyLocations.state = .loading
+            presentData()
+            locationManager.requestWhenInUseAuthorization()
+            locationManager.startUpdatingLocation()
+        } else if status == .authorizedWhenInUse || status == .authorizedAlways {
+            sectionsData.nearbyLocations.state = .loading
+            presentData()
+            locationManager.startUpdatingLocation()
+        } else if status == .denied || status == .restricted {
+            presenter?.presentOpenLocationSettings()
+        }
+    }
+    
+    func updateLocationStatus() {
+        let status = locationManager.authorizationStatus
+        let isAuthorized = (status == .authorizedWhenInUse || status == .authorizedAlways)
+        sectionsData.nearbyLocations.isAuthorized = isAuthorized
+        
+        if isAuthorized {
+            locationManager.startUpdatingLocation()
+        }
+    }
+    
+    func requestNearbyLocations(coordinates: CLLocationCoordinate2D?) {
+        guard let coords = coordinates else { return }
+        sectionsData.nearbyLocations.isAuthorized = true
+        sectionsData.nearbyLocations.userCoordinates = (lat: coords.latitude, lon: coords.longitude)
+        Task {
+            let locations = try await worker.fetchNearbyLocations(latitude: coords.latitude, longitude: coords.longitude)
+            sectionsData.nearbyLocations.state = locations.isEmpty ? .empty : .data(locations)
+            await MainActor.run { presentData(animated: true) }
+        }
+    }
+    
+    func didUpdateLocationStatus(isAuthorized: Bool) {
+        sectionsData.nearbyLocations.isAuthorized = isAuthorized
+        if !isAuthorized {
+            sectionsData.nearbyLocations.state = .empty
+            presentData()
+        }
+    }
+}
+
+// MARK: - CLLocationManagerDelegate
+extension HomeInteractor: CLLocationManagerDelegate {
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        handleAuthorizationStatus(manager.authorizationStatus)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        handleAuthorizationStatus(status)
+    }
+    
+    private func handleAuthorizationStatus(_ status: CLAuthorizationStatus) {
+        let isAuthorized = (status == .authorizedWhenInUse || status == .authorizedAlways)
+        sectionsData.nearbyLocations.isAuthorized = isAuthorized
+        
+        if isAuthorized {
+            sectionsData.nearbyLocations.state = .loading
+            presentData()
+            locationManager.startUpdatingLocation()
+            trackLocationAccess(authorization: "Allow")
+        } else if status == .denied || status == .restricted {
+            sectionsData.nearbyLocations.state = .empty
+            presentData()
+            trackLocationAccess(authorization: "Deny")
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        locationManager.stopUpdatingLocation()
+        requestNearbyLocations(coordinates: location.coordinate)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        sectionsData.nearbyLocations.state = .empty
+        presentData()
     }
 }
 

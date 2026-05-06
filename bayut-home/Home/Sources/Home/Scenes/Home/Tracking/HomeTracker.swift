@@ -41,6 +41,7 @@ extension HomeTracker {
         case favouriteClick(position: Int, externalID: String)
         case nearbyLocationClick(position: Int, locationName: String)
         case bannerClick(pageSection: String, title: String)
+        case locationAccess(authorization: String)
 
         // MARK: - Event Names
         var name: String {
@@ -55,6 +56,7 @@ extension HomeTracker {
             case .favouriteClick: return "favourite_property_click"
             case .nearbyLocationClick: return "nearby_location_click"
             case .bannerClick: return "banner_click"
+            case .locationAccess: return "location_access"
             }
         }
 
@@ -110,6 +112,9 @@ extension HomeTracker {
             case let .bannerClick(pageSection, title):
                 params["page_section"] = pageSection
                 params["item_name"] = title
+            case let .locationAccess(authorization):
+                params["page_section"] = "location_access"
+                params["item_name"] = authorization
             }
 
             return params

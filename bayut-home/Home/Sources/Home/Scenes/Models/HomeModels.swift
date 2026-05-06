@@ -43,6 +43,7 @@ struct Home {
         let showSellerLeadsBanner: Bool
         let marketingBannerConfig: MarketingBannerConfig?
         let popularSearchDisplayedLocation: String?
+        let userCoordinates: (lat: Double, lon: Double)?
         let viewController: HomeViewController
     }
     
@@ -62,6 +63,7 @@ struct Home {
         var showSellerLeadsBanner: Bool = false
         var marketingBannerConfig: MarketingBannerConfig? = nil
         var popularSearchDisplayedLocation: String? = nil
+        var userCoordinates: (lat: Double, lon: Double)? = nil
     }
 
     struct SectionsDataState {
@@ -94,6 +96,7 @@ struct Home {
     struct NearbyLocationsState {
         var state: Home.DataState<[LocationHit]> = .loading
         var isAuthorized: Bool = false
+        var userCoordinates: (lat: Double, lon: Double)?
     }
 
     struct PopularSearchState {

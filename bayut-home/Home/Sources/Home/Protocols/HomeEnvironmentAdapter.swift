@@ -20,10 +20,7 @@ public protocol HomeEnvironmentAdapter {
     var storiesViewHeight: CGFloat { get }
     var shouldFetchPopularSectionViaElasticSearch: Bool { get }
     var isSellerLeadsEnabled: Bool { get }
-    var userCoordinates: (lat: Double, lon: Double)? { get }
     var isRailingAutoScrollEnabled: Bool { get }
-    var isLocationAuthorized: Bool { get }
-    func requestLocationAuthorization()
     var recentSearchesProvider: RecentSearchesProvider { get }
     var marketingBannerConfig: MarketingBannerConfig? { get }
     var isAppOnboardingEnabled: Bool { get }

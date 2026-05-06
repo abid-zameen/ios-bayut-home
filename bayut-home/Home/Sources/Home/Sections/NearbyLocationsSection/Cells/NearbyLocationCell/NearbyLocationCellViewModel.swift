@@ -21,15 +21,15 @@ final class NearbyLocationCellViewModel: NearbyLocationCellViewModelType {
     var locationCity: String
     let location: LocationHit
     
-    init(location: LocationHit) {
+    init(location: LocationHit, userCoordinates: (lat: Double, lon: Double)?) {
         self.location = location
         self.locationName = location.localizedName
         self.locationCity = location.hierarchy?.first(where: { $0.level == 1 })?.localizedName ?? ""
-        self.locationDistance = Self.distanceString(for: location)
+        self.locationDistance = Self.distanceString(for: location, userCoordinates: userCoordinates)
     }
     
-    private static func distanceString(for location: LocationHit) -> String {
-        guard let userCoordinates = HomeModule.shared.environment.userCoordinates,
+    private static func distanceString(for location: LocationHit, userCoordinates: (lat: Double, lon: Double)?) -> String {
+        guard let userCoordinates = userCoordinates,
               let geo = location.geography else {
             return ""
         }

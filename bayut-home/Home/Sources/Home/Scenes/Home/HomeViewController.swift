@@ -16,6 +16,7 @@ protocol HomeDisplayLogic: AnyObject {
     func displayOnboarding()
     func displayOnboardingV2()
     func displayAppReview()
+    func displayOpenLocationSettings()
 }
 
 final class HomeViewController: UIViewController, HomeDisplayLogic {
@@ -202,6 +203,11 @@ final class HomeViewController: UIViewController, HomeDisplayLogic {
 
     func displayAppReview() {
         router?.routeToAppReview()
+    }
+    
+    func displayOpenLocationSettings() {
+        guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(settingsURL)
     }
 
     private func setupAutoscrolling(for sections: [AnySection]) {
