@@ -34,6 +34,13 @@ struct AnimatableElement {
     var collapsedAlpha: CGFloat = 1.0
     var alphaStartProgress: CGFloat = 0.0
     var alphaEndProgress: CGFloat = 1.0
+    
+    var expandedScale: CGFloat = 1.0
+    var collapsedScale: CGFloat = 1.0
+    var scaleStartProgress: CGFloat = 0.0
+    var scaleEndProgress: CGFloat = 1.0
+    var anchorTrailing: Bool = false
+    
     var constraintEndProgress: CGFloat = 1.0
     var hideThreshold: CGFloat? = nil
     var activeVariants: Set<HeaderVariant>? = nil
@@ -76,6 +83,24 @@ final class HeaderAnimationEngine {
                 element.view?.alpha = lerp(from: element.expandedAlpha, to: element.collapsedAlpha, progress: localProgress)
             }
 
+            if element.expandedScale != 1.0 || element.collapsedScale != 1.0 {
+                let scaleRange = element.scaleEndProgress - element.scaleStartProgress
+                let localScaleProgress = scaleRange > 0
+                    ? min(1, max(0, (progress - element.scaleStartProgress) / scaleRange))
+                    : progress
+                
+                let s = lerp(from: element.expandedScale, to: element.collapsedScale, progress: localScaleProgress)
+                var transform = CGAffineTransform(scaleX: s, y: s)
+                
+                if element.anchorTrailing, let view = element.view, s > 0 {
+                    // Shift center to keep trailing edge fixed when scaling from middle
+                    let width = view.bounds.width
+                    let tx = (1 - s) * (width / 2)
+                    transform = transform.translatedBy(x: tx / s, y: 0)
+                }
+                
+                element.view?.transform = transform
+            }
 
             if let threshold = element.hideThreshold {
                 element.view?.isHidden = progress > threshold

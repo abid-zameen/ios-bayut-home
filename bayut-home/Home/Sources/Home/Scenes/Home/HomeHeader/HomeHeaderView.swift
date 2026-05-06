@@ -313,18 +313,20 @@ class HomeHeaderView: UIView {
             view: logoImageView,
             topConstraint: nil, expandedTop: 0, collapsedTop: 0,
             expandedAlpha: 1, collapsedAlpha: 0,
-            alphaStartProgress: 0, alphaEndProgress: 0.3
+            alphaStartProgress: 0, alphaEndProgress: 0.25
         )
         
         let buildingsElement = AnimatableElement(
             view: backgroundImageView,
-            topConstraint: nil,
-            expandedTop: 0, collapsedTop: 0,
-            secondaryConstraint: backgroundHeightConstraint,
-            expandedSecondary: layout.buildingsExpandedHeight, collapsedSecondary: 0,
+            topConstraint: backgroundTopConstraint,
+            expandedTop: layout.buildingsExpandedTop,
+            collapsedTop: layout.buildingsExpandedTop - 40,
             expandedAlpha: 1, collapsedAlpha: 0,
             alphaStartProgress: 0, alphaEndProgress: 0.5,
-            constraintEndProgress: 0.5
+            expandedScale: 1.0, collapsedScale: 0.0,
+            scaleStartProgress: 0.1, scaleEndProgress: 1.0,
+            anchorTrailing: true,
+            constraintEndProgress: 0.2
         )
         
         let topCurveElement = AnimatableElement(
@@ -366,7 +368,7 @@ class HomeHeaderView: UIView {
                 topConstraint: contentTopConstraint,
                 expandedTop: layout.tabsExpandedTop, collapsedTop: layout.tabsCollapsedTopGCC,
                 expandedAlpha: 1, collapsedAlpha: 0,
-                alphaStartProgress: 0, alphaEndProgress: 0.3,
+                alphaStartProgress: 0.2, alphaEndProgress: 0.5,
                 hideThreshold: 0.8
             )
             
